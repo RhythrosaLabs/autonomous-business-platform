@@ -1,0 +1,85 @@
+# =============================================================================
+# Docker Compose Configuration - Autonomous Business Platform Pro
+# =============================================================================
+# Simplified deployment with volume mounting and environment management
+# =============================================================================
+
+version: '3.8'
+
+services:
+  # Main application service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: autonomous-business-platform
+    image: autonomous-business-platform:latest
+    
+    # Port mapping (host:container)
+    ports:
+      - "8501:8501"
+    
+    # Environment variables from .env file
+    env_file:
+      - .env
+    
+    # Volume mounts for persistent data
+    volumes:
+      # Persistent data directories
+      - ./campaigns:/app/campaigns
+      - ./sessions:/app/sessions
+      - ./workflows:/app/workflows
+      - ./task_artifacts:/app/task_artifacts
+      - ./runs:/app/runs
+      
+      # Optional: Mount .env for hot-reload during development
+      # - ./.env:/app/.env
+      
+      # Optional: Mount YouTube credentials if they exist
+      # - ./token.pickle:/app/token.pickle:ro
+      # - ./client_secret.json:/app/client_secret.json:ro
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits (adjust based on your system)
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
+          memory: 8G
+        reservations:
+          cpus: '2.0'
+          memory: 4G
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    # Network configuration
+    networks:
+      - app-network
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Networks
+networks:
+  app-network:
+    driver: bridge
+
+# Volumes (optional: use named volumes instead of bind mounts)
+# volumes:
+#   campaigns:
+#   sessions:
+#   workflows:
+#   task_artifacts:
+#   runs:

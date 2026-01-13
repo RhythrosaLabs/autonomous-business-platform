@@ -1,0 +1,49 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Environment
+.env
+.env.local
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application
+temp_files/
+temp_uploads/
+outputs/
+runs/
+task_artifacts/
+*.log
+campaign_assets.zip
+
+# Generated content
+campaigns/
+products/
+library/
+
+# Ray
+/tmp/ray
+
+# Database
+*.db
+*.db-journal

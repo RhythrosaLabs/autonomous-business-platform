@@ -1,0 +1,151 @@
+{
+  "templates": [
+    {
+      "id": "brand_20251204153341",
+      "name": "Husky Haven",
+      "tagline": "Unleash the Pack Within",
+      "description": "Husky Haven is a haven for husky lovers, offering a curated selection of unique, high-quality products that celebrate the spirit of these majestic creatures. Our mission is to bring people together through a shared passion for huskies, while promoting responsible pet ownership and supporting animal welfare initiatives.",
+      "created_at": "2025-12-04T15:33:41.543276",
+      "ai_generated": true,
+      "original_prompt": "shop that sells husky themed stuff",
+      "market_analysis": "The pet industry is growing rapidly, with the global market expected to reach $281 billion by 2023. The husky-themed market is niche but has a dedicated following. Competitors such as Husky Squad, Husky Lovers, and Pawfect Pets have found success through social media engagement, influencer partnerships, and offering unique products. To stand out, Husky Haven will focus on high-quality products, strong community building, and supporting animal welfare initiatives.",
+      "success_factors": [
+        "Strong community building through social media and events",
+        "High-quality, unique products that appeal to husky enthusiasts",
+        "Partnerships with animal welfare organizations and influencers"
+      ],
+      "colors": {
+        "primary": "#4567b7",
+        "secondary": "#8bc34a",
+        "accent": "#ffd700",
+        "background": "#ffffff",
+        "text": "#333333"
+      },
+      "fonts": {
+        "heading_family": "Montserrat",
+        "heading_weight": "700",
+        "heading_size": "32px",
+        "body_family": "Open Sans",
+        "body_weight": "400",
+        "body_size": "16px",
+        "accent_family": "Poppins",
+        "accent_weight": "600"
+      },
+      "background_style": "Light & Clean",
+      "font_style": "Modern Sans-Serif",
+      "image_style": "Photorealistic",
+      "voice": "Friendly & Casual",
+      "target_audience": "Demographics: Women and men aged 25-45, middle to upper-middle class, living in urban and suburban areas. Psychographics: Animal lovers, outdoor enthusiasts, and individuals who value loyalty, friendship, and adventure. They are active on social media, enjoy sharing content, and are likely to participate in online communities related to huskies.",
+      "content_tone": [
+        "Informative",
+        "Entertaining",
+        "Inspirational"
+      ],
+      "emoji_usage": "Moderate",
+      "hashtags": [
+        "#HuskyLove",
+        "#HuskySquad",
+        "#DogLovers",
+        "#PetParents",
+        "#AnimalWelfare",
+        "#OutdoorAdventures"
+      ],
+      "keywords": [
+        "husky",
+        "husky lovers",
+        "dog owners",
+        "pet accessories",
+        "outdoor gear",
+        "animal welfare"
+      ],
+      "avoid_words": [
+        "cute",
+        "puppy"
+      ],
+      "cta_text": "Join the Pack!",
+      "platforms": {
+        "instagram": {
+          "grid_style": "Consistent Colors",
+          "caption_length": "Medium (3-5 lines)"
+        },
+        "twitter": {
+          "style": "Concise & Punchy",
+          "include_link": true
+        },
+        "pinterest": {
+          "style": "Product Focused",
+          "keywords": [
+            "husky gifts",
+            "dog accessories",
+            "outdoor gear",
+            "animal welfare"
+          ]
+        },
+        "email": {
+          "greeting": "Hello, fellow husky lover!",
+          "signature": "Stay loyal, stay wild!"
+        }
+      }
+    }
+  ],
+  "font_presets": {
+    "modern_clean": {
+      "name": "Modern & Clean",
+      "heading_family": "Montserrat",
+      "heading_weight": "700",
+      "body_family": "Open Sans",
+      "body_weight": "400"
+    },
+    "elegant_serif": {
+      "name": "Elegant Serif",
+      "heading_family": "Playfair Display",
+      "heading_weight": "700",
+      "body_family": "Lora",
+      "body_weight": "400"
+    },
+    "bold_impact": {
+      "name": "Bold Impact",
+      "heading_family": "Oswald",
+      "heading_weight": "700",
+      "body_family": "Roboto",
+      "body_weight": "400"
+    },
+    "friendly_rounded": {
+      "name": "Friendly & Rounded",
+      "heading_family": "Nunito",
+      "heading_weight": "800",
+      "body_family": "Quicksand",
+      "body_weight": "500"
+    },
+    "minimalist": {
+      "name": "Minimalist",
+      "heading_family": "Inter",
+      "heading_weight": "600",
+      "body_family": "Inter",
+      "body_weight": "400"
+    },
+    "vintage_retro": {
+      "name": "Vintage Retro",
+      "heading_family": "Abril Fatface",
+      "heading_weight": "400",
+      "body_family": "Merriweather",
+      "body_weight": "400"
+    },
+    "tech_modern": {
+      "name": "Tech & Modern",
+      "heading_family": "Space Grotesk",
+      "heading_weight": "700",
+      "body_family": "IBM Plex Sans",
+      "body_weight": "400"
+    },
+    "handwritten": {
+      "name": "Handwritten Feel",
+      "heading_family": "Pacifico",
+      "heading_weight": "400",
+      "body_family": "Caveat",
+      "body_weight": "500"
+    }
+  },
+  "active_brand": "brand_20251204153341",
+  "updated_at": "2025-12-04T15:33:41.544749"
+}
