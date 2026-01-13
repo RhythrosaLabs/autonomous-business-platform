@@ -7,7 +7,11 @@ from typing import Tuple
 from PIL import Image
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
-from rembg import remove
+try:
+    from rembg import remove
+    HAS_REMBG = True
+except ImportError:
+    HAS_REMBG = False
 
 class ImageManager:
     """Manages image history and local storage"""
@@ -46,7 +50,12 @@ class ImageManager:
             
             image = Image.open(io.BytesIO(response.content))
             # Use rembg for robust background removal
-            result = remove(image)
+            # Use rembg for robust background removal
+            if HAS_REMBG:
+                result = remove(image)
+            else:
+                # Fallback: use simple transparency method
+                result = self._make_transparent(image)
             # rembg may return a PIL Image, numpy array, or bytes
             if isinstance(result, Image.Image):
                 result.save(filepath, "PNG")

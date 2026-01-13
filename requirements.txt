@@ -1,73 +1,65 @@
 # ============================================================================
 # AUTONOMOUS BUSINESS PLATFORM - DEPENDENCIES
 # ============================================================================
-# Complete production-ready requirements for automated e-commerce system
-# Last Updated: November 12, 2024
+# Streamlit Cloud compatible requirements
+# Python 3.11 required (see .python-version or runtime.txt)
 # ============================================================================
 
 # === CORE WEB FRAMEWORK ===
-streamlit>=1.28.0              # Modern web UI framework
+streamlit>=1.28.0,<1.53.0
 
 # === AI & MACHINE LEARNING ===
-replicate>=0.20.0              # Replicate API for AI models
-torch>=2.0.0                   # PyTorch for local AI models
-diffusers>=0.21.0              # Hugging Face Diffusers
-transformers>=4.30.0           # Hugging Face Transformers
-accelerate>=0.20.0             # Model acceleration
-safetensors>=0.3.0             # Safe tensor serialization
-sentencepiece>=0.1.99          # Text tokenization
+replicate>=0.20.0
+torch>=2.0.0,<2.9.0
+diffusers>=0.21.0,<0.36.0
+transformers>=4.30.0,<4.58.0
+accelerate>=0.20.0,<1.13.0
+safetensors>=0.3.0,<0.8.0
+sentencepiece>=0.1.99,<0.3.0
 
-# === DISTRIBUTED COMPUTING ===
-ray[default]>=2.9.0            # Ray for distributed task execution (optional)
+# === DISTRIBUTED COMPUTING (Optional) ===
+# ray[default]>=2.9.0  # Commented out - causes issues on Streamlit Cloud
 
 # === IMAGE PROCESSING ===
-Pillow>=10.0.0                 # PIL image manipulation
-rembg>=2.0.50                  # Background removal
-opencv-python>=4.8.0           # Computer vision operations
+Pillow>=10.0.0,<13.0.0
+opencv-python>=4.8.0,<5.0.0
+# rembg>=2.0.50  # Commented out - has Python 3.13 issues, optional feature
 
 # === VIDEO PROCESSING ===
-moviepy>=1.0.3                 # Video editing and composition
-ffmpeg-python>=0.2.0           # FFmpeg Python bindings
+moviepy>=1.0.3,<3.0.0
+ffmpeg-python>=0.2.0
 
 # === HTTP & API ===
-requests>=2.31.0               # HTTP library
-urllib3>=2.0.0                 # HTTP client
-httpx>=0.24.0                  # Modern HTTP client
+requests>=2.31.0
+urllib3>=2.0.0
+httpx>=0.24.0
 
 # === DATA & FILES ===
-python-dotenv>=1.0.0           # Environment variable management
-pandas>=2.0.0                  # Data manipulation
-fpdf2>=2.7.0                   # PDF generation
-openpyxl>=3.1.0                # Excel file support
+python-dotenv>=1.0.0
+pandas>=2.0.0
+fpdf2>=2.7.0
+openpyxl>=3.1.0
 
 # === E-COMMERCE INTEGRATIONS ===
-ShopifyAPI>=12.0.0             # Shopify REST API client
-printify-python>=0.1.0         # Printify API (if available)
+ShopifyAPI>=12.0.0
+# printify-python>=0.1.0  # NOT AVAILABLE - we use local printify.py module
 
 # === GOOGLE APIs (YouTube) ===
-google-auth>=2.20.0            # Google authentication
-google-auth-oauthlib>=1.0.0    # OAuth 2.0 for Google
-google-auth-httplib2>=0.1.0    # HTTP library for Google Auth
-google-api-python-client>=2.95.0  # YouTube Data API
+google-auth>=2.20.0
+google-auth-oauthlib>=1.0.0
+google-auth-httplib2>=0.1.0
+google-api-python-client>=2.95.0
 
 # === BROWSER AUTOMATION ===
-selenium>=4.15.0               # Browser automation for social media posting
-webdriver-manager>=4.0.1       # Automatic ChromeDriver management
-browser-use>=0.10.1            # AI-powered browser automation with LangChain (UPGRADED)
-browser-use-sdk>=0.1.0         # Browser-use cloud SDK for stealth browser (NEW)
-playwright>=1.49.0             # Modern browser automation (requires: playwright install)
-langchain-openai>=0.1.0        # LangChain OpenAI integration for browser-use
-langchain-anthropic>=0.3.1     # Anthropic Claude for browser-use (NEW)
+selenium>=4.15.0
+webdriver-manager>=4.0.1
+playwright>=1.49.0
+langchain-openai>=0.1.0
+langchain-anthropic>=0.3.1
+# browser-use>=0.10.1  # Optional - may have compatibility issues
+# browser-use-sdk>=0.1.0  # Optional
 
 # === UTILITIES ===
-python-dateutil>=2.8.2         # Date/time utilities
-pytz>=2023.3                   # Timezone support
-certifi>=2023.5.7              # SSL certificates
-
-# === OPTIONAL (GUI - if using Qt components) ===
-# PyQt5>=5.15.0                # Uncomment if Qt UI needed
-
-# === DEVELOPMENT (Optional) ===
-# pytest>=7.4.0                # Testing framework
-# black>=23.7.0                # Code formatter
-# flake8>=6.1.0                # Linting
+python-dateutil>=2.8.2
+pytz>=2023.3
+certifi>=2023.5.7
