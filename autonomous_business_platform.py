@@ -72,9 +72,19 @@ def get_tab_renderer(tab_name: str):
     try:
         module = __import__(module_name, fromlist=[func_name])
         return getattr(module, func_name)
-    except (ImportError, AttributeError) as e:
-        st.error(f"Error loading tab: {str(e)}")
+    except ImportError as e:
+        st.error(f"❌ Failed to load tab module '{module_name}'")
+        with st.expander("🔍 Debug Info"):
+            st.code(f"Import Error: {str(e)}")
+            st.info(f"Looking for: {module_name}.py in sys.path")
+            st.code(f"sys.path includes:\n" + "\n".join(sys.path[:5]))
+        logger.error(f"ImportError loading {module_name}: {e}")
         return None
+    except AttributeError as e:
+        st.error(f"❌ Function '{func_name}' not found in module '{module_name}'")
+        with st.expander("🔍 Debug Info"):
+            st.code(f"AttributeError: {str(e)}")
+        logger.error(f"AttributeError in {module_name}: {e}")
 
 # ========================================
 # APP CONFIGURATION
