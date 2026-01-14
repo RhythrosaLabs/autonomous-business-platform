@@ -6,6 +6,7 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
+from secure_config import render_secure_config_ui, init_api_clients, is_demo_mode, get_api_key
 from enhanced_features import GlobalSearchManager
 from tab_visibility_manager import (
     initialize_tab_visibility,
@@ -18,6 +19,7 @@ from shopify_service import ShopifyAPI
 from platform_helpers import _get_replicate_token
 from platform_integrations import render_recovery_check
 from performance_optimizations import render_performance_settings
+from secure_config import render_secure_config_ui, init_secure_config, get_api_key
 try:
     from background_tasks import get_task_manager, TaskState
     BACKGROUND_TASKS_AVAILABLE = True
@@ -155,98 +157,15 @@ def render_sidebar(
                 tab1, tab2, tab3, tab_shortcuts, tab4, tab5, tab6, tab7 = settings_tabs
                 
                 with tab1:
-                    st.markdown("#### API Configuration")
-        
-                    st.info("💡 **Get your free API key:** [replicate.com/account/api-tokens](https://replicate.com/account/api-tokens)")
-        
-                    # Check current token status from session state (persists across pages)
-                    current_replicate = st.session_state.api_keys.get('replicate', '')
-                    current_printify = st.session_state.api_keys.get('printify', '')
-        
-                    if current_replicate:
-                        st.success(f"✅ Replicate API Key is ACTIVE (ends with ...{current_replicate[-8:]})")
-                    else:
-                        st.error("❌ NO REPLICATE API KEY - PLATFORM WILL NOT WORK")
-                        st.error("⚠️ Add your API key below to enable AI generation")
-        
-                    if current_printify:
-                        st.success(f"✅ Printify API Token is ACTIVE (ends with ...{current_printify[-8:]})")
-                    else:
-                        st.info("ℹ️ No Printify token - publishing disabled")
-        
-                    st.markdown("---")
-        
-                    # API Keys Status (Read-only from .env)
-                    st.info("💡 **API credentials are configured in your `.env` file**")
-        
-                    st.markdown("**Current Configuration:**")
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        if current_replicate:
-                            st.success(f"✅ Replicate  \n`...{current_replicate[-8:]}`")
-                        else:
-                            st.error("❌ Replicate  \nNot set")
-                    with col2:
-                        if current_printify:
-                            st.success(f"✅ Printify  \n`...{current_printify[-8:]}`")
-                        else:
-                            st.error("❌ Printify  \nNot set")
-                    with col3:
-                        if st.session_state.api_keys.get('printify_shop_id'):
-                            st.success(f"✅ Shop ID  \n`{st.session_state.api_keys['printify_shop_id']}`")
-                        else:
-                            st.warning("⚠️ Shop ID  \nNot set")
-        
-                    st.caption("To update credentials, edit your `.env` file and restart the app.")
-        
-                    # Shopify Configuration
-                    st.markdown("---")
-                    st.markdown("#### Shopify (Analytics & Blog Publishing)")
-        
-                    # Initialize Shopify keys in session state from .env
-                    if 'shopify_url' not in st.session_state:
-                        st.session_state.shopify_url = os.getenv('SHOPIFY_SHOP_URL', '')
-                    if 'shopify_api_key' not in st.session_state:
-                        st.session_state.shopify_api_key = os.getenv('SHOPIFY_API_KEY', '')
-                    if 'shopify_api_secret' not in st.session_state:
-                        st.session_state.shopify_api_secret = os.getenv('SHOPIFY_API_SECRET', '')
-                    if 'shopify_access_token' not in st.session_state:
-                        st.session_state.shopify_access_token = os.getenv('SHOPIFY_ACCESS_TOKEN', '')
-        
-                    # Status display - check for either API key/secret OR access token
-                    shopify_configured = (
-                        st.session_state.shopify_url and 
-                        (st.session_state.shopify_access_token or 
-                         (st.session_state.shopify_api_key and st.session_state.shopify_api_secret))
-                    )
-        
-                    if shopify_configured:
-                        auth_method = "Access Token" if st.session_state.shopify_access_token else "API Key + Secret"
-                        st.success(f"✅ Shopify Connected: `{st.session_state.shopify_url}` ({auth_method})")
-        
-                        if st.button("🧪 Test Shopify Connection", use_container_width=True):
-                            try:
-                                # Use the globally initialized API or create new one
-                                if st.session_state.shopify_api:
-                                    shopify = st.session_state.shopify_api
-                                else:
-                                    from shopify_service import ShopifyAPI
-                                    shopify = ShopifyAPI()  # Will auto-load from .env
-        
-                                if shopify.test_connection():
-                                    st.success("✅ Shopify connection verified!")
-                                    st.info("💬 Try asking the Chat Assistant: 'How many products are in my shop?'")
-                                    st.balloons()
-                            except Exception as e:
-                                st.error(f"❌ Connection failed: {str(e)}")
-                    else:
-                        st.warning("⚠️ Shopify not configured")
-                        st.caption("Configure in `.env` file with either:")
-                        st.code("SHOPIFY_SHOP_URL=yourstore.myshopify.com\nSHOPIFY_ACCESS_TOKEN=shpat_xxxxx", language="bash")
-                        st.caption("OR")
-                        st.code("SHOPIFY_SHOP_URL=yourstore.myshopify.com\nSHOPIFY_API_KEY=xxxxx\nSHOPIFY_API_SECRET=xxxxx", language="bash")
-        
-        with tab2:
+                    # Use the new secure configuration UI
+                    try:
+                        render_secure_config_ui()
+                    except Exception as e:
+                        st.error(f"Error loading API configuration: {str(e)}")
+                        # Fallback to basic display
+                        st.markdown("#### API Configuration")
+                        st.info("Please configure your API keys in the .env file or use Streamlit Cloud secrets.")
+                with tab2:
                     st.markdown("#### YouTube Video Publishing")
                     st.markdown("*Configure OAuth 2.0 credentials for automated video uploads*")
         
