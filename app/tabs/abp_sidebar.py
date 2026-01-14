@@ -6,7 +6,7 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
-from secure_config import render_secure_config_ui, init_api_clients, is_demo_mode, get_api_key
+from app.services.secure_config import render_secure_config_ui, init_api_clients, is_demo_mode, get_api_key
 from enhanced_features import GlobalSearchManager
 from tab_visibility_manager import (
     initialize_tab_visibility,
@@ -19,7 +19,7 @@ from shopify_service import ShopifyAPI
 from platform_helpers import _get_replicate_token
 from platform_integrations import render_recovery_check
 from performance_optimizations import render_performance_settings
-from secure_config import render_secure_config_ui, init_secure_config, get_api_key
+from app.services.secure_config import render_secure_config_ui, init_secure_config, get_api_key
 try:
     from background_tasks import get_task_manager, TaskState
     BACKGROUND_TASKS_AVAILABLE = True
