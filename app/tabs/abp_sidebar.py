@@ -19,7 +19,6 @@ from shopify_service import ShopifyAPI
 from platform_helpers import _get_replicate_token
 from platform_integrations import render_recovery_check
 from performance_optimizations import render_performance_settings
-from app.services.secure_config import render_secure_config_ui, init_secure_config, get_api_key
 try:
     from background_tasks import get_task_manager, TaskState
     BACKGROUND_TASKS_AVAILABLE = True
