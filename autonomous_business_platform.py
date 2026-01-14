@@ -1,6 +1,12 @@
 # Ensure all necessary imports are included at the top of the file
 # Fix SDL threading issue on macOS - must be set before any imports
 import os
+import sys
+# Add app directories to path for Streamlit Cloud (symlinks may not work)
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app', 'tabs'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app', 'services'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'app', 'utils'))
+sys.path.insert(0, os.path.dirname(__file__))
 os.environ['SDL_VIDEODRIVER'] = 'dummy'
 os.environ['SDL_AUDIODRIVER'] = 'dummy'
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
