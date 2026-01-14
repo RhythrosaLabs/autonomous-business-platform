@@ -610,7 +610,7 @@ def render_file_library_tab():
         with prod_tabs[1]:
             st.markdown("#### 👕 Printify Integration")
             try:
-                from printify import PrintifyClient
+                from api_service import PrintifyAPI as PrintifyClient
                 printify_token = st.session_state.get('printify_api_key') or os.getenv('PRINTIFY_API_TOKEN')
                 
                 if printify_token:

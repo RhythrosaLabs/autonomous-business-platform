@@ -48,7 +48,7 @@ def render_analytics_tab():
             # Try to initialize from credentials
             if os.getenv('PRINTIFY_API_TOKEN'):
                 try:
-                    from printify import PrintifyAPI
+                    from api_service import PrintifyAPI
                     st.session_state.printify_api = PrintifyAPI(
                         api_token=os.getenv('PRINTIFY_API_TOKEN'),
                         shop_id=os.getenv('PRINTIFY_SHOP_ID')
@@ -416,7 +416,7 @@ def render_analytics_tab():
         else:
             try:
                 with st.spinner("Loading Printify products..."):
-                    from printify import PrintifyAPI
+                    from api_service import PrintifyAPI
                     api = st.session_state.printify_api
                     
                     # Get shops

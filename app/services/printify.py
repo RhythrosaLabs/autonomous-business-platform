@@ -191,7 +191,12 @@ from api_service import PrintifyAPI, ReplicateAPI
 from local_models_manager import LocalModelsManager
 from database_manager import DatabaseManager
 from image_manager import ImageManager
-from dialogs import TemplateDialog, PriceRuleDialog, ScheduleDialog
+try:
+    from dialogs import TemplateDialog, PriceRuleDialog, ScheduleDialog
+    HAS_DIALOGS = True
+except ImportError:
+    HAS_DIALOGS = False
+    TemplateDialog = PriceRuleDialog = ScheduleDialog = None
 
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, 
@@ -234,7 +239,10 @@ from data_models import APIConfig, ProductTemplate, PriceRule, ProductDetails, W
 # ============================================================================
 
 # LocalModelsDialog is imported from dialogs.py
-from dialogs import LocalModelsDialog
+try:
+    from dialogs import LocalModelsDialog
+except ImportError:
+    LocalModelsDialog = None
 
 # ============================================================================
 

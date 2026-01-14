@@ -42,7 +42,7 @@ def get_youtube_service():
 def get_printify_api(api_token: str, shop_id: str):
     """Cache Printify API client."""
     try:
-        from printify import PrintifyAPI
+        from api_service import PrintifyAPI
         return PrintifyAPI(api_token=api_token, shop_id=shop_id)
     except Exception as e:
         logger.error(f"Printify API init failed: {e}")

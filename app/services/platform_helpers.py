@@ -8,7 +8,7 @@ from typing import Any, Dict, Tuple, Optional
 
 import streamlit as st
 
-from printify import PrintifyAPI
+from api_service import PrintifyAPI
 from api_service import ReplicateAPI
 
 

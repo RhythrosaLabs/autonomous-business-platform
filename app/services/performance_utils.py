@@ -33,7 +33,7 @@ def get_printify_api(token: str, shop_id: str):
     """Cached Printify API client - reused across pages"""
     if not token or not shop_id:
         return None
-    from printify import PrintifyAPI
+    from api_service import PrintifyAPI
     return PrintifyAPI(token)
 
 
@@ -68,7 +68,7 @@ def load_campaign_metadata(campaign_dir: str):
 @st.cache_data(ttl=7200, show_spinner=False)
 def get_printify_blueprints(token: str):
     """Cache Printify blueprints for 2 hours (rarely changes)"""
-    from printify import PrintifyAPI
+    from api_service import PrintifyAPI
     api = PrintifyAPI(token)
     return api.get_blueprints()
 
