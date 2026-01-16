@@ -712,6 +712,8 @@ if quick_items:
                 pass
 
 selected_tab_idx = st.session_state.current_main_tab
+st.write(f"🔍 Debug: current_main_tab index = {st.session_state.current_main_tab}")
+st.write(f"🔍 Debug: all_tabs list = {all_tabs[:5]}...")
 # Update selected_tab_name to match the actual selected index
 selected_tab_name = all_tabs[selected_tab_idx]
 
