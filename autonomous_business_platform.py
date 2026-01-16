@@ -712,6 +712,9 @@ if quick_items:
                 pass
 
 selected_tab_idx = st.session_state.current_main_tab
+# Update selected_tab_name to match the actual selected index
+selected_tab_name = all_tabs[selected_tab_idx]
+
 
 # ========================================
 # RENDER SELECTED TAB (Lazy Loading for Performance)
