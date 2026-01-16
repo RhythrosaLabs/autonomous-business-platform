@@ -720,17 +720,21 @@ selected_tab_idx = st.session_state.current_main_tab
 # This provides HUGE performance boost (40-60% faster page navigation)
 
 with st.spinner("Loading tab..."):
+    st.write(f"🔍 Debug: Attempting to load tab: {selected_tab_name}")
     renderer = get_tab_renderer(selected_tab_name)
     
     if renderer:
+        st.write(f"✅ Debug: Renderer loaded successfully")
         try:
             # Special handling for tabs with additional parameters
             if selected_tab_name == "🏠 Dashboard":
+                st.write("🔹 Debug: Calling Dashboard renderer with parameters")
                 renderer(
                     smart_dashboard_available=SMART_DASHBOARD_AVAILABLE,
                     cross_page_mgr=cross_page_mgr
                 )
             elif selected_tab_name == "🤖 Task Queue":
+                st.write("🔹 Debug: Calling Task Queue renderer with parameters")
                 replicate_api = st.session_state.get('replicate_client')
                 printify_api = st.session_state.get('printify_api')
                 shopify_api = st.session_state.get('shopify_api')
@@ -745,11 +749,17 @@ with st.spinner("Loading tab..."):
                 )
             else:
                 # All other tabs use simple renderer
+                st.write(f"🔹 Debug: Calling {selected_tab_name} renderer (no parameters)")
                 renderer()
+                st.write(f"✅ Debug: {selected_tab_name} rendered successfully")
         except Exception as e:
-            st.error(f"Error rendering tab: {str(e)}")
+            st.error(f"❌ Error rendering tab: {str(e)}")
+            import traceback
+            with st.expander("📋 Full Error Traceback"):
+                st.code(traceback.format_exc())
     else:
-        st.error("Tab not found")
+        st.error(f"❌ Tab not found: {selected_tab_name}")
+        st.info("Renderer returned None - check import errors above")
 
 # Footer
 st.markdown("---")
