@@ -656,33 +656,22 @@ if st.session_state.current_main_tab >= len(all_tabs):
 # ========================================
 # NAVIGATION WITH LAZY RENDERING
 # ========================================
-# Row 1: Dropdown selector
-selected_tab_name = st.selectbox(
-    "📑 Navigate",
-    all_tabs,
-    index=st.session_state.current_main_tab,
-    key="main_nav_select",
-    label_visibility="collapsed"
-)
-selected_tab_idx = all_tabs.index(selected_tab_name)
-if selected_tab_idx != st.session_state.current_main_tab:
-    st.session_state.current_main_tab = selected_tab_idx
-    st.rerun()
 
-# ========================================
-# GLOBAL STATE INITIALIZATION
-# ========================================
-# Initialize advanced_model_params with defaults to prevent NameError in other tabs
-# This ensures Product Studio (Tab 3) works even if Campaign Creator (Tab 5) hasn't run
-advanced_model_params = {
-    "image": {},
-    "video_quality": {},
-    "model_selection": {}
-}
-
-# Row 2: Compact emoji quick-access buttons (filtered by role)
+# Row 1: Compact emoji quick-access buttons (filtered by role)
+# IMPORTANT: Check buttons BEFORE selectbox to ensure button clicks aren't overridden
 all_quick_items = [
     ("🏠", 0, "🏠 Dashboard"), ("⚡", 1, "⚡ Shortcuts"), ("🤖", 2, "🤖 Task Queue"), 
+    ("🔄", 3, "🔄 Job Monitor"), ("📦", 4, "📦 Product Studio"), ("💾", 5, "💾 Digital Products"), 
+    ("🎯", 6, "🎯 Campaign Creator"),
+    ("📝", 7, "📝 Content Generator"), ("🎬", 8, "🎬 Video Producer"), ("🎮", 9, "🎮 Playground"),
+    ("🔧", 10, "🔧 Workflows"), ("📅", 11, "📅 Calendar"), ("📓", 12, "📓 Journal"),
+    ("🔍", 13, "🔍 Contact Finder"), ("👥", 14, "👥 Customers"), ("📊", 15, "📊 Analytics"),
+    ("🎨", 16, "🎨 Brand Templates"), ("💌", 17, "💌 Email Outreach"), ("🎵", 18, "🎵 Music Platforms"), 
+    ("📁", 19, "📁 File Library"), ("🌐", 20, "🌐 Browser-Use")
+]
+
+all_quick_items = [
+    ("🏠", 0, "🏠 Dashboard"), ("⚡", 1, "⚡ Shortcuts"), ("🤖", 2, "�� Task Queue"), 
     ("🔄", 3, "🔄 Job Monitor"), ("📦", 4, "📦 Product Studio"), ("💾", 5, "💾 Digital Products"), 
     ("🎯", 6, "🎯 Campaign Creator"),
     ("📝", 7, "📝 Content Generator"), ("🎬", 8, "🎬 Video Producer"), ("🎮", 9, "🎮 Playground"),
@@ -710,6 +699,30 @@ if quick_items:
             except ValueError:
                 # Tab not in visible list, skip
                 pass
+
+# Row 2: Dropdown selector (placed AFTER buttons to not interfere)
+selected_tab_name = st.selectbox(
+    "📑 Navigate",
+    all_tabs,
+    index=st.session_state.current_main_tab,
+    key="main_nav_select",
+    label_visibility="collapsed"
+)
+selected_tab_idx = all_tabs.index(selected_tab_name)
+if selected_tab_idx != st.session_state.current_main_tab:
+    st.session_state.current_main_tab = selected_tab_idx
+    st.rerun()
+
+# ========================================
+# GLOBAL STATE INITIALIZATION
+# ========================================
+# Initialize advanced_model_params with defaults to prevent NameError in other tabs
+# This ensures Product Studio (Tab 3) works even if Campaign Creator (Tab 5) hasn't run
+advanced_model_params = {
+    "image": {},
+    "video_quality": {},
+    "model_selection": {}
+}
 
 selected_tab_idx = st.session_state.current_main_tab
 st.write(f"🔍 Debug: current_main_tab index = {st.session_state.current_main_tab}")
