@@ -260,7 +260,7 @@ def render_dashboard_tab(
 
     # Digital Products Configuration (if enabled) - Full Generator
     if digital_products_enabled:
-        with st.expander("💾 Digital Products Settings - Complete Product Generator", expanded=True):
+        with st.expander("💾 Digital Products Settings - Complete Product Generator", expanded=False):
             st.markdown("**🚀 AI will create COMPLETE digital products - full books, courses, not just cover art!**")
         
             dp_col1, dp_col2 = st.columns(2)
@@ -626,7 +626,7 @@ def render_dashboard_tab(
         # Deduplicate
         all_emails = list(dict.fromkeys(all_emails))
     
-        with st.expander("📧 Email Campaign Recipients", expanded=True):
+        with st.expander("📧 Email Campaign Recipients", expanded=False):
             email_col1, email_col2 = st.columns([3, 1])
         
             with email_col1:
@@ -1385,49 +1385,8 @@ def render_dashboard_tab(
                 - Video: {'Yes' if campaign['video'] else 'No'}
                 - Social Media: {'Yes' if campaign['social'] else 'No'}
                 """)
-    st.markdown("**Zero-click campaigns. Intelligent orchestration. Autonomous execution.**")
-
-    col1, col2, col3, col4 = st.columns(4)
-
-    with col1:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>🎯 Smart Campaigns</h3>
-            <p>AI-powered strategy generation</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col2:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>🤖 Multi-Agent</h3>
-            <p>Specialized AI workers</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col3:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>📈 Auto-Optimize</h3>
-            <p>Real-time performance tuning</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-    with col4:
-        st.markdown("""
-        <div class="feature-card">
-            <h3>🌐 Multi-Platform</h3>
-            <p>Publish everywhere instantly</p>
-        </div>
-        """, unsafe_allow_html=True)
 
     st.markdown("---")
-
-    # Smart Dashboard Widget (with AI Insights in beautiful cards)
-    if smart_dashboard_available:
-        st.markdown("## 📊 Smart Dashboard & Insights")
-        SmartDashboard.render_smart_dashboard()
-        st.markdown("---")
     
     st.markdown("### 📋 Recent Activity")
     
@@ -1439,45 +1398,5 @@ def render_dashboard_tab(
     else:
         st.info("📭 No recent activity. Start creating!")
     
-    # Show last completed campaign if exists
-    if st.session_state.campaign_history:
-        last_campaign = st.session_state.campaign_history[-1]
-        if last_campaign.get('status') == 'completed':
-            st.markdown("---")
-            st.markdown("### ✅ Campaign Completed!")
-            col1, col2, col3, col4 = st.columns(4)
-            with col1:
-                st.markdown(f"**Concept:** {last_campaign.get('concept', 'Unknown')[:30]}...")
-            with col2:
-                duration = last_campaign.get('duration', 0)
-                st.markdown(f"**Time:** {duration}s")
-            with col3:
-                products = len(last_campaign.get('products', []))
-                st.markdown(f"**Products:** {products}")
-            with col4:
-                campaign_dir = last_campaign.get('directory', '')
-                st.markdown(f"**📁 Saved to:** {campaign_dir.split('/')[-1] if campaign_dir else 'N/A'}")
-
-    # Quick Actions
-    st.markdown("---")
-    st.markdown("### ⚡ Quick Actions")
-    col1, col2, col3 = st.columns(3)
-
-    with col1:
-        if st.button("🎯 New Campaign", key="quick_campaign"):
-            st.session_state.page = "🎯 Campaign Creator"
-            st.rerun()
-
-    with col2:
-        if st.button("📦 Create Product", key="quick_product"):
-            st.session_state.page = "📦 Product Studio"
-            st.rerun()
-
-    with col3:
-        if st.button("🎬 Make Video", key="quick_video"):
-            st.session_state.page = "🎬 Video Producer"
-            st.rerun()
-
-    # ========================================
     # TAB 1: TASK QUEUE (Autonomous AI Task System)
     # ========================================
