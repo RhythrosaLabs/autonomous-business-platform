@@ -42,7 +42,7 @@ def get_youtube_service():
 def get_printify_api(api_token: str, shop_id: str):
     """Cache Printify API client."""
     try:
-        from api_service import PrintifyAPI
+        from app.services.api_service import PrintifyAPI
         return PrintifyAPI(api_token=api_token, shop_id=shop_id)
     except Exception as e:
         logger.error(f"Printify API init failed: {e}")
@@ -57,7 +57,7 @@ def get_replicate_api(api_token: str):
     which provides image, video, text, and speech generation.
     """
     try:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         return ReplicateAPI(api_token=api_token)
     except Exception as e:
         logger.error(f"ReplicateAPI init failed: {e}")

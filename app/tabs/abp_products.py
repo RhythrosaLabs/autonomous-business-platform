@@ -6,7 +6,7 @@ import requests
 import json
 
 from app.utils.cross_page_state import restore_page_to_session
-from platform_helpers import (
+from app.services.platform_helpers import (
     _render_printify_product_config,
     _ensure_replicate_client,
     _get_replicate_token,
@@ -15,13 +15,13 @@ from platform_helpers import (
     _send_design_to_printify
 )
 from app.services.platform_integrations import tracked_replicate_run
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_batch_product_designs,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType
+from app.services.global_job_queue import JobType
 
 # Style and color prompts for Product Studio
 STYLE_PROMPTS = {
@@ -268,7 +268,7 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                 img_params = advanced_model_params.get("image", {})
                 
                 # Submit batch jobs
-                from global_job_queue import get_global_job_queue
+                from app.services.global_job_queue import get_global_job_queue
                 queue = get_global_job_queue()
                 
                 job_ids = []

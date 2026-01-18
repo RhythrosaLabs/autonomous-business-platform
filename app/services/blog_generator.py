@@ -19,7 +19,7 @@ try:
 except Exception:
     _WEASYPRINT_AVAILABLE = False
 
-from api_service import ReplicateAPI
+from app.services.api_service import ReplicateAPI
 
 
 def _strip_code_fences(text: str) -> str:

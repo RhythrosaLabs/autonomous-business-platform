@@ -12,7 +12,7 @@ Usage in autonomous_business_platform.py:
 
 1. Add this import near the top:
    
-   from platform_integrations import (
+   from app.services.platform_integrations import (
        init_all_integrations,
        tracked_replicate_run,
        render_integrations_sidebar

@@ -237,7 +237,7 @@ class EnhancedTaskQueue:
             except ImportError:
                 # Fallback to basic OttoEngine
                 try:
-                    from otto_engine import OttoEngine
+                    from app.services.otto_engine import OttoEngine
                     self._otto_engine = OttoEngine(
                         replicate_api=self.replicate,
                         printify_api=self.printify,
@@ -1211,7 +1211,7 @@ Respond in this JSON format:
                 
                 # Use the AI Twitter poster
                 try:
-                    from ai_twitter_poster import AITwitterPoster
+                    from app.services.ai_twitter_poster import AITwitterPoster
                     poster = AITwitterPoster()
                     
                     if not image_path:
@@ -1521,7 +1521,7 @@ def render_enhanced_task_queue(replicate_api=None, printify_api=None, shopify_ap
         replicate_token = os.getenv('REPLICATE_API_TOKEN') or st.session_state.get('replicate_api_key', '')
         if replicate_token:
             try:
-                from api_service import ReplicateAPI
+                from app.services.api_service import ReplicateAPI
                 replicate_api = ReplicateAPI(api_token=replicate_token)
                 logger.info("✅ Created ReplicateAPI from token")
             except Exception as e:

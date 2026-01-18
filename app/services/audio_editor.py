@@ -453,11 +453,11 @@ def render_audio_editor_ui():
         st.warning("⚠️ FFmpeg not installed. Some features may be limited.")
     
     # Get API service
-    from platform_helpers import _get_replicate_token
+    from app.services.platform_helpers import _get_replicate_token
     token = _get_replicate_token()
     api = None
     if token:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         api = ReplicateAPI(api_token=token)
     
     editor = AudioEditor(api_service=api)

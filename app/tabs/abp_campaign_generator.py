@@ -10,7 +10,7 @@ logger = setup_logger(__name__)
 
 # Import AI Twitter poster availability flag
 try:
-    from ai_twitter_poster import post_to_twitter_ai
+    from app.services.ai_twitter_poster import post_to_twitter_ai
     AI_TWITTER_AVAILABLE = bool(os.getenv('ANTHROPIC_API_KEY'))
 except ImportError:
     AI_TWITTER_AVAILABLE = False
@@ -18,7 +18,7 @@ except ImportError:
 
 # Import helpers
 from app.services.campaign_generator_service import EnhancedCampaignGenerator
-from api_service import ReplicateAPI
+from app.services.api_service import ReplicateAPI
 from printify_mockup_service import PrintifyMockupService
 from shopify_service import ShopifyAPI
 from app.services.blog_generator import generate_product_blog
@@ -46,7 +46,7 @@ def strip_markdown(text: str) -> str:
     text = re.sub(r'^[\*\-]\s+', '', text, flags=re.MULTILINE)
     return text
 
-from platform_helpers import (
+from app.services.platform_helpers import (
     _get_replicate_token,
     create_campaign_directory,
     save_campaign_metadata,
@@ -62,7 +62,7 @@ from modules.file_utils import save_binary_file
 
 # Try to import tracked_replicate_run, with fallback to regular replicate.run
 try:
-    from platform_integrations import tracked_replicate_run
+    from app.services.platform_integrations import tracked_replicate_run
     TRACKED_REPLICATE_AVAILABLE = True
 except (ImportError, Exception):
     TRACKED_REPLICATE_AVAILABLE = False
@@ -153,7 +153,7 @@ def run_campaign_generation(
         st.stop()
 
     try:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
 
         replicate_api = ReplicateAPI(replicate_token)
         st.success(f"✅ Replicate API connected! Token ends with: ...{replicate_token[-8:]}")
@@ -2867,7 +2867,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                     )
                     
                 else:  # graphic_art fallback
-                    from digital_products_service import DigitalProductsService, DigitalProductGenerator
+                    from app.services.digital_products_service import DigitalProductsService, DigitalProductGenerator
                     generator = DigitalProductGenerator()
                         
                     variations = digital_config.get('variations', 3)
@@ -2927,7 +2927,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                     if auto_publish and digital_result.get('pdf_path'):
                         st.info("📤 Publishing to Shopify...")
                         try:
-                            from digital_products_service import DigitalProductsService
+                            from app.services.digital_products_service import DigitalProductsService
                             service = DigitalProductsService()
                                 
                             # Build description with brand voice
@@ -2965,7 +2965,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                     elif auto_publish and digital_result.get('files'):
                         # Publish graphic art
                         try:
-                            from digital_products_service import DigitalProductsService
+                            from app.services.digital_products_service import DigitalProductsService
                             service = DigitalProductsService()
                                 
                             digital_products_created = []

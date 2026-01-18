@@ -6,7 +6,7 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
-from platform_helpers import (
+from app.services.platform_helpers import (
     _get_replicate_token,
     _get_printify_api,
     _ensure_replicate_client,
@@ -14,7 +14,7 @@ from platform_helpers import (
     save_campaign_metadata,
     _render_printify_product_config
 )
-from api_service import ReplicateAPI
+from app.services.api_service import ReplicateAPI
 from app.utils.ray_integration_helpers import is_ray_enabled
 from app.services.smart_dashboard_widget import SmartDashboard, ActivityFeed
 from app.utils.cross_page_state import render_campaign_status_banner
@@ -63,7 +63,7 @@ def render_dashboard_tab(
 
                 if replicate_token:
                     try:
-                        from api_service import ReplicateAPI
+                        from app.services.api_service import ReplicateAPI
                         import random
 
                         replicate_api = ReplicateAPI(replicate_token)

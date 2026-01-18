@@ -6,13 +6,13 @@ Comprehensive job tracking, Ray dashboard integration, and performance analytics
 from abp_imports_common import st, datetime, Path
 import time
 from typing import Dict, List, Any
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     check_jobs_progress,
     are_all_jobs_done,
     collect_job_results,
     get_global_job_queue
 )
-from global_job_queue import JobStatus, JobType
+from app.services.global_job_queue import JobStatus, JobType
 
 
 def render_advanced_job_monitor_tab():
@@ -92,7 +92,7 @@ def render_advanced_job_monitor_tab():
                         st.caption(f"**Priority:** {job.priority}/10")
                         
                         # Resource allocation (if available)
-                        from global_job_queue import RESOURCE_PROFILES
+                        from app.services.global_job_queue import RESOURCE_PROFILES
                         resources = RESOURCE_PROFILES.get(job.job_type, {})
                         if resources:
                             st.caption(f"**CPUs:** {resources.get('num_cpus', 1)}")

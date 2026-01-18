@@ -36,13 +36,13 @@ from typing import Dict, List, Any, Optional
 import os
 
 try:
-    from browser_use_research import (
+    from app.services.browser_use_research import (
         BrowserUseResearcher,
         ProductResearchResult,
         CompetitorPricingResult,
         DesignInspirationResult
     )
-    from browser_use_advanced import (
+    from app.services.browser_use_advanced import (
         AdvancedBrowserAutomation,
         LeadResult,
         ScrapedData,
@@ -50,7 +50,7 @@ try:
         MonitoringResult,
         save_automation_results
     )
-    from background_tasks import BackgroundTaskManager, get_task_manager, TaskState
+    from app.services.background_tasks import BackgroundTaskManager, get_task_manager, TaskState
     BROWSER_USE_AVAILABLE = True
     BACKGROUND_TASKS_AVAILABLE = True
 except ImportError as e:

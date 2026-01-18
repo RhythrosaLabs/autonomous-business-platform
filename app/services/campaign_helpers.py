@@ -18,7 +18,7 @@ def generate_content(action, prompt, budget, platforms, api_key=None):
     """
     try:
         # ALWAYS use Replicate API (never OpenAI)
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         import os as _os
         repl = ReplicateAPI(_os.getenv("REPLICATE_API_TOKEN", ""))
         platforms_list = platforms if isinstance(platforms, list) else [k for k, v in platforms.items() if v]
@@ -57,7 +57,7 @@ def generate_document(prompt, api_key=None):
     Note: api_key parameter is deprecated and ignored - all generation uses Replicate.
     """
     try:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         import os as _os
         repl = ReplicateAPI(_os.getenv("REPLICATE_API_TOKEN", ""))
         sys = "You are a Personal Assistant that creates detailed, professional documents."
@@ -143,7 +143,7 @@ def enhance_content(content, filename, api_key=None):
     Note: api_key parameter is deprecated and ignored - all generation uses Replicate.
     """
     try:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         import os as _os
         repl = ReplicateAPI(_os.getenv("REPLICATE_API_TOKEN", ""))
         sys = f"Enhance the following {filename} content to be more professional and engaging."

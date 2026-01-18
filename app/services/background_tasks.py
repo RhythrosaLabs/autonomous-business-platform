@@ -740,7 +740,7 @@ def run_campaign_in_background(
         if not replicate_token:
             raise Exception("REPLICATE_API_TOKEN not found in environment")
         
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         replicate_api = ReplicateAPI(replicate_token)
         log("✅ Replicate API connected")
         
@@ -748,7 +748,7 @@ def run_campaign_in_background(
         check_cancelled()
         
         # Create campaign directory
-        from platform_helpers import create_campaign_directory, _slugify
+        from app.services.platform_helpers import create_campaign_directory, _slugify
         campaign_dir = create_campaign_directory(concept_input)
         log(f"📁 Campaign directory: {campaign_dir}")
         

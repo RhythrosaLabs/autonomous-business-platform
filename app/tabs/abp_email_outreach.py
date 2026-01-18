@@ -11,14 +11,14 @@ import logging
 import time
 from dataclasses import dataclass, asdict
 import re
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_batch_operation,
     submit_batch_product_designs,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -598,7 +598,7 @@ def render_email_outreach_tab(enhanced_available=False, replicate_api=None,
                 else:
                     try:
                         # Import required services
-                        from platform_helpers import _ensure_replicate_client
+                        from app.services.platform_helpers import _ensure_replicate_client
                         from email_marketing_service import EmailMarketingService
                         
                         replicate_api, _ = _ensure_replicate_client()

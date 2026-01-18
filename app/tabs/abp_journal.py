@@ -9,7 +9,7 @@ logger = setup_logger(__name__)
 from app.services.platform_integrations import tracked_replicate_run
 
 try:
-    from platform_helpers import _get_replicate_token
+    from app.services.platform_helpers import _get_replicate_token
 except ImportError:
     def _get_replicate_token() -> str:
         return ""

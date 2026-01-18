@@ -7,14 +7,14 @@ dt = datetime
 logger = setup_logger(__name__)
 
 from app.utils.ray_integration_helpers import ray_generate_image_sync, is_ray_enabled
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_digital_product_job,
     submit_batch_operation,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 def render_digital_products_tab():
     """
@@ -24,7 +24,7 @@ def render_digital_products_tab():
     st.markdown("### Create and sell digital downloads: ebooks, courses, templates, and more")
     
     try:
-        from digital_products_service import (
+        from app.services.digital_products_service import (
             DigitalProductsService, 
             DigitalProductGenerator,
             DIGITAL_PRODUCT_TYPES
@@ -79,7 +79,7 @@ def render_digital_products_tab():
                     
                     try:
                         # Try using the digital products service
-                        from digital_products_service import DigitalProductsService
+                        from app.services.digital_products_service import DigitalProductsService
                         dps = DigitalProductsService()
                         
                         progress.progress(20)

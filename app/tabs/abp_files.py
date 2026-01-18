@@ -7,17 +7,17 @@ dt = datetime
 logger = setup_logger(__name__)
 
 from abp_utils import cached_scan_files, cached_scan_products
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_batch_operation,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 # Import optional dependencies
 try:
-    from ai_twitter_poster import post_to_twitter_ai
+    from app.services.ai_twitter_poster import post_to_twitter_ai
     AI_TWITTER_AVAILABLE = True
 except ImportError:
     AI_TWITTER_AVAILABLE = False
@@ -546,7 +546,7 @@ def render_file_library_tab():
             st.markdown("View what Otto has learned from your files.")
             
             try:
-                from otto_engine import get_knowledge_base
+                from app.services.otto_engine import get_knowledge_base
                 kb = get_knowledge_base()
                 stats = kb.get_stats()
                 
@@ -610,7 +610,7 @@ def render_file_library_tab():
         with prod_tabs[1]:
             st.markdown("#### 👕 Printify Integration")
             try:
-                from api_service import PrintifyAPI as PrintifyClient
+                from app.services.api_service import PrintifyAPI as PrintifyClient
                 printify_token = st.session_state.get('printify_api_key') or os.getenv('PRINTIFY_API_TOKEN')
                 
                 if printify_token:
@@ -670,7 +670,7 @@ def render_file_library_tab():
                     if replicate_token:
                         with st.spinner(f"🎨 Generating {variations} {product_type} variations in parallel..."):
                             try:
-                                from api_service import ReplicateAPI
+                                from app.services.api_service import ReplicateAPI
                                 import time
                                 api = ReplicateAPI(replicate_token)
                                 
@@ -958,7 +958,7 @@ def render_file_library_tab():
         
         # Import chat history manager
         try:
-            from chat_assistant import get_chat_history_manager
+            from app.services.chat_assistant import get_chat_history_manager
             chat_manager = get_chat_history_manager()
             
             # Search and filter

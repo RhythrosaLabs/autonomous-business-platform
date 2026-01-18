@@ -6,7 +6,7 @@ Makes it easy to parallelize operations across all tabs.
 """
 
 from typing import Any, Callable, Dict, Optional
-from global_job_queue import get_global_job_queue, JobType
+from app.services.global_job_queue import get_global_job_queue, JobType
 import logging
 
 logger = logging.getLogger(__name__)
@@ -384,7 +384,7 @@ def wait_for_all_jobs(job_ids: list, check_interval: float = 1.0, max_wait: floa
         Dictionary with results and statistics
     """
     import time
-    from global_job_queue import JobStatus
+    from app.services.global_job_queue import JobStatus
     
     queue = get_global_job_queue()
     start_time = time.time()
@@ -437,7 +437,7 @@ def check_jobs_progress(job_ids: list) -> Dict[str, int]:
     Returns:
         Dictionary with counts of each status
     """
-    from global_job_queue import JobStatus
+    from app.services.global_job_queue import JobStatus
     
     queue = get_global_job_queue()
     
@@ -459,7 +459,7 @@ def check_jobs_progress(job_ids: list) -> Dict[str, int]:
 
 def are_all_jobs_done(job_ids: list) -> bool:
     """Check if all jobs are completed or failed."""
-    from global_job_queue import JobStatus
+    from app.services.global_job_queue import JobStatus
     
     queue = get_global_job_queue()
     

@@ -2181,7 +2181,7 @@ Provide:
         
         try:
             # Import task queue engine
-            from task_queue_engine import MultiStepPlanner, TaskQueueManager
+            from app.services.task_queue_engine import MultiStepPlanner, TaskQueueManager
             
             if action == "create":
                 # /task create marketing campaign for new product

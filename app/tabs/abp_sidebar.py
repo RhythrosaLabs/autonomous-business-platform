@@ -16,18 +16,18 @@ from app.services.tab_visibility_manager import (
 )
 from app.services.youtube_upload_service import YouTubeUploadService
 from shopify_service import ShopifyAPI
-from platform_helpers import _get_replicate_token
+from app.services.platform_helpers import _get_replicate_token
 from app.services.platform_integrations import render_recovery_check
 from performance_optimizations import render_performance_settings
 try:
-    from background_tasks import get_task_manager, TaskState
+    from app.services.background_tasks import get_task_manager, TaskState
     BACKGROUND_TASKS_AVAILABLE = True
 except ImportError:
     BACKGROUND_TASKS_AVAILABLE = False
     get_task_manager = None
     TaskState = None
 try:
-    from shortcuts_manager import ShortcutsManager
+    from app.services.shortcuts_manager import ShortcutsManager
 except ImportError:
     ShortcutsManager = None
 
@@ -85,7 +85,7 @@ def render_sidebar(
         # Compact Background Task status (visible on all pages)
         if BACKGROUND_TASKS_AVAILABLE:
             try:
-                from background_tasks import render_task_status_widget
+                from app.services.background_tasks import render_task_status_widget
                 render_task_status_widget()
             except Exception:
                 pass
@@ -638,7 +638,7 @@ def render_sidebar(
                                     if test_caption:
                                         with st.spinner("Posting to Twitter..."):
                                             try:
-                                                from ai_twitter_poster import AITwitterPoster
+                                                from app.services.ai_twitter_poster import AITwitterPoster
                                                 poster = AITwitterPoster(headless=False, browser_type='chrome')
                                         
                                                 # Save uploaded image if provided
@@ -822,7 +822,7 @@ def render_sidebar(
                     
                     # Check if ShortcutsManager is available (imported at module level)
                     try:
-                        from shortcuts_manager import ShortcutsManager as SM
+                        from app.services.shortcuts_manager import ShortcutsManager as SM
                         shortcuts_mgr_local = SM()
                         all_shortcuts = shortcuts_mgr_local.load_shortcuts()
                         
@@ -1190,7 +1190,7 @@ def render_sidebar(
         
             # Import shortcuts manager if available
             try:
-                from shortcuts_manager import ShortcutsManager
+                from app.services.shortcuts_manager import ShortcutsManager
                 sidebar_shortcuts_mgr = ShortcutsManager()
                 
                 # Initialize shortcuts in session state if not exists - load from persistence
@@ -1269,8 +1269,8 @@ def render_sidebar(
                                             results = []
                                             context = {'description': shortcut['description']}
                                             
-                                            from otto_engine import get_slash_processor
-                                            from api_service import ReplicateAPI
+                                            from app.services.otto_engine import get_slash_processor
+                                            from app.services.api_service import ReplicateAPI
                                             
                                             # Get Replicate API token
                                             replicate_token = _get_replicate_token()
@@ -1320,7 +1320,7 @@ def render_sidebar(
                                                         
                                                         if 'twitter' in platform and image_path:
                                                             try:
-                                                                from ai_twitter_poster import AITwitterPoster
+                                                                from app.services.ai_twitter_poster import AITwitterPoster
                                                                 poster = AITwitterPoster(headless=True)
                                                                 import asyncio
                                                                 
@@ -1716,7 +1716,7 @@ def render_sidebar(
     with header_cols[4]:
         # Render global progress indicator in the header (compact version)
         try:
-            from background_task_manager import render_compact_progress_indicator
+            from app.services.background_task_manager import render_compact_progress_indicator
             render_compact_progress_indicator()
         except Exception as e:
             pass  # Silently fail if not available

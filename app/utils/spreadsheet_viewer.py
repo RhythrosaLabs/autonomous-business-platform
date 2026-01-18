@@ -365,10 +365,10 @@ def render_spreadsheet_viewer_ui():
     # Get API service
     api = None
     try:
-        from platform_helpers import _get_replicate_token
+        from app.services.platform_helpers import _get_replicate_token
         token = _get_replicate_token()
         if token:
-            from api_service import ReplicateAPI
+            from app.services.api_service import ReplicateAPI
             api = ReplicateAPI(api_token=token)
     except:
         pass

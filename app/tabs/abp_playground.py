@@ -14,16 +14,16 @@ from app.utils.playground_ui_helpers import render_model_parameters, render_file
 from app.utils.unified_storage import auto_save_generated_content
 
 # Import helpers
-from platform_helpers import (
+from app.services.platform_helpers import (
     _render_printify_product_config, 
     _get_replicate_token
 )
 from app.utils.cross_page_state import get_state_manager, restore_page_to_session
-from api_service import ReplicateAPI
+from app.services.api_service import ReplicateAPI
 
 # Try to import tracked_replicate_run
 try:
-    from platform_integrations import tracked_replicate_run
+    from app.services.platform_integrations import tracked_replicate_run
 except ImportError:
     def tracked_replicate_run(client, model, input_params, operation_name=None):
         return client.run(model, input=input_params)

@@ -128,7 +128,7 @@ class ProductPromotionalContent:
             full_prompt = f"{concept}, {scene_prompt}, high quality, professional photography, 4k"
             
             # Generate scene with Flux using ReplicateAPI
-            from api_service import ReplicateAPI
+            from app.services.api_service import ReplicateAPI
             api = ReplicateAPI(self.replicate_token)
             
             # Use flux-fast for lifestyle scenes (faster and works)

@@ -692,7 +692,7 @@ def render_otto_super_ui(replicate_api, printify_api=None, shopify_api=None, you
         with st.spinner("🚀 Initializing Otto Super..."):
             # Initialize task queue engine
             try:
-                from task_queue_engine import TaskQueueEngine
+                from app.services.task_queue_engine import TaskQueueEngine
                 task_queue = TaskQueueEngine()
             except Exception as e:
                 logger.warning(f"Task queue not available: {e}")

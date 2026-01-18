@@ -7,7 +7,7 @@ dt = datetime
 logger = setup_logger(__name__)
 
 from app.utils.cross_page_state import restore_page_to_session
-from platform_helpers import _ensure_replicate_client, _slugify, _extract_article_html, _get_replicate_token
+from app.services.platform_helpers import _ensure_replicate_client, _slugify, _extract_article_html, _get_replicate_token
 from app.services.blog_generator import generate_product_blog
 from app.utils.brand_templates import PRESET_TEMPLATES as BRAND_TEMPLATES
 from app.services.email_marketing_service import EmailMarketingService
@@ -15,7 +15,7 @@ from shopify_service import ShopifyAPI
 from app.services.campaign_generator_service import EnhancedCampaignGenerator
 from app.services.platform_integrations import tracked_replicate_run
 from app.utils.ray_integration_helpers import ray_generate_image_sync, is_ray_enabled
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_blog_generation_job,
     submit_social_content_job,
     submit_batch_operation,
@@ -23,7 +23,7 @@ from tab_job_helpers import (
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 def render_content_generator_tab():
     # Restore any saved Content Generator state

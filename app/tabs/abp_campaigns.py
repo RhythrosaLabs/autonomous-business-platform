@@ -8,15 +8,15 @@ dt = datetime
 logger = setup_logger(__name__)
 
 from app.services.platform_integrations import tracked_replicate_run
-from platform_helpers import _get_replicate_token
-from tab_job_helpers import (
+from app.services.platform_helpers import _get_replicate_token
+from app.services.tab_job_helpers import (
     submit_batch_product_designs,
     submit_batch_operation,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 def render_campaign_creator_tab():
     st.header("🎯 Campaign Creator")
@@ -180,7 +180,7 @@ Format: Just the 5 headlines, numbered."""
                     if not replicate_token:
                         st.error("❌ REPLICATE_API_TOKEN not found. Please set it in your environment or Settings.")
                         st.stop()
-                    from api_service import ReplicateAPI
+                    from app.services.api_service import ReplicateAPI
                     st.session_state.replicate_api = ReplicateAPI(replicate_token)
                 
                 # Create generator with fast_mode option

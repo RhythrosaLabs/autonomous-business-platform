@@ -8,7 +8,7 @@ logger = setup_logger(__name__)
 
 from app.services.platform_integrations import tracked_replicate_run
 from app.utils.ray_integration_helpers import is_ray_enabled, get_ray_manager_if_enabled
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_workflow_job,
     submit_batch_operation,
     collect_job_results,
@@ -16,7 +16,7 @@ from tab_job_helpers import (
     are_all_jobs_done,
     wait_for_all_jobs
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 try:
     from playground_models import (
@@ -37,7 +37,7 @@ except ImportError:
     def build_model_input(*args, **kwargs): return {}
 
 try:
-    from platform_helpers import _get_printify_api, _send_design_to_printify
+    from app.services.platform_helpers import _get_printify_api, _send_design_to_printify
 except ImportError:
     def _get_printify_api(): return None
     def _send_design_to_printify(*args, **kwargs): return {}
@@ -439,7 +439,7 @@ def render_custom_workflows_tab():
                     if bg_workflow:
                         # Execute in background
                         try:
-                            from background_tasks import BackgroundTaskManager, get_task_manager
+                            from app.services.background_tasks import BackgroundTaskManager, get_task_manager
                             
                             task_mgr = get_task_manager()  # Use cached manager
                             
@@ -949,7 +949,7 @@ def render_custom_workflows_tab():
             with col_run1:
                 if st.button("▶️ Execute Pipeline", type="primary", use_container_width=True, key="run_chain"):
                     # Get Replicate token
-                    replicate_token = st.session_state.api_keys.get('replicate', '').strip()
+                    replicate_token = get_api_key('REPLICATE_API_TOKEN', 'Replicate') or ''
                     if not replicate_token:
                         replicate_token = os.getenv('REPLICATE_API_TOKEN', '').strip()
                     
@@ -1846,7 +1846,7 @@ def render_custom_workflows_tab():
                                             tmp_path = tmp_file.name
                                         
                                         # Send to Printify
-                                        from platform_helpers import _send_design_to_printify
+                                        from app.services.platform_helpers import _send_design_to_printify
                                         variation_label = f"Playground - {result['model'][:30]}"
                                         printify_result = _send_design_to_printify(
                                             tmp_path,
@@ -1948,7 +1948,7 @@ def render_custom_workflows_tab():
                                 if st.button("✨ Generate Video", key=f"gen_vid_{idx}", type="primary", use_container_width=True):
                                     try:
                                         with st.spinner(f"🎬 Generating video... This may take 1-3 minutes"):
-                                            replicate_token = st.session_state.api_keys.get('replicate', '').strip()
+                                            replicate_token = get_api_key('REPLICATE_API_TOKEN', 'Replicate') or ''
                                             if not replicate_token:
                                                 replicate_token = os.getenv('REPLICATE_API_TOKEN', '').strip()
                                             

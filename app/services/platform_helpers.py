@@ -6,10 +6,11 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Tuple, Optional
 
+from .secure_config import get_api_key
 import streamlit as st
 
-from api_service import PrintifyAPI
-from api_service import ReplicateAPI
+from app.services.api_service import PrintifyAPI
+from app.services.api_service import ReplicateAPI
 
 
 __all__ = [
@@ -39,8 +40,8 @@ def _get_cached_printify_api(token: str, shop_id: str) -> Optional[PrintifyAPI]:
 
 
 def _get_printify_api() -> Optional[PrintifyAPI]:
-    token = (st.session_state.api_keys.get('printify') or os.getenv('PRINTIFY_API_TOKEN', '')).strip()
-    shop_id = (st.session_state.api_keys.get('printify_shop_id') or os.getenv('PRINTIFY_SHOP_ID', '')).strip()
+    token = get_api_key('PRINTIFY_API_TOKEN', 'Printify API Token') or ''
+    shop_id = get_api_key('PRINTIFY_SHOP_ID', 'Printify Shop ID') or ''
     if not token or not shop_id:
         return None
 
@@ -582,10 +583,9 @@ def _slugify(value: Optional[str], max_length: int = 80) -> str:
 
 
 def _get_replicate_token() -> str:
-    token = (st.session_state.api_keys.get('replicate') or os.getenv('REPLICATE_API_TOKEN', '')).strip()
+    token = get_api_key('REPLICATE_API_TOKEN', 'Replicate API Token')
     if not token:
         raise ValueError("Add your REPLICATE_API_TOKEN in the Settings panel to enable AI generation.")
-    st.session_state.api_keys['replicate'] = token
     return token
 
 

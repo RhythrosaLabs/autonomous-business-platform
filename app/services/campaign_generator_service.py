@@ -795,7 +795,7 @@ Key Patterns from Magic-Marketer:
 
 Usage:
     from .campaign_generator_service import EnhancedCampaignGenerator
-    from api_service import ReplicateAPI
+    from app.services.api_service import ReplicateAPI
     
     api = ReplicateAPI(token)
     generator = EnhancedCampaignGenerator(api)

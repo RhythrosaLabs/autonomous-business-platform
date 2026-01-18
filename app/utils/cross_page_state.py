@@ -730,7 +730,7 @@ def render_campaign_status_banner():
 
     # Also show recent failures in the status area (compact)
     try:
-        from background_tasks import get_task_manager, TaskState
+        from app.services.background_tasks import get_task_manager, TaskState
         manager = get_task_manager()
         failed_tasks = [t for t in manager.get_all_tasks() if t.state == TaskState.FAILED]
         if failed_tasks:

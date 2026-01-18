@@ -5,9 +5,9 @@ from abp_imports_common import (
 logger = setup_logger(__name__)
 
 import pandas as pd
-from platform_helpers import _get_replicate_token
+from app.services.platform_helpers import _get_replicate_token
 from app.services.contact_finder_service import ContactFinderService, Contact, OutreachPlan
-from api_service import ReplicateAPI
+from app.services.api_service import ReplicateAPI
 from app.services.platform_integrations import tracked_replicate_run
 
 def render_contact_finder_tab():
@@ -387,7 +387,7 @@ Be specific and actionable."""
                     
                     # Generate plans if requested (parallel execution)
                     if (plan_day or plan_week) and contacts:
-                        from global_job_queue import get_global_job_queue, JobType
+                        from app.services.global_job_queue import get_global_job_queue, JobType
                         
                         queue = get_global_job_queue()
                         plan_jobs = []
@@ -419,7 +419,7 @@ Be specific and actionable."""
         
         # Check for plan generation jobs
         if 'contact_plan_jobs' in st.session_state and st.session_state.contact_plan_jobs:
-            from tab_job_helpers import check_jobs_progress, are_all_jobs_done, collect_job_results
+            from app.services.tab_job_helpers import check_jobs_progress, are_all_jobs_done, collect_job_results
             
             plan_jobs = st.session_state.contact_plan_jobs
             job_ids = [job_id for _, job_id in plan_jobs]

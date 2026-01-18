@@ -8,7 +8,7 @@ import os
 logger = logging.getLogger(__name__)
 
 try:
-    from shortcuts_manager import (
+    from app.services.shortcuts_manager import (
         ShortcutsManager,
         init_shortcuts,
         add_shortcut,
@@ -43,7 +43,7 @@ except ImportError:
     SHORTCUT_CATEGORIES = {}
 
 try:
-    from platform_helpers import _get_replicate_token
+    from app.services.platform_helpers import _get_replicate_token
 except ImportError:
     def _get_replicate_token(): return None
 
@@ -53,9 +53,9 @@ async def execute_shortcut_in_background(task_id, shortcut):
     This runs independently and persists across page navigation.
     """
     try:
-        from background_task_manager import BackgroundTaskManager
-        from otto_engine import get_slash_processor
-        from api_service import ReplicateAPI
+        from app.services.background_task_manager import BackgroundTaskManager
+        from app.services.otto_engine import get_slash_processor
+        from app.services.api_service import ReplicateAPI
         
         task_mgr = BackgroundTaskManager()
         task_mgr.update_task(task_id, status='running', progress=0.0)
@@ -112,7 +112,7 @@ async def execute_shortcut_in_background(task_id, shortcut):
                     image_path = context.get('image_url') or context.get('product_image')
                     
                     if 'twitter' in platform and image_path:
-                        from ai_twitter_poster import AITwitterPoster
+                        from app.services.ai_twitter_poster import AITwitterPoster
                         poster = AITwitterPoster(headless=True)
                         
                         # Download image if URL
@@ -137,7 +137,7 @@ async def execute_shortcut_in_background(task_id, shortcut):
                     # AI processing
                     prompt = step.get('prompt_template', '')
                     
-                    from chat_assistant import ChatAssistant
+                    from app.services.chat_assistant import ChatAssistant
                     chat_assistant = ChatAssistant()
                     
                     ai_response = await chat_assistant.process_message(prompt, [])
@@ -160,7 +160,7 @@ async def execute_shortcut_in_background(task_id, shortcut):
     except Exception as e:
         logger.error(f"Background execution error: {e}")
         try:
-            from background_task_manager import BackgroundTaskManager
+            from app.services.background_task_manager import BackgroundTaskManager
             task_mgr = BackgroundTaskManager()
             task_mgr.update_task(task_id, status='failed', error=str(e))
         except:
@@ -357,7 +357,7 @@ def render_shortcuts_tab():
             else:
                 with st.spinner("🔮 Creating your magic button..."):
                     try:
-                        from api_service import ReplicateAPI
+                        from app.services.api_service import ReplicateAPI
                         
                         # Use AI to analyze and break down the workflow
                         replicate_token = _get_replicate_token()
@@ -783,7 +783,7 @@ Now analyze the request above and provide the steps:"""
                                 if bg_option:
                                     # Execute in background using BackgroundTaskManager
                                     try:
-                                        from background_task_manager import BackgroundTaskManager
+                                        from app.services.background_task_manager import BackgroundTaskManager
                                         import threading
                                         
                                         task_mgr = BackgroundTaskManager()
@@ -837,8 +837,8 @@ Now analyze the request above and provide the steps:"""
                                         results = []
                                         context = {'description': shortcut['description']}
                                         
-                                        from otto_engine import get_slash_processor
-                                        from api_service import ReplicateAPI
+                                        from app.services.otto_engine import get_slash_processor
+                                        from app.services.api_service import ReplicateAPI
                                         
                                         # Get Replicate API token
                                         replicate_token = _get_replicate_token()
@@ -968,7 +968,7 @@ Now analyze the request above and provide the steps:"""
                                                     
                                                     try:
                                                         if 'twitter' in platform and image_path:
-                                                            from ai_twitter_poster import AITwitterPoster
+                                                            from app.services.ai_twitter_poster import AITwitterPoster
                                                             poster = AITwitterPoster(headless=True)
                                                             import asyncio
                                                             
@@ -1045,7 +1045,7 @@ Now analyze the request above and provide the steps:"""
                                                     try:
                                                         # Use Otto's chat assistant for AI processing
                                                         if 'chat_assistant' not in st.session_state:
-                                                            from chat_assistant import ChatAssistant
+                                                            from app.services.chat_assistant import ChatAssistant
                                                             st.session_state.chat_assistant = ChatAssistant()
                                                         
                                                         chat_assistant = st.session_state.chat_assistant

@@ -199,7 +199,7 @@ def init_api_clients():
     printify_token = get_api_key('PRINTIFY_API_TOKEN')
     if printify_token and 'printify_api' not in st.session_state:
         try:
-            from api_service import PrintifyAPI
+            from app.services.api_service import PrintifyAPI
             st.session_state['printify_api'] = PrintifyAPI(printify_token)
         except Exception as e:
             st.warning(f"Failed to initialize Printify: {e}")

@@ -48,7 +48,7 @@ def render_analytics_tab():
             # Try to initialize from credentials
             if os.getenv('PRINTIFY_API_TOKEN'):
                 try:
-                    from api_service import PrintifyAPI
+                    from app.services.api_service import PrintifyAPI
                     st.session_state.printify_api = PrintifyAPI(
                         api_token=os.getenv('PRINTIFY_API_TOKEN'),
                         shop_id=os.getenv('PRINTIFY_SHOP_ID')
@@ -106,7 +106,7 @@ def render_analytics_tab():
         
         if st.session_state.analytics_fetch_jobs:
             # Jobs already submitted, check progress
-            from tab_job_helpers import check_jobs_progress, are_all_jobs_done, collect_job_results
+            from app.services.tab_job_helpers import check_jobs_progress, are_all_jobs_done, collect_job_results
             
             job_ids = st.session_state.analytics_fetch_jobs
             progress = check_jobs_progress(job_ids)
@@ -124,7 +124,7 @@ def render_analytics_tab():
                     st.stop()
         else:
             # Submit parallel fetch jobs
-            from global_job_queue import get_global_job_queue, JobType
+            from app.services.global_job_queue import get_global_job_queue, JobType
             queue = get_global_job_queue()
             job_ids = []
             
@@ -416,7 +416,7 @@ def render_analytics_tab():
         else:
             try:
                 with st.spinner("Loading Printify products..."):
-                    from api_service import PrintifyAPI
+                    from app.services.api_service import PrintifyAPI
                     api = st.session_state.printify_api
                     
                     # Get shops

@@ -357,7 +357,7 @@ class JobExecutor:
     def _init_replicate(self):
         """Initialize Replicate API"""
         try:
-            from api_service import ReplicateAPI
+            from app.services.api_service import ReplicateAPI
             token = os.getenv("REPLICATE_API_TOKEN")
             if token:
                 self.replicate_api = ReplicateAPI(token)

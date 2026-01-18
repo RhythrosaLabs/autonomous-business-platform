@@ -19,7 +19,7 @@ def get_cached_replicate_client(api_token: str):
 def get_cached_replicate_api(api_token: str):
     """Cache ReplicateAPI instance."""
     try:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         return ReplicateAPI(api_token)
     except Exception:
         return None

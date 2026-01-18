@@ -24,7 +24,7 @@ executor = ThreadPoolExecutor(max_workers=5)
 @st.cache_resource(show_spinner=False)
 def get_replicate_api(token: str):
     """Cached Replicate API client - reused across pages"""
-    from api_service import ReplicateAPI
+    from app.services.api_service import ReplicateAPI
     return ReplicateAPI(token)
 
 
@@ -33,7 +33,7 @@ def get_printify_api(token: str, shop_id: str):
     """Cached Printify API client - reused across pages"""
     if not token or not shop_id:
         return None
-    from api_service import PrintifyAPI
+    from app.services.api_service import PrintifyAPI
     return PrintifyAPI(token)
 
 
@@ -68,7 +68,7 @@ def load_campaign_metadata(campaign_dir: str):
 @st.cache_data(ttl=7200, show_spinner=False)
 def get_printify_blueprints(token: str):
     """Cache Printify blueprints for 2 hours (rarely changes)"""
-    from api_service import PrintifyAPI
+    from app.services.api_service import PrintifyAPI
     api = PrintifyAPI(token)
     return api.get_blueprints()
 

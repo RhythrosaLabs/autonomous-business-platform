@@ -5,19 +5,19 @@ import calendar
 import uuid
 import logging
 from app.services.platform_integrations import tracked_replicate_run
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_batch_operation,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 # Configure logger
 logger = logging.getLogger(__name__)
 
 try:
-    from platform_helpers import _get_replicate_token
+    from app.services.platform_helpers import _get_replicate_token
 except ImportError:
     def _get_replicate_token(): return None
 
@@ -318,8 +318,8 @@ def render_calendar_tab():
                                 if task_type == 'image' or task_type == 'generate_image':
                                     prompt = task.get('prompt') or task.get('description', '')
                                     if prompt:
-                                        from otto_engine import get_slash_processor
-                                        from api_service import ReplicateAPI
+                                        from app.services.otto_engine import get_slash_processor
+                                        from app.services.api_service import ReplicateAPI
                                         replicate_token = _get_replicate_token()
                                         if replicate_token:
                                             replicate_api = ReplicateAPI(api_token=replicate_token)
@@ -336,8 +336,8 @@ def render_calendar_tab():
                                 elif task_type == 'video' or task_type == 'generate_video':
                                     prompt = task.get('prompt') or task.get('description', '')
                                     if prompt:
-                                        from otto_engine import get_slash_processor
-                                        from api_service import ReplicateAPI
+                                        from app.services.otto_engine import get_slash_processor
+                                        from app.services.api_service import ReplicateAPI
                                         replicate_token = _get_replicate_token()
                                         if replicate_token:
                                             replicate_api = ReplicateAPI(api_token=replicate_token)
@@ -359,7 +359,7 @@ def render_calendar_tab():
                                     
                                     if platform.lower() == 'twitter' and image_path:
                                         try:
-                                            from ai_twitter_poster import AITwitterPoster
+                                            from app.services.ai_twitter_poster import AITwitterPoster
                                             poster = AITwitterPoster(headless=True)
                                             import asyncio
                                             success = asyncio.run(poster.post_to_twitter(image_path, content))
@@ -434,7 +434,7 @@ def render_calendar_tab():
                         if st.button("▶️ Run Now", key=f"run_pending_{idx}", use_container_width=True):
                             # Execute in background
                             try:
-                                from background_task_manager import BackgroundTaskManager
+                                from app.services.background_task_manager import BackgroundTaskManager
                                 import threading
                                 import asyncio
                                 
@@ -664,7 +664,7 @@ def render_calendar_tab():
                 if planning_context and replicate_token:
                     with st.spinner("🧠 AI is creating your personalized content plan..."):
                         try:
-                            from api_service import ReplicateAPI
+                            from app.services.api_service import ReplicateAPI
                             replicate_api = ReplicateAPI(replicate_token)
                             
                             plan_prompt = f"""You are a social media strategist. Create a detailed content calendar based on:

@@ -17,7 +17,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 try:
-    from music_platform_oauth import (
+    from app.utils.music_platform_oauth import (
         MusicPlatformOAuthHandler,
         CredentialStorage,
         OAUTH_CONFIGS,

@@ -6,7 +6,7 @@ that reference 'background_task_manager' instead of 'background_tasks'.
 """
 
 # Re-export everything from background_tasks
-from background_tasks import (
+from app.services.background_tasks import (
     BackgroundTaskManager,
     log,
     run_background_campaign,
@@ -16,7 +16,7 @@ from background_tasks import (
 def render_compact_progress_indicator():
     """Render a compact progress indicator for background tasks."""
     import streamlit as st
-    from global_job_queue import get_global_job_queue
+    from app.services.global_job_queue import get_global_job_queue
     
     try:
         queue = get_global_job_queue()

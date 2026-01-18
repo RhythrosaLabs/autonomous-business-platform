@@ -16,7 +16,7 @@ Dependencies:
 import os as os_module
 import requests
 from datetime import datetime
-from api_service import ReplicateAPI
+from app.services.api_service import ReplicateAPI
 
 # Optional: import moviepy for video assembly
 try:

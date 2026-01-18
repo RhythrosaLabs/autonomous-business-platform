@@ -10,9 +10,9 @@ from performance_optimizations import get_replicate_client
 from app.services.platform_integrations import tracked_replicate_run
 from modules.video_generation import generate_ken_burns_video
 from app.services.youtube_upload_service import YouTubeUploadService
-from platform_helpers import _get_replicate_token
+from app.services.platform_helpers import _get_replicate_token
 from app.utils.ray_integration_helpers import is_ray_enabled, get_ray_manager_if_enabled
-from tab_job_helpers import (
+from app.services.tab_job_helpers import (
     submit_video_generation_job,
     submit_batch_videos,
     submit_batch_operation,
@@ -20,7 +20,7 @@ from tab_job_helpers import (
     check_jobs_progress,
     are_all_jobs_done
 )
-from global_job_queue import JobType, get_global_job_queue
+from app.services.global_job_queue import JobType, get_global_job_queue
 
 logger = logging.getLogger(__name__)
 

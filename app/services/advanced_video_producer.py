@@ -80,7 +80,7 @@ class AdvancedVideoProducer:
     
     def __init__(self, replicate_token: str):
         """Initialize video producer with Replicate API token"""
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         self.replicate_api = ReplicateAPI(replicate_token)
         self.replicate_token = replicate_token
         self.output_dir = tempfile.mkdtemp(prefix="video_production_")

@@ -40,7 +40,7 @@ class AutonomousTaskQueue:
     
     def __init__(self, replicate_api):
         # Import here to avoid circular dependencies
-        from chat_assistant import MultiAgentOrchestrator
+        from app.services.chat_assistant import MultiAgentOrchestrator
         
         self.replicate = replicate_api
         self.orchestrator = MultiAgentOrchestrator(replicate_api)

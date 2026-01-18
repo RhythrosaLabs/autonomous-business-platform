@@ -7,7 +7,7 @@ Shows active operations, progress, and allows cancellation.
 
 import streamlit as st
 from typing import Optional
-from global_job_queue import get_global_job_queue, JobStatus, JobType
+from app.services.global_job_queue import get_global_job_queue, JobStatus, JobType
 from datetime import datetime
 import time
 

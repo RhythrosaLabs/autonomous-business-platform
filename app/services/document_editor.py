@@ -430,8 +430,8 @@ def render_document_editor_ui():
                 with st.spinner("Generating..."):
                     try:
                         # Get API service
-                        from platform_helpers import _get_replicate_token
-                        from api_service import ReplicateAPI
+                        from app.services.platform_helpers import _get_replicate_token
+                        from app.services.api_service import ReplicateAPI
                         
                         token = _get_replicate_token()
                         if token:

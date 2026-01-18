@@ -52,7 +52,7 @@ def _get_replicate_api():
     """Lazy load ReplicateAPI."""
     global _replicate_api
     if _replicate_api is None:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         _replicate_api = ReplicateAPI
     return _replicate_api
 
@@ -81,7 +81,7 @@ def _get_otto_engine():
     global _otto_engine_module, OTTO_ENGINE_AVAILABLE, _otto_loaded
     if not _otto_loaded:
         try:
-            from otto_engine import OttoEngine, TaskPlan, render_otto_chat, get_knowledge_base, OttoKnowledgeBase
+            from app.services.otto_engine import OttoEngine, TaskPlan, render_otto_chat, get_knowledge_base, OttoKnowledgeBase
             _otto_engine_module = {
                 'OttoEngine': OttoEngine,
                 'TaskPlan': TaskPlan,
@@ -506,7 +506,7 @@ If this task requires logging in to any service, check if credentials are availa
                 logger.info(f"⚡ Processing slash command: {user_message[:50]}...")
                 
                 try:
-                    from otto_engine import SlashCommandProcessor, get_slash_processor, SLASH_COMMANDS, AI_MODELS
+                    from app.services.otto_engine import SlashCommandProcessor, get_slash_processor, SLASH_COMMANDS, AI_MODELS
                     
                     # Get the slash processor
                     slash_processor = get_slash_processor(self.replicate)
@@ -1343,7 +1343,7 @@ def _initialize_apis():
     try:
         token = os.getenv('PRINTIFY_API_TOKEN') or st.session_state.get('printify_token')
         if token:
-            from api_service import PrintifyAPI
+            from app.services.api_service import PrintifyAPI
             apis['printify'] = PrintifyAPI(token)
     except: pass
     

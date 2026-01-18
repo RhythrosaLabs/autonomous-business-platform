@@ -28,7 +28,7 @@ def save_pipeline_as_shortcut(
         str: The ID of the created shortcut
     """
     try:
-        from shortcuts_manager import ShortcutsManager
+        from app.services.shortcuts_manager import ShortcutsManager
         shortcuts_mgr = ShortcutsManager()
     except ImportError:
         shortcuts_mgr = None

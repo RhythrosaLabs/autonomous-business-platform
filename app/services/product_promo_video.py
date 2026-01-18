@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from api_service import ReplicateAPI
+from app.services.api_service import ReplicateAPI
 
 # Lazy imports for moviepy to avoid pygame/SDL initialization issues on macOS
 # These will be imported when actually needed in the functions

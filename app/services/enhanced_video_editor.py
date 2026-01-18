@@ -412,11 +412,11 @@ def render_video_editor_ui():
         return
     
     # Get API service
-    from platform_helpers import _get_replicate_token
+    from app.services.platform_helpers import _get_replicate_token
     token = _get_replicate_token()
     api = None
     if token:
-        from api_service import ReplicateAPI
+        from app.services.api_service import ReplicateAPI
         api = ReplicateAPI(api_token=token)
     
     editor = VideoEditor(api_service=api)

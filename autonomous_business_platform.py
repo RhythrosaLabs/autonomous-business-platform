@@ -118,7 +118,7 @@ except ImportError:
 
 # Import platform integrations (API tracking, session persistence, performance boost)
 try:
-    from platform_integrations import (
+    from app.services.platform_integrations import (
         init_all_integrations,
         tracked_replicate_run,
         tracked_replicate_text_generation,
@@ -223,7 +223,7 @@ from app.tabs.abp_utils import (
 
 # Import AI Twitter poster (uses Anthropic Claude via browser-use)
 try:
-    from ai_twitter_poster import post_to_twitter_ai
+    from app.services.ai_twitter_poster import post_to_twitter_ai
     # Check if Anthropic key is available
     if os.getenv('ANTHROPIC_API_KEY'):
         AI_TWITTER_AVAILABLE = True
@@ -311,7 +311,7 @@ def get_chat_assistant():
     """Lazy load chat_assistant module on first use."""
     global _chat_assistant_module
     if _chat_assistant_module is None:
-        from chat_assistant import render_chat_interface, render_autonomous_todo
+        from app.services.chat_assistant import render_chat_interface, render_autonomous_todo
         _chat_assistant_module = {
             'render_chat_interface': render_chat_interface,
             'render_autonomous_todo': render_autonomous_todo
@@ -328,14 +328,14 @@ def render_autonomous_todo():
 
 # Import enhanced task queue
 try:
-    from task_queue_engine import render_enhanced_task_queue, EnhancedTaskQueue
+    from app.services.task_queue_engine import render_enhanced_task_queue, EnhancedTaskQueue
     ENHANCED_TASK_QUEUE_AVAILABLE = True
 except ImportError:
     ENHANCED_TASK_QUEUE_AVAILABLE = False
 
 # Import shortcuts manager for persistent magic buttons
 try:
-    from shortcuts_manager import (
+    from app.services.shortcuts_manager import (
         ShortcutsManager,
         init_shortcuts,
         add_shortcut,
@@ -436,7 +436,7 @@ def _get_platform_helpers():
     """Lazy load platform helpers on first use."""
     global _platform_helpers_cache
     if _platform_helpers_cache is None:
-        from platform_helpers import (
+        from app.services.platform_helpers import (
             _get_printify_api,
             _render_printify_product_config,
             _resolve_campaign_printify_config,
