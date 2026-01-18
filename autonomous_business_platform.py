@@ -14,7 +14,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 os.environ.setdefault('STREAMLIT_SERVER_HEADLESS', 'true')
 os.environ.setdefault('STREAMLIT_BROWSER_GATHER_USAGE_STATS', 'false')
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     time, logging, uuid, datetime, timedelta, Path, json, random, re, asyncio,
     Any, Dict, Tuple, Optional, requests, setup_logger
 )
@@ -22,9 +22,9 @@ from PIL import Image, ImageFilter, ImageOps, ImageEnhance
 from dotenv import load_dotenv
 
 import streamlit as st
-from abp_campaign_results import render_campaign_complete_summary
-from abp_config import AppConfig
-from abp_ui_components import render_about_guide, render_command_line_guide
+from app.tabs.abp_campaign_results import render_campaign_complete_summary
+from app.tabs.abp_config import AppConfig
+from app.tabs.abp_ui_components import render_about_guide, render_command_line_guide
 
 # Set up logging
 logger = setup_logger(__name__)
@@ -205,7 +205,7 @@ except ImportError:
 # PERFORMANCE: CACHING FUNCTIONS
 # ========================================
 # Caching functions are imported from abp_utils.py
-from abp_utils import (
+from app.tabs.abp_utils import (
     get_cached_replicate_client,
     get_cached_replicate_api,
     cached_scan_files,
@@ -235,7 +235,7 @@ except ImportError as e:
     AI_TWITTER_AVAILABLE = False
     logging.warning(f"⚠️ AI Twitter poster not available: {e}")
 
-from abp_state import init_session_defaults
+from app.tabs.abp_state import init_session_defaults
 
 def initialize_session_state():
     """Initialize all session state variables - runs once per session."""
@@ -246,7 +246,7 @@ initialize_session_state()
 
 # Import and initialize onboarding
 try:
-    from abp_onboarding import check_and_show_onboarding, render_getting_started_sidebar
+    from app.tabs.abp_onboarding import check_and_show_onboarding, render_getting_started_sidebar
     ONBOARDING_AVAILABLE = True
 except ImportError:
     ONBOARDING_AVAILABLE = False
@@ -606,7 +606,7 @@ DESIGN_ENHANCERS = {
 # ========================================
 # SIDEBAR: MAIN NAVIGATION
 # ========================================
-from abp_sidebar import render_sidebar
+from app.tabs.abp_sidebar import render_sidebar
 all_tabs = render_sidebar(
     enhanced_features_available=ENHANCED_FEATURES_AVAILABLE,
     platform_integrations_available=PLATFORM_INTEGRATIONS_AVAILABLE,
