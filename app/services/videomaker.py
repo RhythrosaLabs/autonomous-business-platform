@@ -4,7 +4,7 @@ import tempfile
 import os
 import requests
 import re
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 from moviepy.editor import (
     VideoFileClip,
     concatenate_videoclips, # Corrected import from concatenate_videoclip to concatenate_videoclips

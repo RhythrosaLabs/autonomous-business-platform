@@ -23,10 +23,10 @@ from abp_imports_common import (
 )
 
 # Import modularized components
-from chat_assistant_history import (
+from app.services.chat_assistant_history import (
     ChatHistoryManager, get_chat_history_manager, render_chat_history_sidebar
 )
-from chat_assistant_tasks import (
+from app.services.chat_assistant_tasks import (
     TaskQueueItem, AutonomousTaskQueue
 )
 

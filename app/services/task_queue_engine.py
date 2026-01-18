@@ -31,7 +31,7 @@ from enum import Enum
 from concurrent.futures import ThreadPoolExecutor
 import requests
 import tempfile
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 
 logger = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 
 try:
     from platform_helpers import _get_replicate_token

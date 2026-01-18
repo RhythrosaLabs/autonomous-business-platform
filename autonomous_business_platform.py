@@ -150,7 +150,7 @@ except ImportError as e:
     logging.warning(f"⚠️ Platform integrations not available: {e}")
 
 # Import Playground models configuration
-from playground_models import (
+from app.services.playground_models import (
     IMAGE_MODELS, VIDEO_MODELS, EDITING_MODELS, MARKETING_MODELS,
     VIDEO_EDITING_MODELS, MODEL_3D, MUSIC_MODELS, SPEECH_MODELS,
     build_model_input
@@ -270,7 +270,7 @@ if 'session_manager' not in st.session_state or st.session_state.session_manager
     st.session_state.session_manager = SessionManager()
 
 # Initialize Cross-Page State Manager for persistent state across pages
-from cross_page_state import (
+from app.utils.cross_page_state import (
     init_cross_page_state,
     get_state_manager,
     save_current_page_state,

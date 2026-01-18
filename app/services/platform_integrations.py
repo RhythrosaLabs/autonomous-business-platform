@@ -558,7 +558,7 @@ def get_draft(form_key: str, field: str, default: Any = None) -> Any:
 INTEGRATION_EXAMPLE = '''
 # Add these imports near the top of autonomous_business_platform.py:
 
-from platform_integrations import (
+from app.services.platform_integrations import (
     init_all_integrations,
     tracked_replicate_run,
     tracked_replicate_text_generation,

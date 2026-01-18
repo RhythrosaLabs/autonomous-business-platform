@@ -6,8 +6,8 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
-from platform_integrations import tracked_replicate_run
-from ray_integration_helpers import is_ray_enabled, get_ray_manager_if_enabled
+from app.services.platform_integrations import tracked_replicate_run
+from app.utils.ray_integration_helpers import is_ray_enabled, get_ray_manager_if_enabled
 from tab_job_helpers import (
     submit_workflow_job,
     submit_batch_operation,

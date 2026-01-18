@@ -8,7 +8,7 @@ import pandas as pd
 from platform_helpers import _get_replicate_token
 from app.services.contact_finder_service import ContactFinderService, Contact, OutreachPlan
 from api_service import ReplicateAPI
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 
 def render_contact_finder_tab():
     """

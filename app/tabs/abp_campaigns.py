@@ -7,7 +7,7 @@ import time
 dt = datetime
 logger = setup_logger(__name__)
 
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 from platform_helpers import _get_replicate_token
 from tab_job_helpers import (
     submit_batch_product_designs,

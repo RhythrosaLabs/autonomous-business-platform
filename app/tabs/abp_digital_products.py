@@ -6,7 +6,7 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
-from ray_integration_helpers import ray_generate_image_sync, is_ray_enabled
+from app.utils.ray_integration_helpers import ray_generate_image_sync, is_ray_enabled
 from tab_job_helpers import (
     submit_digital_product_job,
     submit_batch_operation,

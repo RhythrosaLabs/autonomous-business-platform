@@ -15,9 +15,9 @@ from platform_helpers import (
     _render_printify_product_config
 )
 from api_service import ReplicateAPI
-from ray_integration_helpers import is_ray_enabled
-from smart_dashboard_widget import SmartDashboard, ActivityFeed
-from cross_page_state import render_campaign_status_banner
+from app.utils.ray_integration_helpers import is_ray_enabled
+from app.services.smart_dashboard_widget import SmartDashboard, ActivityFeed
+from app.utils.cross_page_state import render_campaign_status_banner
 from abp_campaign_generator import run_campaign_generation
 from ai_model_manager import ModelFallbackManager, ModelPriority
 from prompt_templates import PromptTemplateLibrary

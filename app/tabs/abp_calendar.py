@@ -4,7 +4,7 @@ from datetime import timedelta, datetime as dt
 import calendar
 import uuid
 import logging
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 from tab_job_helpers import (
     submit_batch_operation,
     collect_job_results,

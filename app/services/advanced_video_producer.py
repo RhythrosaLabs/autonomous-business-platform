@@ -7,7 +7,7 @@ Eliminates code duplication by using modules/ai_generation.py, modules/audio_pro
 """
 
 import tempfile
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 import os
 import requests
 import re

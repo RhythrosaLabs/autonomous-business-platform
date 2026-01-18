@@ -8,7 +8,7 @@ import io
 import os
 import tempfile
 import logging
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 from typing import Dict, List, Optional, Any, Tuple
 from pathlib import Path
 from datetime import datetime

@@ -2,7 +2,7 @@ from abp_imports_common import (
     st, os, time, json, requests, random, re, shutil, base64, logging,
     Path, datetime, ThreadPoolExecutor, setup_logger
 )
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 
 # Use standard datetime alias for backward compatibility
 dt = datetime
@@ -23,11 +23,11 @@ from printify_mockup_service import PrintifyMockupService
 from shopify_service import ShopifyAPI
 from app.services.blog_generator import generate_product_blog
 # VideoMaker is not a class - videomaker.py is a standalone streamlit app
-from social_media_automation import SocialMediaAutomation
+from app.services.social_media_automation import SocialMediaAutomation
 from app.services.digital_products_service import DigitalProductsService, DigitalProductGenerator
 from ai_model_manager import ModelFallbackManager
 from prompt_templates import PromptTemplateLibrary
-from unified_storage import auto_save_generated_content
+from app.utils.unified_storage import auto_save_generated_content
 import moviepy.editor as mpe  # Don't use * import - it shadows 'time' module
 import re
 

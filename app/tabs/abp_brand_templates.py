@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime as dt
 import logging
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 from platform_helpers import _get_replicate_token
 
 # Configure logger

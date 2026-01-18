@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Tuple
 import logging
 import random
 
-from youtube_helper import (
+from app.utils.youtube_helper import (
     get_youtube_service,
     upload_to_youtube,
     YOUTUBE_CATEGORIES

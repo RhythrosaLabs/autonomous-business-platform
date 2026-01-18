@@ -13,7 +13,7 @@ A hyper-intelligent workflow execution engine that:
 """
 
 import os
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 import json
 import logging
 import requests

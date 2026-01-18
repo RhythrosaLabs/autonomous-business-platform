@@ -5,7 +5,7 @@ from datetime import datetime as dt
 import requests
 import json
 
-from cross_page_state import restore_page_to_session
+from app.utils.cross_page_state import restore_page_to_session
 from platform_helpers import (
     _render_printify_product_config,
     _ensure_replicate_client,
@@ -14,7 +14,7 @@ from platform_helpers import (
     _printify_selection_ready,
     _send_design_to_printify
 )
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 from tab_job_helpers import (
     submit_batch_product_designs,
     collect_job_results,

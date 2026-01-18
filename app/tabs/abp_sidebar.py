@@ -7,7 +7,7 @@ dt = datetime
 logger = setup_logger(__name__)
 
 from app.services.secure_config import render_secure_config_ui, init_api_clients, is_demo_mode, get_api_key
-from enhanced_features import GlobalSearchManager
+from app.services.enhanced_features import GlobalSearchManager
 from app.services.tab_visibility_manager import (
     initialize_tab_visibility,
     get_visible_tabs,
@@ -17,7 +17,7 @@ from app.services.tab_visibility_manager import (
 from app.services.youtube_upload_service import YouTubeUploadService
 from shopify_service import ShopifyAPI
 from platform_helpers import _get_replicate_token
-from platform_integrations import render_recovery_check
+from app.services.platform_integrations import render_recovery_check
 from performance_optimizations import render_performance_settings
 try:
     from background_tasks import get_task_manager, TaskState

@@ -18,7 +18,7 @@ Downloads from:
 """
 
 import os
-from platform_integrations import tracked_replicate_run
+from app.services.platform_integrations import tracked_replicate_run
 import json
 import hashlib
 import logging

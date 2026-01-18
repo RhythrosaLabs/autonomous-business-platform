@@ -6,19 +6,19 @@ import logging
 import os
 
 # Import models
-from playground_models import (
+from app.services.playground_models import (
     IMAGE_MODELS, VIDEO_MODELS, EDITING_MODELS, 
     VIDEO_EDITING_MODELS, MODEL_3D
 )
-from playground_ui_helpers import render_model_parameters, render_file_upload
-from unified_storage import auto_save_generated_content
+from app.utils.playground_ui_helpers import render_model_parameters, render_file_upload
+from app.utils.unified_storage import auto_save_generated_content
 
 # Import helpers
 from platform_helpers import (
     _render_printify_product_config, 
     _get_replicate_token
 )
-from cross_page_state import get_state_manager, restore_page_to_session
+from app.utils.cross_page_state import get_state_manager, restore_page_to_session
 from api_service import ReplicateAPI
 
 # Try to import tracked_replicate_run
