@@ -17,14 +17,14 @@ except ImportError:
     post_to_twitter_ai = None
 
 # Import helpers
-from campaign_generator_service import EnhancedCampaignGenerator
+from app.services.campaign_generator_service import EnhancedCampaignGenerator
 from api_service import ReplicateAPI
 from printify_mockup_service import PrintifyMockupService
 from shopify_service import ShopifyAPI
-from blog_generator import generate_product_blog
+from app.services.blog_generator import generate_product_blog
 # VideoMaker is not a class - videomaker.py is a standalone streamlit app
 from social_media_automation import SocialMediaAutomation
-from digital_products_service import DigitalProductsService, DigitalProductGenerator
+from app.services.digital_products_service import DigitalProductsService, DigitalProductGenerator
 from ai_model_manager import ModelFallbackManager
 from prompt_templates import PromptTemplateLibrary
 from unified_storage import auto_save_generated_content

@@ -9,7 +9,7 @@ from cross_page_state import restore_page_to_session
 from performance_optimizations import get_replicate_client
 from platform_integrations import tracked_replicate_run
 from modules.video_generation import generate_ken_burns_video
-from youtube_upload_service import YouTubeUploadService
+from app.services.youtube_upload_service import YouTubeUploadService
 from platform_helpers import _get_replicate_token
 from ray_integration_helpers import is_ray_enabled, get_ray_manager_if_enabled
 from tab_job_helpers import (

@@ -188,7 +188,7 @@ from datetime import datetime, timedelta
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from api_service import PrintifyAPI, ReplicateAPI
-from local_models_manager import LocalModelsManager
+from app.services.local_models_manager import LocalModelsManager
 from database_manager import DatabaseManager
 from image_manager import ImageManager
 try:

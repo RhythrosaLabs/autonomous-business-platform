@@ -793,7 +793,7 @@ def run_campaign_in_background(
             check_cancelled()
             
             try:
-                from campaign_generator_service import EnhancedCampaignGenerator
+                from .campaign_generator_service import EnhancedCampaignGenerator
                 generator = EnhancedCampaignGenerator(replicate_api)
                 
                 # Generate campaign concept and plan
@@ -949,7 +949,7 @@ def run_campaign_in_background(
             check_cancelled()
             
             try:
-                from blog_generator import generate_product_blog
+                from .blog_generator import generate_product_blog
                 
                 # Create blogs directory
                 blogs_dir = campaign_dir / "blogs"

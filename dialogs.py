@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import QDateTime, Qt, QTimer
 from PyQt5.QtGui import QFont
 from data_models import ProductTemplate, PriceRule, ScheduledJob
-from local_models_manager import LocalModelsManager
+from app.services.local_models_manager import LocalModelsManager
 
 class TemplateDialog(QDialog):
     """Dialog for creating/editing templates"""

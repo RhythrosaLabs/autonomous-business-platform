@@ -621,7 +621,7 @@ class DigitalProductsService:
             product_type = type_map.get(product_type.lower(), product_type.lower())
             
             if product_type == 'ebook':
-                from digital_product_generator import EBookGenerator
+                from .digital_product_generator import EBookGenerator
                 generator = EBookGenerator()
                 return generator.generate_ebook(
                     topic=f"{title} for {target_audience}",
@@ -633,7 +633,7 @@ class DigitalProductsService:
                     include_audio=kwargs.get('include_audio', False)
                 )
             elif product_type == 'coloring_book':
-                from digital_product_generator import ColoringBookGenerator
+                from .digital_product_generator import ColoringBookGenerator
                 generator = ColoringBookGenerator()
                 # Map target_audience to difficulty level
                 difficulty_map = {
@@ -653,7 +653,7 @@ class DigitalProductsService:
                     page_size=kwargs.get('page_size', 'letter')
                 )
             elif product_type == 'course':
-                from digital_product_generator import CourseGenerator
+                from .digital_product_generator import CourseGenerator
                 generator = CourseGenerator()
                 return generator.generate_course(
                     title=title,

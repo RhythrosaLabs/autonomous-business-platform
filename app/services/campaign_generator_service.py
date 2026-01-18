@@ -794,7 +794,7 @@ Key Patterns from Magic-Marketer:
 - Professional ZIP packaging
 
 Usage:
-    from campaign_generator_service import EnhancedCampaignGenerator
+    from .campaign_generator_service import EnhancedCampaignGenerator
     from api_service import ReplicateAPI
     
     api = ReplicateAPI(token)

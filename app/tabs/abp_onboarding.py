@@ -4,7 +4,7 @@ Makes the app more accessible and guides new users through key features
 """
 
 import streamlit as st
-from tab_visibility_manager import apply_role_preset, ROLE_PRESETS
+from app.services.tab_visibility_manager import apply_role_preset, ROLE_PRESETS
 from abp_onboarding_content import SIDEBAR_GUIDE, DASHBOARD_GUIDE, OTTO_GUIDE
 from abp_onboarding_content2 import PLAYGROUND_GUIDE, INTEGRATIONS_GUIDE, AUTOMATIONS_GUIDE
 

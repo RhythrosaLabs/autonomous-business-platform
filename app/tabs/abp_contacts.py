@@ -6,7 +6,7 @@ logger = setup_logger(__name__)
 
 import pandas as pd
 from platform_helpers import _get_replicate_token
-from contact_finder_service import ContactFinderService, Contact, OutreachPlan
+from app.services.contact_finder_service import ContactFinderService, Contact, OutreachPlan
 from api_service import ReplicateAPI
 from platform_integrations import tracked_replicate_run
 

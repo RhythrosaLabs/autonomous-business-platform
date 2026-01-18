@@ -386,7 +386,7 @@ from session_manager import (
     track_generated_file,
     scan_and_index_files
 )
-from unified_agent_builder import render_unified_agent_builder
+from app.services.unified_agent_builder import render_unified_agent_builder
 
 # Lazy load video_export_utils (takes 5.5s due to moviepy import)
 _video_export_module = None
