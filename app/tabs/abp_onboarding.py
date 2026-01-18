@@ -20,7 +20,7 @@ def show_onboarding_modal():
     """Display an interactive onboarding guide for first-time users"""
     
     # Less intrusive - just a compact banner
-    with st.expander("👋 **New here?** Complete Platform Guide", expanded=False  # not st.session_state.get('minimized_onboarding', False)):
+    with st.expander("👋 **New here?** Complete Platform Guide", expanded=False):
         # Tabs for different learning paths
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
             "🚀 Quick Start", 
