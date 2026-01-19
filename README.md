@@ -617,8 +617,10 @@ MIT License - see [LICENSE](LICENSE) file
 - [Ray](https://ray.io/) - Distributed computing
 - [Replicate](https://replicate.com/) - AI model hosting
 - [Anthropic Claude](https://anthropic.com/) - Otto AI brain
+- [Anthropic Computer Use](https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo) - Computer interaction capabilities
+- [Browser Use](https://github.com/browser-use/browser-use) - Web automation framework
 
-**Created By**: [RhythrosaLabs](https://github.com/RhythrosaLabs)
+**Created By**: Dan Sheils ([RhythrosaLabs](https://github.com/RhythrosaLabs))
 
 ---
 
@@ -632,4 +634,4 @@ MIT License - see [LICENSE](LICENSE) file
 
 **⭐ Star this repo if you find it useful!**
 
-**Made with ❤️ by RhythrosaLabs**
+**Made with ❤️ by Dan Sheils**
