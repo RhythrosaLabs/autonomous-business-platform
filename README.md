@@ -10,6 +10,40 @@
 
 ---
 
+## 📑 Table of Contents
+
+- [🎯 What is This?](#-what-is-this)
+- [✨ Core Features](#-core-features)
+  - [🤖 Otto AI Assistant](#-otto-ai-assistant)
+  - [📊 Complete Tab Breakdown](#-complete-tab-breakdown)
+- [🔌 Complete Integration List](#-complete-integration-list)
+  - [🤖 AI Models & APIs](#-ai-models--apis)
+  - [🛍️ E-Commerce Platforms](#️-e-commerce-platforms)
+  - [📱 Social Media Platforms](#-social-media-platforms)
+  - [📧 Email & Communication](#-email--communication)
+  - [🔧 Automation & Workflows](#-automation--workflows)
+  - [💾 Storage & Database](#-storage--database)
+- [🏗️ Architecture](#️-architecture)
+- [📦 Installation & Setup](#-installation--setup)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
+- [🐳 Docker Deployment](#-docker-deployment)
+- [🌐 Cloud Deployment](#-cloud-deployment)
+  - [Deploy to Railway](#deploy-to-railway)
+  - [Deploy to Render](#deploy-to-render)
+  - [Deploy to Fly.io](#deploy-to-flyio)
+- [🎓 Usage Examples](#-usage-examples)
+- [🛠️ Development](#️-development)
+  - [Project Structure](#project-structure)
+  - [Running Tests](#running-tests)
+- [📊 Performance Benchmarks](#-performance-benchmarks)
+- [🤝 Contributing](#-contributing)
+- [📝 License](#-license)
+- [�� Credits](#-credits)
+- [📧 Support & Community](#-support--community)
+
+---
+
 ## 🎯 What is This?
 
 The Autonomous Business Platform is a **production-ready, self-hosted AI business automation suite** that combines:
