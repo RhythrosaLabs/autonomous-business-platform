@@ -627,7 +627,6 @@ MIT License - see [LICENSE](LICENSE) file
 ## 📧 Support & Community
 
 - 🐛 **Bug Reports**: [GitHub Issues](https://github.com/RhythrosaLabs/autonomous-business-platform/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/RhythrosaLabs/autonomous-business-platform/discussions)
 - 📖 **Documentation**: [Wiki](https://github.com/RhythrosaLabs/autonomous-business-platform/wiki)
 
 ---
