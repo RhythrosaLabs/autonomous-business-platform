@@ -3,7 +3,7 @@ Chat History Management System
 Handles conversation persistence, loading, searching, and management.
 """
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, json, logging, uuid, Path, Dict, List, Any, Optional,
     datetime, setup_logger
 )

@@ -37,7 +37,7 @@ SLASH COMMANDS:
 This is the core brain of Otto Mate.
 """
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, re, time, hashlib, base64, tempfile,
     Path, Dict, List, Any, Optional, Tuple, Callable, Union, datetime,
     ThreadPoolExecutor, dataclass, field, Enum, lru_cache, BytesIO, pickle,
@@ -46,7 +46,7 @@ from abp_imports_common import (
 
 logger = setup_logger(__name__)
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, re, time, hashlib, base64, tempfile,
     Path, Dict, List, Any, Optional, Tuple, Callable, Union, datetime,
     ThreadPoolExecutor, dataclass, field, Enum, lru_cache, BytesIO, pickle,
@@ -56,7 +56,7 @@ from abp_imports_common import (
 logger = setup_logger(__name__)
 
 # Import all models and support classes from modularized file
-from otto_engine_models import (
+from .otto_engine_models import (
     OttoKnowledgeBase, OttoAppAwareness, OttoPerformanceConfig, RequestCache,
     TaskType, TaskStep, TaskPlan, OTTO_CONFIG, get_knowledge_base
 )

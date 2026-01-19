@@ -14,7 +14,7 @@ A powerful autonomous task queue system that:
 Integrates with OttoEngine for intelligent task planning and execution.
 """
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, re, time,
     Path, Dict, List, Any, Optional, Tuple, ThreadPoolExecutor, setup_logger
 )

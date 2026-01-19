@@ -11,7 +11,7 @@ from app.services.platform_helpers import _ensure_replicate_client, _slugify, _e
 from app.services.blog_generator import generate_product_blog
 from app.utils.brand_templates import PRESET_TEMPLATES as BRAND_TEMPLATES
 from app.services.email_marketing_service import EmailMarketingService
-from shopify_service import ShopifyAPI
+from app.services.shopify_service import ShopifyAPI
 from app.services.campaign_generator_service import EnhancedCampaignGenerator
 from app.services.platform_integrations import tracked_replicate_run
 from app.utils.ray_integration_helpers import ray_generate_image_sync, is_ray_enabled

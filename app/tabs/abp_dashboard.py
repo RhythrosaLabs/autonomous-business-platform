@@ -18,9 +18,9 @@ from app.services.api_service import ReplicateAPI
 from app.utils.ray_integration_helpers import is_ray_enabled
 from app.services.smart_dashboard_widget import SmartDashboard, ActivityFeed
 from app.utils.cross_page_state import render_campaign_status_banner
-from abp_campaign_generator import run_campaign_generation
-from ai_model_manager import ModelFallbackManager, ModelPriority
-from prompt_templates import PromptTemplateLibrary
+from app.tabs.abp_campaign_generator import run_campaign_generation
+from app.services.ai_model_manager import ModelFallbackManager, ModelPriority
+from app.utils.prompt_templates import PromptTemplateLibrary
 
 def render_dashboard_tab(
     smart_dashboard_available,
@@ -901,7 +901,7 @@ def render_dashboard_tab(
                 )
         
             # Set model flags based on recommendation
-            from ai_model_manager import ModelFallbackManager
+            from app.services.ai_model_manager import ModelFallbackManager
             manager = ModelFallbackManager()
         
             requirements = {
@@ -918,7 +918,7 @@ def render_dashboard_tab(
             use_sora = recommended_model.value == "sora"
             use_kling = recommended_model.value == "kling"
         
-            from ai_model_manager import ModelPriority
+            from app.services.ai_model_manager import ModelPriority
             model_info = ModelPriority.MODEL_CAPABILITIES[recommended_model]
             st.success(f"🎬 Recommended: **{model_info['name']}**")
             st.caption(f"💡 {model_info['strengths']}")
@@ -983,7 +983,7 @@ def render_dashboard_tab(
                 )
         
             # Show fallback order
-            from ai_model_manager import ModelPriority
+            from app.services.ai_model_manager import ModelPriority
             tier_key = quality_tier.lower()
             fallback_order = ModelPriority.QUALITY_TIERS.get(tier_key, [])
         
@@ -1037,7 +1037,7 @@ def render_dashboard_tab(
         )
     
         if use_prompt_templates:
-            from prompt_templates import PromptTemplateLibrary, PromptEnhancer
+            from app.utils.prompt_templates import PromptTemplateLibrary, PromptEnhancer
             template_lib = PromptTemplateLibrary()
         
             template_col1, template_col2 = st.columns(2)
@@ -1329,7 +1329,7 @@ def render_dashboard_tab(
             st.info(f"⏱️ Est. time: ~{estimated_time} min")
 
     if start_button:
-        from abp_campaign_generator import run_campaign_generation
+        from app.tabs.abp_campaign_generator import run_campaign_generation
         run_campaign_generation(
             concept_input=concept_input,
             target_audience=target_audience,

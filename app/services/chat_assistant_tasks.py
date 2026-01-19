@@ -3,7 +3,7 @@ Task Queue System for Autonomous Task Execution
 Handles task creation, analysis, planning, and execution with multi-agent orchestration.
 """
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     os, json, logging, asyncio, datetime, Dict, List, Any, Optional,
     setup_logger
 )

@@ -15,7 +15,7 @@ from app.services.tab_visibility_manager import (
     render_tab_preferences
 )
 from app.services.youtube_upload_service import YouTubeUploadService
-from shopify_service import ShopifyAPI
+from app.services.shopify_service import ShopifyAPI
 from app.services.platform_helpers import _get_replicate_token
 from app.services.platform_integrations import render_recovery_check
 from performance_optimizations import render_performance_settings

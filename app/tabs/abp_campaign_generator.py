@@ -19,14 +19,14 @@ except ImportError:
 # Import helpers
 from app.services.campaign_generator_service import EnhancedCampaignGenerator
 from app.services.api_service import ReplicateAPI
-from printify_mockup_service import PrintifyMockupService
-from shopify_service import ShopifyAPI
+from app.services.printify_mockup_service import PrintifyMockupService
+from app.services.shopify_service import ShopifyAPI
 from app.services.blog_generator import generate_product_blog
 # VideoMaker is not a class - videomaker.py is a standalone streamlit app
 from app.services.social_media_automation import SocialMediaAutomation
 from app.services.digital_products_service import DigitalProductsService, DigitalProductGenerator
-from ai_model_manager import ModelFallbackManager
-from prompt_templates import PromptTemplateLibrary
+from app.services.ai_model_manager import ModelFallbackManager
+from app.utils.prompt_templates import PromptTemplateLibrary
 from app.utils.unified_storage import auto_save_generated_content
 import moviepy.editor as mpe  # Don't use * import - it shadows 'time' module
 import re
@@ -1314,7 +1314,7 @@ Include specific metrics and measurement methodologies."""
                     
                 if shopify_shop_url and shopify_access_token:
                     try:
-                        from shopify_service import ShopifyAPI
+                        from app.services.shopify_service import ShopifyAPI
                         import base64
                             
                         with st.spinner("Publishing blog to Shopify..."):

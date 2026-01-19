@@ -11,18 +11,18 @@ from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 # Import all Otto components
-from otto_super_engine import (
+from .otto_super_engine import (
     ToolRegistry, Tool, ToolCategory,
     IntentParser, ParsedIntent,
     MemoryManager, ChatSession, ChatMessage
 )
-from otto_super_engine_part2 import (
+from .otto_super_engine_part2 import (
     ExecutionEngine, ExecutionResult,
     ContextTracker
 )
 
 # Import Otto extensions
-from otto_super_extensions import (
+from .otto_super_extensions import (
     OttoTaskQueueExtension,
     OttoDocumentExtension,
     OttoPinterestTikTokExtension,
@@ -31,7 +31,7 @@ from otto_super_extensions import (
 )
 
 # Import Otto App Controller for full platform access
-from otto_app_controller import (
+from .otto_app_controller import (
     OttoAppController,
     parse_app_control_intent
 )

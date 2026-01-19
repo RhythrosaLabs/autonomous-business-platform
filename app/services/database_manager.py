@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional
 from datetime import datetime
-from data_models import ProductTemplate, PriceRule, ScheduledJob
+from .data_models import ProductTemplate, PriceRule, ScheduledJob
 
 class DatabaseManager:
     """SQLite database for analytics and history"""

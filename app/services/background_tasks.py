@@ -12,7 +12,7 @@ Key Features:
 5. Thread-safe task queue management
 """
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, threading, time, json, logging, uuid, Path, Dict, List, Any,
     Optional, setup_logger
 )

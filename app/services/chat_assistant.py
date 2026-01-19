@@ -17,7 +17,7 @@ Now integrated with:
 - EnhancedBrowserService for stable browser automation
 """
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, Path, Dict, List, Any, Optional, Tuple,
     datetime, ThreadPoolExecutor, setup_logger
 )
