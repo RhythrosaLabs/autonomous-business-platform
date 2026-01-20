@@ -9,7 +9,6 @@ Classes:
 - RequestCache: In-memory cache for repeated requests
 - TaskType, TaskStep, TaskPlan: Task workflow structures
 """
-from app.services.secure_config import get_api_key
 
 from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, re, time, hashlib, base64, tempfile,

@@ -1,6 +1,7 @@
 from app.tabs.abp_imports_common import (
     st, os, json, asyncio, Path, datetime, requests, setup_logger
 )
+from app.services.secure_config import get_api_key
 
 # Maintain backward compatibility alias
 dt = datetime
@@ -32,7 +33,6 @@ def format_size(bytes_size):
 
 def toggle_favorite(file_path):
     """Toggle favorite status for a file"""
-from app.services.secure_config import get_api_key
     path_str = str(file_path)
     if path_str in st.session_state.file_favorites:
         st.session_state.file_favorites.remove(path_str)

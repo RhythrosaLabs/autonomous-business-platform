@@ -3,7 +3,6 @@ AI Digital Product Generator
 Creates COMPLETE digital products - full books, courses, coloring books, etc.
 Not just cover art, but the entire product with all content.
 """
-from app.services.secure_config import get_api_key
 from app.tabs.abp_imports_common import (
     os, json, requests, replicate, Path, Optional, Dict, List, Any,
     datetime, logging, BytesIO, base64, time, re, setup_logger

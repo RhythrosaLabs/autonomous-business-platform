@@ -26,7 +26,6 @@ from dataclasses import dataclass, field, asdict
 from enum import Enum
 from functools import wraps
 import os
-from app.services.secure_config import get_api_key
 
 logger = logging.getLogger(__name__)
 

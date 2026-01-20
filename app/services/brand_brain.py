@@ -606,7 +606,6 @@ def render_brand_brain_page():
                     # Get Replicate API
                     from performance_utils import get_replicate_api
                     import os
-from app.services.secure_config import get_api_key
                     
                     token = get_api_key('REPLICATE_API_TOKEN')
                     if token:

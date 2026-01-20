@@ -36,7 +36,6 @@ SLASH COMMANDS:
 
 This is the core brain of Otto Mate.
 """
-from app.services.secure_config import get_api_key
 
 from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, re, time, hashlib, base64, tempfile,

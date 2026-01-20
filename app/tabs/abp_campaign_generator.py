@@ -3,6 +3,7 @@ from app.tabs.abp_imports_common import (
     Path, datetime, ThreadPoolExecutor, setup_logger
 )
 from app.services.platform_integrations import tracked_replicate_run
+from app.services.secure_config import get_api_key
 
 # Use standard datetime alias for backward compatibility
 dt = datetime
@@ -68,7 +69,6 @@ except (ImportError, Exception):
     TRACKED_REPLICATE_AVAILABLE = False
     def tracked_replicate_run(client, model, input_params, operation_name=None):
         """Fallback to regular replicate.run if platform_integrations unavailable"""
-from app.services.secure_config import get_api_key
         return client.run(model, input=input_params)
 
 from app.tabs.abp_campaign_results import render_campaign_complete_summary

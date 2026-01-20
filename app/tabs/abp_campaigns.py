@@ -2,6 +2,7 @@ from app.tabs.abp_imports_common import (
     st, os, Path, datetime, requests, json, setup_logger
 )
 import time
+from app.services.secure_config import get_api_key
 
 # Maintain backward compatibility alias
 dt = datetime
@@ -107,7 +108,6 @@ Provide:
 4. Recommended budget split across platforms
 
 Be concise - under 150 words total."""
-from app.services.secure_config import get_api_key
                                 response = tracked_replicate_run(client, "meta/meta-llama-3-8b-instruct", {"prompt": analysis_prompt, "max_tokens": 300}, operation_name="Campaign Analysis")
                                 st.session_state['campaign_analysis'] = "".join(response) if isinstance(response, list) else response
                             except Exception as e:
