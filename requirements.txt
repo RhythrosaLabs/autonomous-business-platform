@@ -63,3 +63,39 @@ langchain-anthropic>=0.3.1
 python-dateutil>=2.8.2
 pytz>=2023.3
 certifi>=2023.5.7
+
+# === ANTHROPIC AI ===
+anthropic>=0.42.0
+
+# === PYDANTIC (for data models) ===
+pydantic>=2.0.0,<3.0.0
+
+# === BROWSER USE (Advanced automation) ===
+browser-use>=0.1.0
+
+# === LANGCHAIN GOOGLE ===
+langchain-google-genai>=1.0.0
+
+# === ADDITIONAL VIDEO/AUDIO ===
+pydub>=0.25.1
+
+# === EMAIL SERVICES ===
+sendgrid>=6.11.0
+
+# === SOCIAL MEDIA ===
+tweepy>=4.14.0
+python-twitter>=3.5
+
+# === DATABASE ===
+sqlalchemy>=2.0.0
+aiosqlite>=0.19.0
+
+# === ASYNC SUPPORT ===
+aiohttp>=3.9.0
+asyncio>=3.4.3
+
+# === JSON & DATA ===
+jsonschema>=4.20.0
+
+# === MARKDOWN ===
+markdown>=3.5.0
