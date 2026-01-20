@@ -1,4 +1,4 @@
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, time, json, random, re, Path, datetime, setup_logger
 )
 

@@ -5,7 +5,10 @@ import asyncio
 import os
 import sys
 from pathlib import Path
-from browser_use import Agent, Browser, BrowserConfig
+try:
+    from browser_use import Agent, Browser, BrowserConfig
+except ImportError:
+    Agent = Browser = BrowserConfig = None
 from dotenv import load_dotenv
 import logging
 from langchain_anthropic import ChatAnthropic

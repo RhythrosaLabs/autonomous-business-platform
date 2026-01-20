@@ -6,7 +6,7 @@ import re
 import logging
 
 from app.utils.cross_page_state import restore_page_to_session
-from performance_optimizations import get_replicate_client
+from app.utils.performance_optimizations import get_replicate_client
 from app.services.platform_integrations import tracked_replicate_run
 from modules.video_generation import generate_ken_burns_video
 from app.services.youtube_upload_service import YouTubeUploadService

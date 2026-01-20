@@ -3,7 +3,7 @@ Advanced Job Monitor Tab
 Comprehensive job tracking, Ray dashboard integration, and performance analytics
 """
 
-from abp_imports_common import st, datetime, Path
+from app.tabs.abp_imports_common import st, datetime, Path
 import time
 from typing import Dict, List, Any
 from app.services.tab_job_helpers import (

@@ -14,7 +14,7 @@ Usage:
         from typing import Dict, List
     
     Use the centralized imports:
-        from abp_imports_common import Path, datetime, Dict, List
+        from app.tabs.abp_imports_common import Path, datetime, Dict, List
 
 Organized by category for clarity.
 """
@@ -78,7 +78,7 @@ except ImportError:
 # LOCAL - Project modules (conditionally imported to avoid circular deps)
 # ============================================================================
 # These are imported on-demand in functions that use them to avoid circular imports
-# Usage: from abp_imports_common import lazy_import
+# Usage: from app.tabs.abp_imports_common import lazy_import
 # result = lazy_import('platform_integrations')
 
 def lazy_import(module_name: str) -> Any:

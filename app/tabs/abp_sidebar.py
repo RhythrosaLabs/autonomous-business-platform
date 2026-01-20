@@ -1,4 +1,4 @@
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, time, json, Path, datetime, setup_logger
 )
 
@@ -18,7 +18,7 @@ from app.services.youtube_upload_service import YouTubeUploadService
 from app.services.shopify_service import ShopifyAPI
 from app.services.platform_helpers import _get_replicate_token
 from app.services.platform_integrations import render_recovery_check
-from performance_optimizations import render_performance_settings
+from app.utils.performance_optimizations import render_performance_settings
 try:
     from app.services.background_tasks import get_task_manager, TaskState
     BACKGROUND_TASKS_AVAILABLE = True

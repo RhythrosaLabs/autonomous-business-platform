@@ -1,4 +1,4 @@
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, datetime, timedelta, uuid, json, logging, setup_logger
 )
 
@@ -15,7 +15,7 @@ except ImportError:
         return ""
 
 try:
-    from performance_optimizations import get_replicate_client
+    from app.utils.performance_optimizations import get_replicate_client
     PERF_OPTIMIZATIONS_AVAILABLE = True
 except ImportError:
     PERF_OPTIMIZATIONS_AVAILABLE = False

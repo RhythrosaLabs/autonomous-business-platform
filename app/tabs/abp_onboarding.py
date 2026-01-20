@@ -5,8 +5,8 @@ Makes the app more accessible and guides new users through key features
 
 import streamlit as st
 from app.services.tab_visibility_manager import apply_role_preset, ROLE_PRESETS
-from abp_onboarding_content import SIDEBAR_GUIDE, DASHBOARD_GUIDE, OTTO_GUIDE
-from abp_onboarding_content2 import PLAYGROUND_GUIDE, INTEGRATIONS_GUIDE, AUTOMATIONS_GUIDE
+from app.tabs.abp_onboarding_content import SIDEBAR_GUIDE, DASHBOARD_GUIDE, OTTO_GUIDE
+from app.tabs.abp_onboarding_content2 import PLAYGROUND_GUIDE, INTEGRATIONS_GUIDE, AUTOMATIONS_GUIDE
 
 def check_and_show_onboarding():
     """Check if user is new and show onboarding if needed"""

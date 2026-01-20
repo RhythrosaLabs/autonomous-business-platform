@@ -1,4 +1,4 @@
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, time, json, requests, random, re, shutil, base64, logging,
     Path, datetime, ThreadPoolExecutor, setup_logger
 )
@@ -70,7 +70,7 @@ except (ImportError, Exception):
         """Fallback to regular replicate.run if platform_integrations unavailable"""
         return client.run(model, input=input_params)
 
-from abp_campaign_results import render_campaign_complete_summary
+from app.tabs.abp_campaign_results import render_campaign_complete_summary
 
 def run_campaign_generation(
     concept_input,

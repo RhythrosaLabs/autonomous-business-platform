@@ -5,7 +5,7 @@ Includes: Spotify, Apple Music, YouTube Music, Bandcamp, SoundCloud, Deezer, Tik
 Amazon Music, Tidal, Beatport, Traxsource, Juno Download, etc.
 """
 
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, json, os, datetime, timedelta, Path, asyncio, 
     dataclass, asdict, Dict, List, Optional, Any, setup_logger
 )

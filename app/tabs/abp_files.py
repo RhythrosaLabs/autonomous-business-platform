@@ -1,4 +1,4 @@
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, json, asyncio, Path, datetime, requests, setup_logger
 )
 
@@ -6,7 +6,7 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
-from abp_utils import cached_scan_files, cached_scan_products
+from app.tabs.abp_utils import cached_scan_files, cached_scan_products
 from app.services.tab_job_helpers import (
     submit_batch_operation,
     collect_job_results,

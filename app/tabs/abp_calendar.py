@@ -22,7 +22,7 @@ except ImportError:
     def _get_replicate_token(): return None
 
 try:
-    from performance_optimizations import get_replicate_client
+    from app.utils.performance_optimizations import get_replicate_client
     PERF_OPTIMIZATIONS_AVAILABLE = True
 except ImportError:
     PERF_OPTIMIZATIONS_AVAILABLE = False

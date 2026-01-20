@@ -189,8 +189,8 @@ from PIL import Image
 from concurrent.futures import ThreadPoolExecutor
 from app.services.api_service import PrintifyAPI, ReplicateAPI
 from app.services.local_models_manager import LocalModelsManager
-from app.services.database_manager import DatabaseManager
-from app.services.image_manager import ImageManager
+from .database_manager import DatabaseManager
+from .image_manager import ImageManager
 try:
     from dialogs import TemplateDialog, PriceRuleDialog, ScheduleDialog
     HAS_DIALOGS = True
