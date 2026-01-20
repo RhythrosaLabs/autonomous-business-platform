@@ -764,9 +764,12 @@ with st.spinner("Loading tab..."):
                 renderer()
         except Exception as e:
             st.error(f"❌ Error rendering tab: {str(e)}")
+            st.warning("🔄 The tab encountered an error. This is usually due to missing dependencies.")
+            st.info("💡 Tip: Check 'Manage app' logs for details, or try selecting a different tab.")
             import traceback
             with st.expander("📋 Full Error Traceback"):
                 st.code(traceback.format_exc())
+            # Don't navigate away - stay on current tab
     else:
         st.error(f"❌ Tab not found: {selected_tab_name}")
         st.info("Renderer returned None - check import errors above")
