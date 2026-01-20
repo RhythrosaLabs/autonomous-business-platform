@@ -11,15 +11,23 @@ from pathlib import Path
 import json
 import re
 
+# Import Pydantic first (always needed for models)
+from pydantic import BaseModel, Field
+
 try:
     from browser_use import Agent
     from langchain_anthropic import ChatAnthropic
     from langchain_openai import ChatOpenAI
     from langchain_google_genai import ChatGoogleGenerativeAI
-    from pydantic import BaseModel, Field
     BROWSER_USE_AVAILABLE = True
 except ImportError:
     BROWSER_USE_AVAILABLE = False
+    # Create dummy BaseModel if pydantic is also missing
+    try:
+        from pydantic import BaseModel, Field
+    except ImportError:
+        BaseModel = object
+        Field = lambda *args, **kwargs: None
 
 # ========================================
 # DATA MODELS
