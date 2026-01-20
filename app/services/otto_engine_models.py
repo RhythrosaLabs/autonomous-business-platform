@@ -9,6 +9,7 @@ Classes:
 - RequestCache: In-memory cache for repeated requests
 - TaskType, TaskStep, TaskPlan: Task workflow structures
 """
+from app.services.secure_config import get_api_key
 
 from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, re, time, hashlib, base64, tempfile,
@@ -354,7 +355,7 @@ class OttoAppAwareness:
             "printify_connected": "printify_api_key" in st.session_state or os.getenv("PRINTIFY_API_KEY"),
             "shopify_connected": "shopify_store_url" in st.session_state or os.getenv("SHOPIFY_STORE_URL"),
             "youtube_connected": st.session_state.get("youtube_authenticated", False),
-            "replicate_connected": "replicate_api_key" in st.session_state or os.getenv("REPLICATE_API_TOKEN")
+            "replicate_connected": "replicate_api_key" in st.session_state or get_api_key("REPLICATE_API_TOKEN")
         }
         
         if "brand_name" in st.session_state:

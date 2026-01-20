@@ -38,6 +38,7 @@ Usage in autonomous_business_platform.py:
 
 import streamlit as st
 import os
+from app.services.secure_config import get_api_key
 import time
 from typing import Any, Dict, Optional, Callable
 from functools import wraps
@@ -504,7 +505,7 @@ if PERFORMANCE_BOOST_AVAILABLE:
     def get_replicate_client_cached():
         """Cache the Replicate client (centralized AI hub)"""
         import replicate
-        return replicate.Client(api_token=os.getenv('REPLICATE_API_TOKEN'))
+        return replicate.Client(api_token=get_api_key('REPLICATE_API_TOKEN'))
 
 
 # =============================================================================

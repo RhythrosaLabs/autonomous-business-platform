@@ -25,6 +25,7 @@ Version: 1.0
 """
 
 import os
+from app.services.secure_config import get_api_key
 import time
 import logging
 from pathlib import Path
@@ -57,7 +58,7 @@ class SocialMediaAutomation:
         self.headless = headless
         self.download_dir = download_dir or str(Path.home() / "Downloads")
         self.driver = None
-        self.replicate_token = os.getenv('REPLICATE_API_TOKEN')
+        self.replicate_token = get_api_key('REPLICATE_API_TOKEN')
         self.shop_url = os.getenv('SHOPIFY_SHOP_URL', 'https://husky-hub-2.myshopify.com')
         
         # Load credentials from .env

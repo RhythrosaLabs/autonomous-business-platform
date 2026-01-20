@@ -107,6 +107,7 @@ Provide:
 4. Recommended budget split across platforms
 
 Be concise - under 150 words total."""
+from app.services.secure_config import get_api_key
                                 response = tracked_replicate_run(client, "meta/meta-llama-3-8b-instruct", {"prompt": analysis_prompt, "max_tokens": 300}, operation_name="Campaign Analysis")
                                 st.session_state['campaign_analysis'] = "".join(response) if isinstance(response, list) else response
                             except Exception as e:
@@ -176,7 +177,7 @@ Format: Just the 5 headlines, numbered."""
             try:
                 # Initialize replicate_api if not in session state
                 if 'replicate_api' not in st.session_state or st.session_state.replicate_api is None:
-                    replicate_token = os.getenv('REPLICATE_API_TOKEN')
+                    replicate_token = get_api_key('REPLICATE_API_TOKEN')
                     if not replicate_token:
                         st.error("❌ REPLICATE_API_TOKEN not found. Please set it in your environment or Settings.")
                         st.stop()

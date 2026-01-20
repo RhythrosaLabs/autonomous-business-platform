@@ -12,6 +12,7 @@ Architecture:
 """
 
 import os
+from app.services.secure_config import get_api_key
 import sys
 import json
 import uuid
@@ -358,7 +359,7 @@ class JobExecutor:
         """Initialize Replicate API"""
         try:
             from app.services.api_service import ReplicateAPI
-            token = os.getenv("REPLICATE_API_TOKEN")
+            token = get_api_key("REPLICATE_API_TOKEN")
             if token:
                 self.replicate_api = ReplicateAPI(token)
                 logger.info("✅ Replicate API initialized")

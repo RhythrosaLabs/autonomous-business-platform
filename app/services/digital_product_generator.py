@@ -3,6 +3,7 @@ AI Digital Product Generator
 Creates COMPLETE digital products - full books, courses, coloring books, etc.
 Not just cover art, but the entire product with all content.
 """
+from app.services.secure_config import get_api_key
 from app.tabs.abp_imports_common import (
     os, json, requests, replicate, Path, Optional, Dict, List, Any,
     datetime, logging, BytesIO, base64, time, re, setup_logger
@@ -37,7 +38,7 @@ class AIContentGenerator:
     """Generate text content using AI models."""
     
     def __init__(self):
-        self.replicate_token = os.getenv('REPLICATE_API_TOKEN')
+        self.replicate_token = get_api_key('REPLICATE_API_TOKEN')
         self.anthropic_key = os.getenv('ANTHROPIC_API_KEY')
         self._last_api_call = 0
         self._rate_limit_delay = 12  # seconds between API calls (safe for 6/min limit)

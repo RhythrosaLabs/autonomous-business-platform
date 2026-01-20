@@ -5,6 +5,7 @@ This creates beautiful, branded advertising images from product mockups.
 Includes PIL-based text overlay fallback for reliable text rendering.
 """
 import os
+from app.services.secure_config import get_api_key
 import replicate
 import requests
 import logging
@@ -845,7 +846,7 @@ class FluxStaticAdsGenerator:
         Args:
             api_token: Replicate API token. Falls back to REPLICATE_API_TOKEN env var.
         """
-        self.api_token = api_token or os.getenv('REPLICATE_API_TOKEN')
+        self.api_token = api_token or get_api_key('REPLICATE_API_TOKEN')
         if not self.api_token:
             raise ValueError("Replicate API token required. Set REPLICATE_API_TOKEN env var.")
         

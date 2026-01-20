@@ -4,6 +4,7 @@ Handles selling digital downloads: audio files, software, graphic art, ebooks, e
 Integrates with Shopify Digital Downloads app for automated delivery.
 """
 import os
+from app.services.secure_config import get_api_key
 import json
 import requests
 import hashlib
@@ -718,7 +719,7 @@ class DigitalProductGenerator:
     def __init__(self):
         """Initialize the generator."""
         self.service = DigitalProductsService()
-        self.replicate_token = os.getenv('REPLICATE_API_TOKEN')
+        self.replicate_token = get_api_key('REPLICATE_API_TOKEN')
         
     def generate_graphic_art(
         self,

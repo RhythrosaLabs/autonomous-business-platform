@@ -5,6 +5,7 @@ Integrates patterns from youtube-automate for autonomous_business_platform.
 """
 
 import os
+from app.services.secure_config import get_api_key
 import re
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -181,7 +182,7 @@ class YouTubeUploadService:
         # Use AI to generate viral YouTube title and description
         try:
             import replicate
-            replicate_token = os.getenv('REPLICATE_API_TOKEN')
+            replicate_token = get_api_key('REPLICATE_API_TOKEN')
             if replicate_token:
                 logger.info("🤖 Using AI to generate YouTube metadata...")
                 

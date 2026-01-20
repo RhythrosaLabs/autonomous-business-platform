@@ -32,6 +32,7 @@ def format_size(bytes_size):
 
 def toggle_favorite(file_path):
     """Toggle favorite status for a file"""
+from app.services.secure_config import get_api_key
     path_str = str(file_path)
     if path_str in st.session_state.file_favorites:
         st.session_state.file_favorites.remove(path_str)
@@ -666,7 +667,7 @@ def render_file_library_tab():
             
             if st.button("🚀 Generate Product", use_container_width=True, type="primary", key="gen_product_btn"):
                 if product_idea:
-                    replicate_token = st.session_state.get('replicate_api_key') or os.getenv('REPLICATE_API_TOKEN')
+                    replicate_token = st.session_state.get('replicate_api_key') or get_api_key('REPLICATE_API_TOKEN')
                     if replicate_token:
                         with st.spinner(f"🎨 Generating {variations} {product_type} variations in parallel..."):
                             try:

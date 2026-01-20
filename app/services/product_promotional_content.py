@@ -21,6 +21,7 @@ Version: 1.0
 """
 
 import os
+from app.services.secure_config import get_api_key
 import requests
 import replicate
 from pathlib import Path
@@ -88,7 +89,7 @@ class ProductPromotionalContent:
         Args:
             replicate_token: Replicate API token (optional if in env)
         """
-        self.replicate_token = replicate_token or os.getenv("REPLICATE_API_TOKEN")
+        self.replicate_token = replicate_token or get_api_key("REPLICATE_API_TOKEN")
         
         if self.replicate_token:
             os.environ["REPLICATE_API_TOKEN"] = self.replicate_token

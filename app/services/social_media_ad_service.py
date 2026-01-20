@@ -10,6 +10,7 @@ Enhances social media visuals and video production with advertising-grade qualit
 """
 
 import os
+from app.services.secure_config import get_api_key
 import time
 import logging
 from typing import Dict, List, Optional, Tuple
@@ -39,7 +40,7 @@ class SocialMediaAdService:
         Args:
             replicate_token: Replicate API token (optional, will use env var if not provided)
         """
-        self.token = replicate_token or os.getenv('REPLICATE_API_TOKEN')
+        self.token = replicate_token or get_api_key('REPLICATE_API_TOKEN')
         if self.token:
             os.environ['REPLICATE_API_TOKEN'] = self.token
         

@@ -68,6 +68,7 @@ except (ImportError, Exception):
     TRACKED_REPLICATE_AVAILABLE = False
     def tracked_replicate_run(client, model, input_params, operation_name=None):
         """Fallback to regular replicate.run if platform_integrations unavailable"""
+from app.services.secure_config import get_api_key
         return client.run(model, input=input_params)
 
 from app.tabs.abp_campaign_results import render_campaign_complete_summary
@@ -1020,7 +1021,7 @@ Include specific metrics and measurement methodologies."""
                         try:
                             with st.spinner("🔮 Removing background..."):
                                 import replicate
-                                bg_client = replicate.Client(api_token=os.getenv('REPLICATE_API_TOKEN'))
+                                bg_client = replicate.Client(api_token=get_api_key('REPLICATE_API_TOKEN'))
                                     
                                 with open(product_image_path, "rb") as img_file:
                                     bg_result = bg_client.run(
@@ -1552,7 +1553,7 @@ Include specific metrics and measurement methodologies."""
 
             # 2. Initialize Replicate client
             import replicate
-            replicate_client = replicate.Client(api_token=os.getenv('REPLICATE_API_TOKEN'))
+            replicate_client = replicate.Client(api_token=get_api_key('REPLICATE_API_TOKEN'))
                 
             # 3. Generate CHILL script - pitch the ACTUAL PRODUCT not the design
             st.info("📝 Step 1: Writing script...")

@@ -26,6 +26,7 @@ from dataclasses import dataclass, field, asdict
 from enum import Enum
 from functools import wraps
 import os
+from app.services.secure_config import get_api_key
 
 logger = logging.getLogger(__name__)
 
@@ -711,7 +712,7 @@ def run_campaign_in_background(
         check_cancelled()
         
         # Get Replicate API token - try multiple fallbacks so background threads work
-        replicate_token = os.getenv('REPLICATE_API_TOKEN')
+        replicate_token = get_api_key('REPLICATE_API_TOKEN')
 
         # Fallback 1: Try Streamlit session_state (when running inside streamlit)
         try:
@@ -731,7 +732,7 @@ def run_campaign_in_background(
                 env_path = Path(__file__).parent / '.env'
                 if env_path.exists():
                     load_dotenv(env_path)
-                    replicate_token = os.getenv('REPLICATE_API_TOKEN') or replicate_token
+                    replicate_token = get_api_key('REPLICATE_API_TOKEN') or replicate_token
                     if replicate_token:
                         log("✅ Loaded REPLICATE_API_TOKEN from .env file")
             except Exception as e:

@@ -13,6 +13,7 @@ A powerful autonomous task queue system that:
 
 Integrates with OttoEngine for intelligent task planning and execution.
 """
+from app.services.secure_config import get_api_key
 
 from app.tabs.abp_imports_common import (
     st, os, json, logging, asyncio, uuid, re, time,
@@ -1518,7 +1519,7 @@ def render_enhanced_task_queue(replicate_api=None, printify_api=None, shopify_ap
     # Ensure we have a ReplicateAPI instance
     if replicate_api is None:
         # Try to create one from environment or session
-        replicate_token = os.getenv('REPLICATE_API_TOKEN') or st.session_state.get('replicate_api_key', '')
+        replicate_token = get_api_key('REPLICATE_API_TOKEN') or st.session_state.get('replicate_api_key', '')
         if replicate_token:
             try:
                 from app.services.api_service import ReplicateAPI
