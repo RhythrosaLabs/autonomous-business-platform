@@ -695,33 +695,10 @@ if quick_items:
                 is_selected = (filtered_idx == st.session_state.current_main_tab)
                 if st.button(emoji, key=f"q_{idx}", help=name, type="primary" if is_selected else "secondary"):
                     st.session_state.current_main_tab = filtered_idx
-                    # Clear any widget state to prevent conflicts
-                    if 'main_nav_select' in st.session_state:
-                        del st.session_state['main_nav_select']
                     st.rerun()
             except ValueError:
                 # Tab not in visible list, skip
                 pass
-
-# Row 2: Dropdown selector (placed AFTER buttons to not interfere)
-# Row 2: Dropdown selector with on_change callback to prevent conflicts
-def on_nav_change():
-    """Handle navigation dropdown changes without conflicting with button clicks"""
-    selected_name = st.session_state.main_nav_select
-    if selected_name in all_tabs:
-        new_idx = all_tabs.index(selected_name)
-        if new_idx != st.session_state.current_main_tab:
-            st.session_state.current_main_tab = new_idx
-
-selected_tab_name = st.selectbox(
-    "📑 Navigate",
-    all_tabs,
-    index=st.session_state.current_main_tab,
-    key="main_nav_select",
-    on_change=on_nav_change,
-    label_visibility="collapsed"
-)
-
 
 # ========================================
 # GLOBAL STATE INITIALIZATION
