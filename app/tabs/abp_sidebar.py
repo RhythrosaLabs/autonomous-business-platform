@@ -1051,16 +1051,26 @@ def render_sidebar(
     # Define base tabs list
     base_tabs = [
     "🏠 Dashboard",
-    "💬 Chat",
-    "🎯 Campaign Planner",
-    "🎥 Video Maker",
-    "🖼️ Static Ad Creator",
-    "📣 Social Poster",
-    "🎨 Brand Templates",
+    "⚡ Shortcuts",
+    "🤖 Task Queue",
+    "🔄 Job Monitor",
+    "📦 Product Studio",
+    "�� Digital Products",
+    "🎯 Campaign Creator",
+    "📝 Content Generator",
+    "🎬 Video Producer",
+    "🎮 Playground",
+    "🔧 Workflows",
+    "📅 Calendar",
+    "📓 Journal",
+    "🔍 Contact Finder",
+    "👥 Customers",
+    "📊 Analytics",
+    "�� Brand Templates",
     "💌 Email Outreach",
     "🎵 Music Platforms",
     "📁 File Library",
-    "🌐 Browser-Use"
+    "�� Browser-Use"
     ]
         
     # No separate experimental tabs - all features visible by default
