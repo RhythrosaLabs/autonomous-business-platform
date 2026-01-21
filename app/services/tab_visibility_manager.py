@@ -11,6 +11,7 @@ ALL_TABS = [
     "🏠 Dashboard",
     "⚡ Shortcuts",
     "🤖 Task Queue",
+    "🔄 Job Monitor",
     "📦 Product Studio",
     "💾 Digital Products",
     "🎯 Campaign Creator",
@@ -37,6 +38,8 @@ ROLE_PRESETS = {
         "tabs": [
             "🏠 Dashboard",
             "⚡ Shortcuts",
+            "🤖 Task Queue",
+            "🔄 Job Monitor",
             "🎯 Campaign Creator",
             "📊 Analytics",
             "💌 Email Outreach",
