@@ -83,6 +83,9 @@ This isn't just another AI wrapper - it's a **complete business operating system
 The hosted demo at **[otto-mate.streamlit.app](https://otto-mate.streamlit.app)** has these limitations:
 
 - **No Persistent File Storage**: Files exist only during your active session
+  - ⚠️ **CRITICAL**: Generated files cannot be saved to disk on Streamlit Cloud
+  - Files are stored in temporary memory only and will be lost when session ends
+  - Always download files immediately after generation
 - **Session Timeout**: Inactive sessions automatically disconnect after 15-20 minutes
 - **Limited Resources**: Shared computing resources may result in slower generation
 - **No System Access**: Cannot access your local files or install dependencies

@@ -6,6 +6,24 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Tuple, Optional
 
+def is_streamlit_cloud():
+    """Detect if running on Streamlit Cloud (files cannot be saved)."""
+    return os.getenv('STREAMLIT_SHARING_MODE') is not None or            os.getenv('STREAMLIT_RUNTIME_ENV') == 'cloud' or            'streamlit.app' in os.getenv('HOSTNAME', '')
+
+def get_file_save_path(filename, subfolder='generated_images'):
+    """
+    Get appropriate file save path. Returns None on Streamlit Cloud.
+    On local, returns path in file_library.
+    """
+    if is_streamlit_cloud():
+        return None  # Cannot save files on Streamlit Cloud
+    
+    base_dir = Path("file_library")
+    save_dir = base_dir / subfolder
+    save_dir.mkdir(parents=True, exist_ok=True)
+    return save_dir / filename
+
+
 from .secure_config import get_api_key
 import streamlit as st
 
@@ -31,6 +49,28 @@ __all__ = [
 
 
 @st.cache_resource(ttl=3600)
+
+def safe_save_file(content, filename, subfolder='generated_images', file_type='binary'):
+    """
+    Safely save file with Streamlit Cloud check.
+    Returns (success, file_path_or_none, message)
+    """
+    if is_streamlit_cloud():
+        return (False, None, "⚠️ Cannot save files on Streamlit Cloud. Please download immediately.")
+    
+    try:
+        save_path = get_file_save_path(filename, subfolder)
+        if save_path is None:
+            return (False, None, "File saving disabled in cloud mode")
+        
+        mode = 'wb' if file_type == 'binary' else 'w'
+        with open(save_path, mode) as f:
+            f.write(content)
+        
+        return (True, str(save_path), f"✅ Saved to {save_path}")
+    except Exception as e:
+        return (False, None, f"❌ Error saving file: {str(e)}")
+
 def _get_cached_printify_api(token: str, shop_id: str) -> Optional[PrintifyAPI]:
     """Cached Printify API client."""
     try:

@@ -167,7 +167,7 @@ def render_file_grid(files, key_prefix, cols_count=4):
                                     
                                     if st.button("�� Generate", key=f"gen_vid_{key_prefix}_{idx}", type="primary"):
                                         try:
-                                            from app.services.platform_helpers import _ensure_replicate_client
+                                            from app.services.platform_helpers import is_streamlit_cloud, _ensure_replicate_client
                                             from pathlib import Path
                                             import requests
                                             from datetime import datetime
