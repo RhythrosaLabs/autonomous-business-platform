@@ -68,8 +68,17 @@ check_dependencies() {
     fi
     
     if ! python3 -c "import streamlit" 2>/dev/null; then
-        echo -e "${RED}❌ Streamlit not found. Please install: pip install streamlit${NC}"
-        exit 1
+        echo -e "${YELLOW}📦 Installing dependencies from requirements.txt...${NC}"
+        if [ -f "../requirements.txt" ]; then
+            pip install -q -r ../requirements.txt || {
+                echo -e "${RED}❌ Failed to install dependencies. Please run: pip install -r requirements.txt${NC}"
+                exit 1
+            }
+        else
+            echo -e "${RED}❌ Streamlit not found and requirements.txt not found.${NC}"
+            echo -e "${YELLOW}Please install: pip install -r requirements.txt${NC}"
+            exit 1
+        fi
     fi
     
     echo -e "${GREEN}✅ All dependencies OK${NC}"
