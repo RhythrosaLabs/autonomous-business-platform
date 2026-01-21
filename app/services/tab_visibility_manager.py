@@ -154,6 +154,12 @@ def initialize_tab_visibility():
     """Initialize tab visibility in session state"""
     if 'visible_tabs' not in st.session_state:
         st.session_state.visible_tabs = ALL_TABS.copy()
+    else:
+        # Auto-add any new tabs that were added to ALL_TABS
+        current_visible = set(st.session_state.visible_tabs)
+        for tab in ALL_TABS:
+            if tab not in current_visible:
+                st.session_state.visible_tabs.append(tab)
     
     if CUSTOM_PRESETS_KEY not in st.session_state:
         st.session_state[CUSTOM_PRESETS_KEY] = {}
