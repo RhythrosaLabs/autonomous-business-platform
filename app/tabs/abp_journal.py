@@ -121,7 +121,7 @@ def render_journal_tab():
             with col_ai_enhance:
                 if st.button("✨ AI Enhance & Save", use_container_width=True):
                     replicate_token = _get_replicate_token()
-                    replicate_client = get_replicate_client()
+                    replicate_client = get_replicate_client(_get_replicate_token())
                     if note_text.strip() and replicate_token and replicate_client:
                         with st.spinner("🤖 AI is analyzing your note..."):
                             try:
@@ -187,7 +187,7 @@ Respond in JSON format:
             
             if st.button("🚀 Run AI Action", use_container_width=True):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = get_replicate_client(_get_replicate_token())
                 if note_text.strip() and replicate_token and replicate_client:
                     with st.spinner("Processing..."):
                         try:
@@ -319,7 +319,7 @@ Respond in JSON format:
             with col_develop:
                 if st.button("🚀 AI Develop Idea", use_container_width=True, type="primary"):
                     replicate_token = _get_replicate_token()
-                    replicate_client = get_replicate_client()
+                    replicate_client = get_replicate_client(_get_replicate_token())
                     if idea_text.strip() and replicate_token and replicate_client:
                         with st.spinner("🤖 AI is developing your idea..."):
                             try:
@@ -376,7 +376,7 @@ Be specific and actionable."""
             
             if st.button("⚡ Apply Tool", use_container_width=True):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = get_replicate_client(_get_replicate_token())
                 if idea_text.strip() and replicate_token and replicate_client:
                     with st.spinner("Thinking..."):
                         tool_prompts = {
@@ -500,7 +500,7 @@ Be specific and actionable."""
             with col_ai_reflect:
                 if st.button("🤖 AI Reflection", use_container_width=True):
                     replicate_token = _get_replicate_token()
-                    replicate_client = get_replicate_client()
+                    replicate_client = get_replicate_client(_get_replicate_token())
                     if replicate_token and replicate_client and any([journal_wins, journal_challenges]):
                         with st.spinner("AI is reflecting on your day..."):
                             try:
@@ -629,7 +629,7 @@ Keep it warm, supportive, and under 200 words."""
             # AI Goal Breakdown
             if st.button("🤖 AI: Break Down a Goal", use_container_width=True):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = get_replicate_client(_get_replicate_token())
                 if goal_text.strip() and replicate_token and replicate_client:
                     with st.spinner("AI is creating your action plan..."):
                         try:
@@ -763,7 +763,7 @@ Format as a numbered list with clear, actionable items."""
         with col_insight1:
             if st.button("📊 Analyze My Patterns", use_container_width=True):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = get_replicate_client(_get_replicate_token())
                 if replicate_token and replicate_client and (st.session_state.saved_notes or st.session_state.journal_entries):
                     with st.spinner("Analyzing your patterns..."):
                         try:
@@ -803,7 +803,7 @@ Be insightful but supportive."""
         with col_insight2:
             if st.button("💡 Connect My Ideas", use_container_width=True):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = get_replicate_client(_get_replicate_token())
                 if replicate_token and replicate_client and len(st.session_state.saved_ideas) >= 2:
                     with st.spinner("Finding connections..."):
                         try:

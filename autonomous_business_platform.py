@@ -60,7 +60,7 @@ def get_tab_renderer(tab_name: str):
         "📊 Analytics": ('app.tabs.abp_analytics', 'render_analytics_tab'),
         "🎨 Brand Templates": ('app.tabs.abp_brand_templates', 'render_brand_templates_tab'),
         "💌 Email Outreach": ('app.tabs.abp_email_outreach', 'render_email_outreach_tab'),
-        "�� Music Platforms": ('app.tabs.abp_music_platforms_pro', 'render_music_platforms_tab'),
+        "🎵 Music Platforms": ('app.tabs.abp_music_platforms_pro', 'render_music_platforms_tab'),
         "📁 File Library": ('app.tabs.abp_files', 'render_file_library_tab'),
         "🌐 Browser-Use": ('app.tabs.abp_browser_use', 'render_browser_use_tab'),
     }

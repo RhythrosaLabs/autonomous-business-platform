@@ -1,3 +1,4 @@
+import json
 from app.tabs.abp_imports_common import (
     st, json, os, datetime, logging, setup_logger
 )
@@ -72,7 +73,6 @@ def render_custom_workflows_tab():
     with col_top3:
         workflow_file = st.file_uploader("📁 Load", type=['json'], key="workflow_upload_exp", label_visibility="collapsed")
         if workflow_file:
-            import json
             loaded_workflow = json.load(workflow_file)
             st.session_state.current_workflow = loaded_workflow
             st.success("✅ Workflow loaded")
