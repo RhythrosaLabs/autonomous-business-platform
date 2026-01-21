@@ -668,3 +668,36 @@ MIT License - see [LICENSE](LICENSE) file
 **⭐ Star this repo if you find it useful!**
 
 **Made with ❤️ by Dan Sheils**
+
+
+## 🔒 Security & Privacy
+
+### API Key Safety
+
+**Your API keys are completely private and secure:**
+
+1. **Session Isolation**: Each user gets their own isolated session in Streamlit
+   - Your API keys stored in session_state are NOT visible to other users
+   - Session data is isolated per-browser, per-tab
+   - Keys are never shared between users
+
+2. **Storage Priority** (most secure first):
+   - **User Input** → Stored in your browser session only (most private)
+   - **Streamlit Secrets** → Owner-only secrets in Streamlit Cloud dashboard
+   - **Local .env** → Local environment file (never committed to repo)
+
+3. **No Hardcoded Keys**: 
+   - ✅ No API keys are hardcoded in the source code
+   - ✅ No keys are committed to the repository
+   - ✅ `.env` files are in `.gitignore`
+
+4. **Demo vs Local**:
+   - **Demo (otto-mate.streamlit.app)**: You must enter your own API keys each session
+   - **Local Installation**: Keys saved in `.env` file on your computer only
+
+### File Privacy
+
+- **Streamlit Cloud**: Files stored in temporary memory, lost after session ends
+- **Local Installation**: Files saved to `file_library/` directory (in `.gitignore`)
+- **No files are ever committed to the public GitHub repository**
+
