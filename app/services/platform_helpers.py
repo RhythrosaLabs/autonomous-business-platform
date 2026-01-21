@@ -48,7 +48,6 @@ __all__ = [
 ]
 
 
-@st.cache_resource(ttl=3600)
 
 def safe_save_file(content, filename, subfolder='generated_images', file_type='binary'):
     """
