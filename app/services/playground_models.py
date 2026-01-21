@@ -248,6 +248,7 @@ def build_model_input(model_ref: str, model_type: str, form_data: dict):
 EDITING_MODELS = {
     "google/nano-banana": {
         "name": "Nano Banana (Google Gemini)",
+        "model_id": "google/nano-banana",
         "description": "Google's latest image editing model in Gemini 2.5",
         "category": "editing",
         "parameters": {
@@ -259,6 +260,7 @@ EDITING_MODELS = {
     },
     "hardikdava/flux-image-editing": {
         "name": "Flux Image Editing",
+        "model_id": "hardikdava/flux-image-editing",
         "description": "Image editing with Flux-dev model",
         "category": "editing",
         "parameters": {
