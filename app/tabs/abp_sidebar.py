@@ -341,31 +341,6 @@ def render_sidebar(
                     st.markdown("#### 🎨 User Preferences")
             
                     st.markdown("---")
-                    st.markdown("**🧪 Experimental Features**")
-                    st.caption("Enable cutting-edge features that are in active development")
-            
-                    experimental_enabled = st.checkbox(
-                        "Enable Experimental Features",
-                        value=st.session_state.enable_experimental_features,
-                        help="Unlock: Playground, Custom Workflows, Calendar, Queue System, Journal/Notes"
-                    )
-            
-                    if experimental_enabled != st.session_state.enable_experimental_features:
-                        st.session_state.enable_experimental_features = experimental_enabled
-                        st.success("✅ Preferences saved! Refresh to see new tabs." if experimental_enabled else "✅ Experimental features disabled")
-                        st.info("💡 Please reload the page to apply changes")
-            
-                    if experimental_enabled:
-                        st.info("🚀 **Enabled Features:**")
-                        st.markdown("""
-                        - 🎮 **Playground** - Chain and test AI models interactively
-                        - 🔧 **Custom Workflows** - Build automated pipelines
-                        - 📅 **Calendar** - Schedule and plan content campaigns
-                        - 📋 **Queue System** - Track task progress and history
-                        - 📓 **Journal/Notes** - Quick notes and todo lists
-                        """)
-                    
-                    st.markdown("---")
                     st.markdown("**⌨️ Keyboard Shortcuts**")
                     st.caption("Customize keyboard commands for quick actions")
                     
@@ -464,18 +439,7 @@ def render_sidebar(
                     # Tab Visibility Preferences
                     render_tab_preferences()
                     
-                    st.markdown("---")
-                    st.markdown("**🎨 UI Preferences**")
-            
-                    theme_col1, theme_col2 = st.columns(2)
-                    with theme_col1:
-                        default_tab = st.selectbox(
-                            "Default Landing Tab",
-                            ["Dashboard", "Campaign Creator", "Product Studio", "Content Generator", "Video Producer", "Analytics", "File Library"],
-                            help="Which tab to show on startup"
-                        )
-                    with theme_col2:
-                        compact_mode = st.checkbox("Compact Layout", help="Reduce spacing for more content")
+                    
                     
                     st.markdown("---")
                     st.markdown("**🤖 Default AI Models**")
