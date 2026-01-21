@@ -88,7 +88,26 @@ check_dependencies() {
     echo -e "${GREEN}✅ All dependencies OK${NC}"
 }
 
+
+find_available_port() {
+    local start_port=$1
+    local port=$start_port
+    
+    while [ $port -lt $((start_port + 100)) ]; do
+        if ! lsof -i :$port -sTCP:LISTEN >/dev/null 2>&1; then
+            echo $port
+            return 0
+        fi
+        port=$((port + 1))
+    done
+    
+    echo $start_port
+    return 1
+}
+
 start_backend() {
+    # Find available port
+    BACKEND_PORT=$(find_available_port $BACKEND_PORT)
     echo -e "${YELLOW}Starting FastAPI backend on port $BACKEND_PORT...${NC}"
     
     # Check if already running
@@ -122,6 +141,8 @@ start_backend() {
 }
 
 start_frontend() {
+    # Find available port
+    FRONTEND_PORT=$(find_available_port $FRONTEND_PORT)
     echo -e "${YELLOW}Starting Streamlit frontend on port $FRONTEND_PORT...${NC}"
     
     # Check if already running
