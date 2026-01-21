@@ -258,6 +258,15 @@ case "${1:-all}" in
         start_backend
         start_frontend
         echo ""
+        echo -e "${GREEN}╔══════════════════════════════════════════════════════════╗${NC}"
+        echo -e "${GREEN}║  🎉 Platform is ready!                                   ║${NC}"
+        echo -e "${GREEN}╠══════════════════════════════════════════════════════════╣${NC}"
+        echo -e "${GREEN}║  FastAPI API:    http://localhost:$BACKEND_PORT             ║${NC}"
+        echo -e "${GREEN}║  API Docs:       http://localhost:$BACKEND_PORT/docs         ║${NC}"
+        echo -e "${GREEN}║  Streamlit UI:   http://localhost:$FRONTEND_PORT            ║${NC}"
+        echo -e "${GREEN}║  Ray Dashboard:  http://127.0.0.1:8265               ║${NC}"
+        echo -e "${GREEN}╚══════════════════════════════════════════════════════════╝${NC}"
+        ;;
     *)
         echo "Usage: $0 {all|backend|frontend|stop|restart|status|logs}"
         exit 1
