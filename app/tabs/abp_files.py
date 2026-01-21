@@ -142,24 +142,6 @@ def render_file_grid(files, key_prefix, cols_count=4):
                                     if st.button("🎬", key=f"vid_{key_prefix}_{idx}"):
                                         st.session_state[f'make_video_{key_prefix}_{idx}'] = file_info['path']
                             
-                            # Twitter posting modal
-                            if st.session_state.get(f'show_tw_{key_prefix}_{idx}'):
-                                with st.expander("🐦 Post to Twitter", expanded=True):
-                                    tw_caption = st.text_area("Tweet text", 
-                                                            value=f"Check out this design! #design #{file_info['campaign']}",
-                                                            key=f"tw_cap_{key_prefix}_{idx}")
-                                    if st.button("🚀 Post Now", key=f"tw_send_{key_prefix}_{idx}"):
-                                        if AI_TWITTER_AVAILABLE:
-                                            with st.spinner("Posting..."):
-                                                success = asyncio.run(post_to_twitter_ai(tw_caption, str(file_info['path'])))
-                                                if success:
-                                                    st.success("Posted!")
-                                                    st.session_state[f'show_tw_{key_prefix}_{idx}'] = False
-                                                else:
-                                                    st.error("Failed to post")
-                                        else:
-                                            st.error("Twitter module not available")
-                            
                             # Video creation modal
                             if st.session_state.get(f'make_video_{key_prefix}_{idx}'):
                                 with st.expander("🎬 Generate Video from Image", expanded=True):

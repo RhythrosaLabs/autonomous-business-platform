@@ -60,7 +60,38 @@ This isn't just another AI wrapper - it's a **complete business operating system
 
 ## ✨ Core Features
 
-### 🤖 Otto AI Assistant
+#
+
+## 📁 File Storage Locations
+
+**Local Installation:**
+- **Generated Files**: Saved to `file_library/` in your project directory
+  - Images: `file_library/generated_images/`
+  - Videos: `file_library/generated_videos/`
+  - Audio: `file_library/generated_audio/`
+  - Documents: `file_library/documents/`
+- **Campaign Files**: Organized by campaign name in subdirectories
+- **Backup Files**: `.backup` extension files stored alongside originals
+
+**Streamlit Demo (otto-mate.streamlit.app):**
+- Files are stored in temporary memory during your session
+- ⚠️ **Important**: Files are lost when the session ends or app restarts
+- Download files immediately after generation to save them locally
+
+### Streamlit Demo Limitations
+
+The hosted demo at **[otto-mate.streamlit.app](https://otto-mate.streamlit.app)** has these limitations:
+
+- **No Persistent File Storage**: Files exist only during your active session
+- **Session Timeout**: Inactive sessions automatically disconnect after 15-20 minutes
+- **Limited Resources**: Shared computing resources may result in slower generation
+- **No System Access**: Cannot access your local files or install dependencies
+- **No Environment Variables**: Some integrations requiring API keys may not work
+- **Cold Starts**: First load may take 30-60 seconds while container spins up
+
+**Recommendation**: For production use with persistent file storage, local API integrations, and optimal performance, install locally by following the Setup section below.
+
+## 🤖 Otto AI Assistant
 Your hyperintelligent multi-agent AI powered by Claude Sonnet 3.5/4:
 - **Slash Commands** (`/image`, `/video`, `/music`, `/pdf`, `/python`, `/chain`, `/help`) - 100+ built-in commands
 - **Knowledge Base** - Remembers your products, brand, campaigns
