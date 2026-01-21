@@ -57,3 +57,6 @@ generated_documents/
 *.generated.*
 uploads/
 user_uploads/
+
+# Session files with user data
+sessions/

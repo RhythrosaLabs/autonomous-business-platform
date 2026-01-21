@@ -700,6 +700,16 @@ if quick_items:
                 # Tab not in visible list, skip
                 pass
 
+# Row 2: Dropdown selector (backup navigation for all tabs)
+st.selectbox(
+    "Or select tab:",
+    all_tabs,
+    index=st.session_state.current_main_tab,
+    key="tab_selector",
+    on_change=lambda: setattr(st.session_state, 'current_main_tab', all_tabs.index(st.session_state.tab_selector)),
+    label_visibility="collapsed"
+)
+
 # ========================================
 # GLOBAL STATE INITIALIZATION
 # ========================================
