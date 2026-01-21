@@ -85,7 +85,7 @@ start_backend() {
     fi
     
     # Start FastAPI
-    nohup python3 -m uvicorn fastapi_backend:app \
+    nohup python3 -m uvicorn backend.fastapi_backend:app \
         --host $BACKEND_HOST \
         --port $BACKEND_PORT \
         --log-level info \
