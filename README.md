@@ -440,7 +440,12 @@ nano .env  # Add your API keys
 3. **Launch Platform**
 ```bash
 cd scripts
-./start_platform.sh  # Starts all services
+./start_platform.sh        # Starts all services (same as ./start_platform.sh all)
+# OR specific services:
+# ./start_platform.sh backend   # Only FastAPI backend
+# ./start_platform.sh frontend  # Only Streamlit UI
+# ./start_platform.sh stop      # Stop all services
+# ./start_platform.sh status    # Check service status
 ```
 
 Access:
