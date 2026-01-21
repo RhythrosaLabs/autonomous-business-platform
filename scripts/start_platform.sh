@@ -31,8 +31,8 @@ FRONTEND_PORT=${FRONTEND_PORT:-8501}
 BACKEND_HOST=${BACKEND_HOST:-0.0.0.0}
 FRONTEND_HOST=${FRONTEND_HOST:-0.0.0.0}
 
-# PID files
-PID_DIR=".pids"
+# PID files (in scripts directory)
+PID_DIR="$SCRIPT_DIR/.pids"
 BACKEND_PID="$PID_DIR/fastapi.pid"
 FRONTEND_PID="$PID_DIR/streamlit.pid"
 
@@ -69,8 +69,8 @@ check_dependencies() {
     
     if ! python3 -c "import streamlit" 2>/dev/null; then
         echo -e "${YELLOW}📦 Installing dependencies from requirements.txt...${NC}"
-        if [ -f "../requirements.txt" ]; then
-            pip install -q -r ../requirements.txt || {
+        if [ -f "$PROJECT_ROOT/requirements.txt" ]; then
+            pip install -q -r "$PROJECT_ROOT/requirements.txt" || {
                 echo -e "${RED}❌ Failed to install dependencies. Please run: pip install -r requirements.txt${NC}"
                 exit 1
             }
@@ -94,11 +94,12 @@ start_backend() {
     fi
     
     # Start FastAPI
+    cd "$PROJECT_ROOT"
     nohup python3 -m uvicorn backend.fastapi_backend:app \
         --host $BACKEND_HOST \
         --port $BACKEND_PORT \
         --log-level info \
-        > logs/fastapi.log 2>&1 &
+        > scripts/logs/fastapi.log 2>&1 &
     
     echo $! > "$BACKEND_PID"
     
@@ -125,12 +126,13 @@ start_frontend() {
         return 0
     fi
     
-    # Start Streamlit
+    # Start Streamlit (from project root)
+    cd "$PROJECT_ROOT"
     nohup streamlit run autonomous_business_platform.py \
         --server.port $FRONTEND_PORT \
         --server.address $FRONTEND_HOST \
         --server.headless true \
-        > logs/streamlit.log 2>&1 &
+        > scripts/logs/streamlit.log 2>&1 &
     
     echo $! > "$FRONTEND_PID"
     
@@ -214,7 +216,7 @@ show_logs() {
 # ========================================
 
 # Create logs directory
-mkdir -p logs
+mkdir -p "$SCRIPT_DIR/logs"
 
 case "${1:-all}" in
     all)
