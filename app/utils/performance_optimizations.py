@@ -19,7 +19,6 @@ logger = logging.getLogger(__name__)
 # STREAMLIT CACHING DECORATORS
 # ============================================
 
-@st.cache_resource(ttl=3600)
 def get_replicate_client(api_token: str):
     """Cache the Replicate client to avoid re-initialization."""
     import replicate
@@ -38,7 +37,6 @@ def get_youtube_service():
         return None
 
 
-@st.cache_resource(ttl=3600)
 def get_printify_api(api_token: str, shop_id: str):
     """Cache Printify API client."""
     try:
@@ -49,7 +47,6 @@ def get_printify_api(api_token: str, shop_id: str):
         return None
 
 
-@st.cache_resource(ttl=3600)
 def get_replicate_api(api_token: str):
     """Cache ReplicateAPI wrapper client for unified API access.
     
@@ -64,7 +61,6 @@ def get_replicate_api(api_token: str):
         return None
 
 
-@st.cache_resource(ttl=3600)
 def get_shopify_api(shop_url: str, access_token: str):
     """Cache Shopify API client."""
     try:

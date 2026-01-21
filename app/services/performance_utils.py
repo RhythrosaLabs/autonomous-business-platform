@@ -21,14 +21,12 @@ executor = ThreadPoolExecutor(max_workers=5)
 # CACHING DECORATORS
 # ============================================
 
-@st.cache_resource(show_spinner=False)
 def get_replicate_api(token: str):
     """Cached Replicate API client - reused across pages"""
     from app.services.api_service import ReplicateAPI
     return ReplicateAPI(token)
 
 
-@st.cache_resource(show_spinner=False)
 def get_printify_api(token: str, shop_id: str):
     """Cached Printify API client - reused across pages"""
     if not token or not shop_id:
@@ -37,7 +35,6 @@ def get_printify_api(token: str, shop_id: str):
     return PrintifyAPI(token)
 
 
-@st.cache_resource(show_spinner=False)
 def get_shopify_api(shop_url: str, access_token: str):
     """Cached Shopify API client"""
     if not shop_url or not access_token:

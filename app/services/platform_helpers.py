@@ -629,7 +629,6 @@ def _get_replicate_token() -> str:
     return token
 
 
-@st.cache_resource(ttl=3600)
 def _get_cached_replicate_client(token: str, model_name: str):
     """Cached Replicate API client."""
     return ReplicateAPI(token, model_name)

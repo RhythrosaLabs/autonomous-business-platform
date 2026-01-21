@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 # CACHING & UTILITIES
 # ========================================
 
-@st.cache_resource(ttl=300)  # Cache API clients for 5 minutes
 def get_cached_replicate_client(api_token: str):
     """Cache Replicate client to avoid recreating on every rerun."""
     try:
@@ -15,7 +14,6 @@ def get_cached_replicate_client(api_token: str):
     except Exception:
         return None
 
-@st.cache_resource(ttl=300)
 def get_cached_replicate_api(api_token: str):
     """Cache ReplicateAPI instance."""
     try:
