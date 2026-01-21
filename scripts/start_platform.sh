@@ -65,21 +65,35 @@ check_dependencies() {
         exit 1
     fi
     
-    # Check pip packages
-    if ! python3 -c "import fastapi" 2>/dev/null; then
-        echo -e "${YELLOW}📦 Installing FastAPI...${NC}"
-        pip install fastapi uvicorn websockets python-multipart
-    fi
+    # Check core packages
+    local missing_deps=false
     
     if ! python3 -c "import streamlit" 2>/dev/null; then
+        missing_deps=true
+    fi
+    
+    if ! python3 -c "import fastapi" 2>/dev/null; then
+        missing_deps=true
+    fi
+    
+    if ! python3 -c "import moviepy.editor" 2>/dev/null; then
+        missing_deps=true
+    fi
+    
+    if ! python3 -c "import PIL" 2>/dev/null; then
+        missing_deps=true
+    fi
+    
+    # Install all requirements if any are missing
+    if [ "$missing_deps" = true ]; then
         echo -e "${YELLOW}📦 Installing dependencies from requirements.txt...${NC}"
         if [ -f "$PROJECT_ROOT/requirements.txt" ]; then
-            pip install -q -r "$PROJECT_ROOT/requirements.txt" || {
+            pip install -r "$PROJECT_ROOT/requirements.txt" || {
                 echo -e "${RED}❌ Failed to install dependencies. Please run: pip install -r requirements.txt${NC}"
                 exit 1
             }
         else
-            echo -e "${RED}❌ Streamlit not found and requirements.txt not found.${NC}"
+            echo -e "${RED}❌ requirements.txt not found.${NC}"
             echo -e "${YELLOW}Please install: pip install -r requirements.txt${NC}"
             exit 1
         fi
