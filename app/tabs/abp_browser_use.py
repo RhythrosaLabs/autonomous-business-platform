@@ -809,9 +809,25 @@ def render_browser_use_tab(**kwargs):
     st.markdown("Powerful AI browser automation for tasks that **cannot** be done via APIs")
     
     if not BROWSER_USE_AVAILABLE:
-        st.error("❌ Browser-use module not available")
-        st.info("Install: `pip install browser-use langchain-anthropic playwright`")
-        st.code("playwright install", language="bash")
+        st.warning("🌐 Browser-Use Feature")
+        st.info("""
+        **Browser-Use** enables advanced browser automation powered by AI:
+        - 🔍 Product research & competitor analysis
+        - 💼 Lead generation & contact finding  
+        - 📊 Data scraping & monitoring
+        - 🤖 Form automation
+        
+        **Note:** This feature requires Playwright browsers which are not available on Streamlit Cloud.
+        To use Browser-Use, run this app locally:
+        """)
+        st.code("""
+# Install dependencies
+pip install browser-use langchain-anthropic playwright
+playwright install chromium
+
+# Run locally
+streamlit run autonomous_business_platform.py
+        """, language="bash")
         return
     
     # Configuration sidebar
