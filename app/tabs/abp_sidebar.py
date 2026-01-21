@@ -42,6 +42,8 @@ def render_sidebar(
     """
     Renders the sidebar content.
     """
+    all_tabs = []  # Initialize to prevent NameError
+
     with st.sidebar:
         # ========================================
         # GLOBAL SEARCH (NEW ENHANCED FEATURE)
