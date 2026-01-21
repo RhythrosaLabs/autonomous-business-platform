@@ -1046,4 +1046,25 @@ def render_sidebar(
             except Exception as e:
                 st.info(f"ℹ️ Ray distributed computing not available: {e}")
 
+    # Define base tabs list
+    base_tabs = [
+    "🏠 Dashboard",
+    "💬 Chat",
+    "🎯 Campaign Planner",
+    "🎥 Video Maker",
+    "🖼️ Static Ad Creator",
+    "📣 Social Poster",
+    "🎨 Brand Templates",
+    "💌 Email Outreach",
+    "🎵 Music Platforms",
+    "📁 File Library",
+    "🌐 Browser-Use"
+    ]
+        
+    # No separate experimental tabs - all features visible by default
+    # Apply tab visibility filtering based on user preferences
+    initialize_tab_visibility()
+    all_tabs = get_filtered_tabs(base_tabs)
+
+
     return all_tabs
