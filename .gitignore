@@ -47,3 +47,13 @@ library/
 # Database
 *.db
 *.db-journal
+
+# User generated files (must not be saved to repo)
+file_library/
+generated_images/
+generated_videos/
+generated_audio/
+generated_documents/
+*.generated.*
+uploads/
+user_uploads/
