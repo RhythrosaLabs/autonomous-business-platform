@@ -476,6 +476,38 @@ def render_sidebar(
                         )
                     with theme_col2:
                         compact_mode = st.checkbox("Compact Layout", help="Reduce spacing for more content")
+                    
+                    st.markdown("---")
+                    st.markdown("**🤖 Default AI Models**")
+                    st.caption("Set default models for quick generation")
+                    
+                    if 'default_image_model' not in st.session_state:
+                        st.session_state.default_image_model = 'prunaai/flux-fast'
+                    if 'default_video_model' not in st.session_state:
+                        st.session_state.default_video_model = 'minimax/video-01'
+                    if 'default_music_model' not in st.session_state:
+                        st.session_state.default_music_model = 'meta/musicgen'
+                    
+                    ai_col1, ai_col2 = st.columns(2)
+                    with ai_col1:
+                        st.session_state.default_image_model = st.selectbox(
+                            "🎨 Image",
+                            ['prunaai/flux-fast', 'bytedance/seedream-4', 'google/imagen-4-ultra'],
+                            key="default_img_sel"
+                        )
+                        st.session_state.default_music_model = st.selectbox(
+                            "🎵 Music",
+                            ['meta/musicgen', 'auffusion/stable-audio'],
+                            key="default_music_sel"
+                        )
+                    with ai_col2:
+                        st.session_state.default_video_model = st.selectbox(
+                            "🎬 Video",
+                            ['minimax/video-01', 'luma/photon-flash', 'lightricks/ltx-video'],
+                            key="default_vid_sel"
+                        )
+                    
+                    st.caption("💡 Dashboard uses its own model selection")
             
                     st.markdown("---")
                     st.markdown("**⚙️ Performance**")

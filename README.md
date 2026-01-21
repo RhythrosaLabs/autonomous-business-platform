@@ -62,7 +62,7 @@ This isn't just another AI wrapper - it's a **complete business operating system
 
 ### 🤖 Otto AI Assistant
 Your hyperintelligent multi-agent AI powered by Claude Sonnet 3.5/4:
-- **Slash Commands** (`/research`, `/plan`, `/create`, etc.) - 20+ built-in commands
+- **Slash Commands** (`/image`, `/video`, `/music`, `/pdf`, `/python`, `/chain`, `/help`) - 100+ built-in commands
 - **Knowledge Base** - Remembers your products, brand, campaigns
 - **Multi-Agent System** - Coordinates specialized AI agents for complex tasks
 - **Context-Aware** - Understands your entire business context

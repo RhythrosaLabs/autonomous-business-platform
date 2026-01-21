@@ -162,10 +162,73 @@ def render_file_grid(files, key_prefix, cols_count=4):
                             
                             # Video creation modal
                             if st.session_state.get(f'make_video_{key_prefix}_{idx}'):
-                                st.info("Go to Video Producer tab to use this image")
-                                if st.button("Go to Video Producer", key=f"go_vid_{key_prefix}_{idx}"):
-                                    st.session_state.current_main_tab = 7
-                                    st.rerun()
+                                with st.expander("🎬 Generate Video from Image", expanded=True):
+                                    st.info("Auto-generating video with AI...")
+                                    
+                                    video_col1, video_col2 = st.columns(2)
+                                    with video_col1:
+                                        video_model = st.selectbox(
+                                            "Video Model",
+                                            ["minimax/video-01", "luma/photon-flash", "lightricks/ltx-video"],
+                                            key=f"vid_model_{key_prefix}_{idx}"
+                                        )
+                                    with video_col2:
+                                        motion_level = st.slider("Motion", 1, 5, 3, key=f"motion_{key_prefix}_{idx}")
+                                    
+                                    video_prompt = st.text_input(
+                                        "Prompt (optional)",
+                                        placeholder="Product showcase with rotation",
+                                        key=f"vid_prompt_{key_prefix}_{idx}"
+                                    )
+                                    
+                                    if st.button("�� Generate", key=f"gen_vid_{key_prefix}_{idx}", type="primary"):
+                                        try:
+                                            from app.services.platform_helpers import _ensure_replicate_client
+                                            from pathlib import Path
+                                            import requests
+                                            from datetime import datetime
+                                            
+                                            replicate_api, _ = _ensure_replicate_client()
+                                            
+                                            with st.spinner(f"Generating video..."):
+                                                image_path = str(file_info['path'])
+                                                prompt = video_prompt if video_prompt.strip() else f"Product video for {file_info['name']}"
+                                                
+                                                video_url = replicate_api.generate_video(
+                                                    prompt=prompt,
+                                                    image_path=image_path,
+                                                    motion_level=motion_level,
+                                                    aspect_ratio="16:9"
+                                                )
+                                                
+                                                if video_url:
+                                                    video_response = requests.get(video_url, timeout=120)
+                                                    video_response.raise_for_status()
+                                                    
+                                                    output_dir = Path("file_library") / "generated_videos"
+                                                    output_dir.mkdir(parents=True, exist_ok=True)
+                                                    
+                                                    base_name = Path(file_info['name']).stem
+                                                    video_filename = f"{base_name}_video_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
+                                                    video_path = output_dir / video_filename
+                                                    
+                                                    with open(video_path, "wb") as f:
+                                                        f.write(video_response.content)
+                                                    
+                                                    st.success("✅ Video generated!")
+                                                    st.video(str(video_path))
+                                                    st.caption(f"📁 `{video_path}`")
+                                                    
+                                                    st.session_state[f'make_video_{key_prefix}_{idx}'] = None
+                                                    st.rerun()
+                                                else:
+                                                    st.error("❌ No video URL returned")
+                                        except Exception as e:
+                                            st.error(f"❌ Failed: {str(e)}")
+                                    
+                                    if st.button("Cancel", key=f"cancel_vid_{key_prefix}_{idx}"):
+                                        st.session_state[f'make_video_{key_prefix}_{idx}'] = None
+                                        st.rerun()
 
 def render_file_library_tab():
     st.markdown("### 📁 File & Asset Library")
