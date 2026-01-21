@@ -1,4 +1,4 @@
-from abp_imports_common import (
+from app.tabs.abp_imports_common import (
     st, os, time, json, Path, datetime, setup_logger
 )
 
@@ -6,27 +6,28 @@ from abp_imports_common import (
 dt = datetime
 logger = setup_logger(__name__)
 
-from enhanced_features import GlobalSearchManager
-from tab_visibility_manager import (
+from app.services.secure_config import render_secure_config_ui, init_api_clients, is_demo_mode, get_api_key
+from app.services.enhanced_features import GlobalSearchManager
+from app.services.tab_visibility_manager import (
     initialize_tab_visibility,
     get_visible_tabs,
     get_filtered_tabs,
     render_tab_preferences
 )
-from youtube_upload_service import YouTubeUploadService
-from shopify_service import ShopifyAPI
-from platform_helpers import _get_replicate_token
-from platform_integrations import render_recovery_check
-from performance_optimizations import render_performance_settings
+from app.services.youtube_upload_service import YouTubeUploadService
+from app.services.shopify_service import ShopifyAPI
+from app.services.platform_helpers import _get_replicate_token
+from app.services.platform_integrations import render_recovery_check
+from app.utils.performance_optimizations import render_performance_settings
 try:
-    from background_tasks import get_task_manager, TaskState
+    from app.services.background_tasks import get_task_manager, TaskState
     BACKGROUND_TASKS_AVAILABLE = True
 except ImportError:
     BACKGROUND_TASKS_AVAILABLE = False
     get_task_manager = None
     TaskState = None
 try:
-    from shortcuts_manager import ShortcutsManager
+    from app.services.shortcuts_manager import ShortcutsManager
 except ImportError:
     ShortcutsManager = None
 
@@ -84,7 +85,7 @@ def render_sidebar(
         # Compact Background Task status (visible on all pages)
         if BACKGROUND_TASKS_AVAILABLE:
             try:
-                from background_tasks import render_task_status_widget
+                from app.services.background_tasks import render_task_status_widget
                 render_task_status_widget()
             except Exception:
                 pass
@@ -155,98 +156,15 @@ def render_sidebar(
                 tab1, tab2, tab3, tab_shortcuts, tab4, tab5, tab6, tab7 = settings_tabs
                 
                 with tab1:
-                    st.markdown("#### API Configuration")
-        
-                    st.info("💡 **Get your free API key:** [replicate.com/account/api-tokens](https://replicate.com/account/api-tokens)")
-        
-                    # Check current token status from session state (persists across pages)
-                    current_replicate = st.session_state.api_keys.get('replicate', '')
-                    current_printify = st.session_state.api_keys.get('printify', '')
-        
-                    if current_replicate:
-                        st.success(f"✅ Replicate API Key is ACTIVE (ends with ...{current_replicate[-8:]})")
-                    else:
-                        st.error("❌ NO REPLICATE API KEY - PLATFORM WILL NOT WORK")
-                        st.error("⚠️ Add your API key below to enable AI generation")
-        
-                    if current_printify:
-                        st.success(f"✅ Printify API Token is ACTIVE (ends with ...{current_printify[-8:]})")
-                    else:
-                        st.info("ℹ️ No Printify token - publishing disabled")
-        
-                    st.markdown("---")
-        
-                    # API Keys Status (Read-only from .env)
-                    st.info("💡 **API credentials are configured in your `.env` file**")
-        
-                    st.markdown("**Current Configuration:**")
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        if current_replicate:
-                            st.success(f"✅ Replicate  \n`...{current_replicate[-8:]}`")
-                        else:
-                            st.error("❌ Replicate  \nNot set")
-                    with col2:
-                        if current_printify:
-                            st.success(f"✅ Printify  \n`...{current_printify[-8:]}`")
-                        else:
-                            st.error("❌ Printify  \nNot set")
-                    with col3:
-                        if st.session_state.api_keys.get('printify_shop_id'):
-                            st.success(f"✅ Shop ID  \n`{st.session_state.api_keys['printify_shop_id']}`")
-                        else:
-                            st.warning("⚠️ Shop ID  \nNot set")
-        
-                    st.caption("To update credentials, edit your `.env` file and restart the app.")
-        
-                    # Shopify Configuration
-                    st.markdown("---")
-                    st.markdown("#### Shopify (Analytics & Blog Publishing)")
-        
-                    # Initialize Shopify keys in session state from .env
-                    if 'shopify_url' not in st.session_state:
-                        st.session_state.shopify_url = os.getenv('SHOPIFY_SHOP_URL', '')
-                    if 'shopify_api_key' not in st.session_state:
-                        st.session_state.shopify_api_key = os.getenv('SHOPIFY_API_KEY', '')
-                    if 'shopify_api_secret' not in st.session_state:
-                        st.session_state.shopify_api_secret = os.getenv('SHOPIFY_API_SECRET', '')
-                    if 'shopify_access_token' not in st.session_state:
-                        st.session_state.shopify_access_token = os.getenv('SHOPIFY_ACCESS_TOKEN', '')
-        
-                    # Status display - check for either API key/secret OR access token
-                    shopify_configured = (
-                        st.session_state.shopify_url and 
-                        (st.session_state.shopify_access_token or 
-                         (st.session_state.shopify_api_key and st.session_state.shopify_api_secret))
-                    )
-        
-                    if shopify_configured:
-                        auth_method = "Access Token" if st.session_state.shopify_access_token else "API Key + Secret"
-                        st.success(f"✅ Shopify Connected: `{st.session_state.shopify_url}` ({auth_method})")
-        
-                        if st.button("🧪 Test Shopify Connection", use_container_width=True):
-                            try:
-                                # Use the globally initialized API or create new one
-                                if st.session_state.shopify_api:
-                                    shopify = st.session_state.shopify_api
-                                else:
-                                    from shopify_service import ShopifyAPI
-                                    shopify = ShopifyAPI()  # Will auto-load from .env
-        
-                                if shopify.test_connection():
-                                    st.success("✅ Shopify connection verified!")
-                                    st.info("💬 Try asking the Chat Assistant: 'How many products are in my shop?'")
-                                    st.balloons()
-                            except Exception as e:
-                                st.error(f"❌ Connection failed: {str(e)}")
-                    else:
-                        st.warning("⚠️ Shopify not configured")
-                        st.caption("Configure in `.env` file with either:")
-                        st.code("SHOPIFY_SHOP_URL=yourstore.myshopify.com\nSHOPIFY_ACCESS_TOKEN=shpat_xxxxx", language="bash")
-                        st.caption("OR")
-                        st.code("SHOPIFY_SHOP_URL=yourstore.myshopify.com\nSHOPIFY_API_KEY=xxxxx\nSHOPIFY_API_SECRET=xxxxx", language="bash")
-        
-        with tab2:
+                    # Use the new secure configuration UI
+                    try:
+                        render_secure_config_ui()
+                    except Exception as e:
+                        st.error(f"Error loading API configuration: {str(e)}")
+                        # Fallback to basic display
+                        st.markdown("#### API Configuration")
+                        st.info("Please configure your API keys in the .env file or use Streamlit Cloud secrets.")
+                with tab2:
                     st.markdown("#### YouTube Video Publishing")
                     st.markdown("*Configure OAuth 2.0 credentials for automated video uploads*")
         
@@ -560,64 +478,6 @@ def render_sidebar(
                         compact_mode = st.checkbox("Compact Layout", help="Reduce spacing for more content")
             
                     st.markdown("---")
-                    st.markdown("**🤖 Default AI Models**")
-                    st.caption("Set default models for quick actions (Files page, Product Design, etc.)")
-                    
-                    # Initialize default models in session state
-                    if 'default_image_model' not in st.session_state:
-                        st.session_state.default_image_model = 'prunaai/flux-fast'
-                    if 'default_video_model' not in st.session_state:
-                        st.session_state.default_video_model = 'minimax/video-01'
-                    if 'default_music_model' not in st.session_state:
-                        st.session_state.default_music_model = 'meta/musicgen'
-                    
-                    ai_col1, ai_col2 = st.columns(2)
-                    with ai_col1:
-                        st.session_state.default_image_model = st.selectbox(
-                            "🎨 Image Model",
-                            [
-                                'prunaai/flux-fast',
-                                'bytedance/seedream-4',
-                                'google/imagen-4-ultra',
-                                'black-forest-labs/flux-1.1-pro',
-                                'ideogram-ai/ideogram-v2-turbo'
-                            ],
-                            index=['prunaai/flux-fast', 'bytedance/seedream-4', 'google/imagen-4-ultra', 'black-forest-labs/flux-1.1-pro', 'ideogram-ai/ideogram-v2-turbo'].index(st.session_state.default_image_model) if st.session_state.default_image_model in ['prunaai/flux-fast', 'bytedance/seedream-4', 'google/imagen-4-ultra', 'black-forest-labs/flux-1.1-pro', 'ideogram-ai/ideogram-v2-turbo'] else 0,
-                            key="default_img_model_select",
-                            help="Default model for Files page and quick generation actions"
-                        )
-                        
-                        st.session_state.default_music_model = st.selectbox(
-                            "🎵 Music Model",
-                            [
-                                'meta/musicgen',
-                                'auffusion/stable-audio',
-                                'suno-ai/bark'
-                            ],
-                            index=['meta/musicgen', 'auffusion/stable-audio', 'suno-ai/bark'].index(st.session_state.default_music_model) if st.session_state.default_music_model in ['meta/musicgen', 'auffusion/stable-audio', 'suno-ai/bark'] else 0,
-                            key="default_music_model_select",
-                            help="Default model for audio generation"
-                        )
-                    
-                    with ai_col2:
-                        st.session_state.default_video_model = st.selectbox(
-                            "🎬 Video Model",
-                            [
-                                'minimax/video-01',
-                                'luma/photon-flash',
-                                'lightricks/ltx-video'
-                            ],
-                            index=['minimax/video-01', 'luma/photon-flash', 'lightricks/ltx-video'].index(st.session_state.default_video_model) if st.session_state.default_video_model in ['minimax/video-01', 'luma/photon-flash', 'lightricks/ltx-video'] else 0,
-                            key="default_vid_model_select",
-                            help="Default model for Files page video generation"
-                        )
-                    
-                    st.caption("💡 Note: Dashboard Campaign Generator uses its own model selection")
-                    
-                    if st.button("💾 Save Default Models", key="save_default_models"):
-                        st.success("✅ Default AI models saved!")
-            
-                    st.markdown("---")
                     st.markdown("**⚙️ Performance**")
             
                     perf_col1, perf_col2 = st.columns(2)
@@ -778,7 +638,7 @@ def render_sidebar(
                                     if test_caption:
                                         with st.spinner("Posting to Twitter..."):
                                             try:
-                                                from ai_twitter_poster import AITwitterPoster
+                                                from app.services.ai_twitter_poster import AITwitterPoster
                                                 poster = AITwitterPoster(headless=False, browser_type='chrome')
                                         
                                                 # Save uploaded image if provided
@@ -962,7 +822,7 @@ def render_sidebar(
                     
                     # Check if ShortcutsManager is available (imported at module level)
                     try:
-                        from shortcuts_manager import ShortcutsManager as SM
+                        from app.services.shortcuts_manager import ShortcutsManager as SM
                         shortcuts_mgr_local = SM()
                         all_shortcuts = shortcuts_mgr_local.load_shortcuts()
                         
@@ -1330,7 +1190,7 @@ def render_sidebar(
         
             # Import shortcuts manager if available
             try:
-                from shortcuts_manager import ShortcutsManager
+                from app.services.shortcuts_manager import ShortcutsManager
                 sidebar_shortcuts_mgr = ShortcutsManager()
                 
                 # Initialize shortcuts in session state if not exists - load from persistence
@@ -1409,8 +1269,8 @@ def render_sidebar(
                                             results = []
                                             context = {'description': shortcut['description']}
                                             
-                                            from otto_engine import get_slash_processor
-                                            from api_service import ReplicateAPI
+                                            from app.services.otto_engine import get_slash_processor
+                                            from app.services.api_service import ReplicateAPI
                                             
                                             # Get Replicate API token
                                             replicate_token = _get_replicate_token()
@@ -1460,7 +1320,7 @@ def render_sidebar(
                                                         
                                                         if 'twitter' in platform and image_path:
                                                             try:
-                                                                from ai_twitter_poster import AITwitterPoster
+                                                                from app.services.ai_twitter_poster import AITwitterPoster
                                                                 poster = AITwitterPoster(headless=True)
                                                                 import asyncio
                                                                 
@@ -1856,7 +1716,7 @@ def render_sidebar(
     with header_cols[4]:
         # Render global progress indicator in the header (compact version)
         try:
-            from background_task_manager import render_compact_progress_indicator
+            from app.services.background_task_manager import render_compact_progress_indicator
             render_compact_progress_indicator()
         except Exception as e:
             pass  # Silently fail if not available

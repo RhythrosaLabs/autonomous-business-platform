@@ -255,61 +255,45 @@ Otto is a **multi-agent AI system** powered by Claude Sonnet 3.5/4 with:
 
 Otto supports powerful **slash commands** for instant content generation. Just type `/` followed by the command in chat:
 
-**🎨 Media Generation:**
-- `/image [prompt]` - Generate images with AI models (Flux, SDXL, Imagen)
-- `/video [prompt]` - Create video clips (Kling, Luma, Minimax)
+**Media Generation:**
+- `/image [prompt]` - Generate images instantly
+- `/video [prompt]` - Create video clips
+- `/music [prompt]` - Generate music tracks
+- `/3d [prompt]` - Create 3D models
+- `/speak [text]` - Text-to-speech audio
 
-**📋 Campaign Management:**
-- `/campaign [concept]` - Create a full marketing campaign
-- `/analyze [campaign_name]` - Analyze campaign performance
-- `/list [campaign_name]` - List files in a campaign
+**Documents & Files:**
+- `/pdf [content]` - Generate PDF documents
+- `/xlsx [description]` - Create Excel spreadsheets
+- `/doc [content]` - Word documents
+- `/csv [data]` - CSV data files
+- `/md [content]` - Markdown files
 
-**📱 Content & Publishing:**
-- `/ads [product_name]` - Generate social media ads
+**Code Generation:**
+- `/python [description]` - Python code
+- `/js` `/ts` - JavaScript/TypeScript
+- `/html` `/css` - Web files
+- `/dockerfile` - Docker configs
+- `/json` `/yaml` - Config files
 
-**🤖 Agents & Automation:**
-- `/agents` - List all saved agents
-- `/agent [agent_name]` - Run a specific agent
+**Direct Model Access:**
+- `/flux` `/sdxl` - Specific image models
+- `/kling` `/luma` - Video models
+- `/musicgen` - Music generation
 
-**📁 File Management:**
-- `/export` - Export files and reports
-
-**🌐 Browser Automation:**
-Otto can control web browsers for social media posting and web tasks:
-- `/browse [url]` - Navigate to a website
-- `/click [element]` - Click on elements
-- `/type [text]` - Type text into forms
-- `/screenshot` - Capture screenshot
-- `/gettext [selector]` - Extract text from page
-- `/find [selector]` - Find elements on page
-- `/closebrowser` - Close browser session
-
-**Natural Language Commands:**
-You can also use natural language for browser automation:
-- "Go to Twitter and post about my new product"
-- "Search Amazon for competitor products"
-- "Post my latest design to Instagram"
+**Workflow Chaining:**
+- `/chain` - Combine multiple commands
+- Example: `/chain /image logo | /video rotate`
 
 **Help:**
-- `/help` - Show all available commands and usage
+- `/help` - Show all available commands
 
-**⚡ Quick Examples:**
+**Quick Examples:**
 ```
-# Generate a campaign
-/campaign eco-friendly water bottles
-
-# Create ads for a product
-/ads minimalist hoodie design
-
-# List campaign files
-/list winter_campaign
-
-# Run a saved agent
-/agent product_launcher
-
-# Browser automation
-/browse https://twitter.com
-Go to Twitter and post "Check out our new product!"
+/image modern tech logo minimalist blue
+/video product showcase cinematic 4k
+/python REST API with Flask
+/chain /image coffee mug | /video spinning
 ```
 
 #### 📚 Otto Knowledge Base (Teach Otto About Your Business)
