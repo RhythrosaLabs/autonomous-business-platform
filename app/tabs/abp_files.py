@@ -1,24 +1,23 @@
-from app.tabs.abp_imports_common import (
+from abp_imports_common import (
     st, os, json, asyncio, Path, datetime, requests, setup_logger
 )
-from app.services.secure_config import get_api_key
 
 # Maintain backward compatibility alias
 dt = datetime
 logger = setup_logger(__name__)
 
-from app.tabs.abp_utils import cached_scan_files, cached_scan_products
-from app.services.tab_job_helpers import (
+from abp_utils import cached_scan_files, cached_scan_products
+from tab_job_helpers import (
     submit_batch_operation,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from app.services.global_job_queue import JobType, get_global_job_queue
+from global_job_queue import JobType, get_global_job_queue
 
 # Import optional dependencies
 try:
-    from app.services.ai_twitter_poster import post_to_twitter_ai
+    from ai_twitter_poster import post_to_twitter_ai
     AI_TWITTER_AVAILABLE = True
 except ImportError:
     AI_TWITTER_AVAILABLE = False
@@ -162,10 +161,103 @@ def render_file_grid(files, key_prefix, cols_count=4):
                             
                             # Video creation modal
                             if st.session_state.get(f'make_video_{key_prefix}_{idx}'):
-                                st.info("Go to Video Producer tab to use this image")
-                                if st.button("Go to Video Producer", key=f"go_vid_{key_prefix}_{idx}"):
-                                    st.session_state.current_main_tab = 7
-                                    st.rerun()
+                                with st.expander("🎬 Generate Video from Image", expanded=True):
+                                    st.info("Automatically generating video using AI...")
+                                    
+                                    # Get the custom default video model from settings
+                                    default_video_model = st.session_state.get('default_video_model', 'minimax/video-01')
+                                    
+                                    # Video generation options
+                                    video_col1, video_col2 = st.columns(2)
+                                    with video_col1:
+                                        video_model = st.selectbox(
+                                            "Video Model",
+                                            ["minimax/video-01", "luma/photon-flash", "lightricks/ltx-video"],
+                                            index=0 if default_video_model not in ["minimax/video-01", "luma/photon-flash", "lightricks/ltx-video"] else ["minimax/video-01", "luma/photon-flash", "lightricks/ltx-video"].index(default_video_model),
+                                            key=f"vid_model_{key_prefix}_{idx}"
+                                        )
+                                    with video_col2:
+                                        motion_level = st.slider("Motion Level", 1, 5, 3, key=f"motion_{key_prefix}_{idx}")
+                                    
+                                    video_prompt = st.text_input(
+                                        "Video Prompt (optional)",
+                                        placeholder="Product showcase with smooth rotation",
+                                        key=f"vid_prompt_{key_prefix}_{idx}"
+                                    )
+                                    
+                                    if st.button("🎬 Generate Video", key=f"gen_vid_{key_prefix}_{idx}", type="primary"):
+                                        try:
+                                            from platform_helpers import _ensure_replicate_client, _get_replicate_token
+                                            from pathlib import Path
+                                            import requests
+                                            
+                                            # Get API client
+                                            replicate_api, _ = _ensure_replicate_client()
+                                            
+                                            with st.spinner(f"🎬 Generating video with {video_model}..."):
+                                                # Generate video from image
+                                                image_path = str(file_info['path'])
+                                                prompt = video_prompt if video_prompt.strip() else f"Product showcase video for {file_info['name']}"
+                                                
+                                                # Update the video model in API
+                                                original_model = replicate_api.video_model
+                                                replicate_api.video_model = video_model
+                                                
+                                                try:
+                                                    video_url = replicate_api.generate_video(
+                                                        prompt=prompt,
+                                                        image_path=image_path,
+                                                        motion_level=motion_level,
+                                                        aspect_ratio="16:9"
+                                                    )
+                                                finally:
+                                                    # Restore original model
+                                                    replicate_api.video_model = original_model
+                                                
+                                                if video_url:
+                                                    # Download and save video
+                                                    video_response = requests.get(video_url, timeout=120)
+                                                    video_response.raise_for_status()
+                                                    
+                                                    # Save to file_library with original filename + _video suffix
+                                                    output_dir = Path("file_library") / "generated_videos"
+                                                    output_dir.mkdir(parents=True, exist_ok=True)
+                                                    
+                                                    base_name = Path(file_info['name']).stem
+                                                    video_filename = f"{base_name}_video_{datetime.now().strftime('%Y%m%d_%H%M%S')}.mp4"
+                                                    video_path = output_dir / video_filename
+                                                    
+                                                    with open(video_path, "wb") as f:
+                                                        f.write(video_response.content)
+                                                    
+                                                    st.success(f"✅ Video generated successfully!")
+                                                    st.video(str(video_path))
+                                                    st.caption(f"📁 Saved to: `{video_path}`")
+                                                    
+                                                    # Clear the modal
+                                                    st.session_state[f'make_video_{key_prefix}_{idx}'] = None
+                                                    
+                                                    # Add to session state for tracking
+                                                    if 'generated_videos' not in st.session_state:
+                                                        st.session_state.generated_videos = []
+                                                    st.session_state.generated_videos.append({
+                                                        'source_image': image_path,
+                                                        'video_path': str(video_path),
+                                                        'model': video_model,
+                                                        'prompt': prompt,
+                                                        'timestamp': datetime.now().isoformat()
+                                                    })
+                                                    
+                                                    st.rerun()
+                                                else:
+                                                    st.error("❌ Video generation returned no URL")
+                                        except Exception as e:
+                                            st.error(f"❌ Video generation failed: {str(e)}")
+                                            logger.error(f"Video generation error: {e}", exc_info=True)
+                                    
+                                    if st.button("Cancel", key=f"cancel_vid_{key_prefix}_{idx}"):
+                                        st.session_state[f'make_video_{key_prefix}_{idx}'] = None
+                                        st.rerun()
 
 def render_file_library_tab():
     st.markdown("### 📁 File & Asset Library")
@@ -547,7 +639,7 @@ def render_file_library_tab():
             st.markdown("View what Otto has learned from your files.")
             
             try:
-                from app.services.otto_engine import get_knowledge_base
+                from otto_engine import get_knowledge_base
                 kb = get_knowledge_base()
                 stats = kb.get_stats()
                 
@@ -611,7 +703,7 @@ def render_file_library_tab():
         with prod_tabs[1]:
             st.markdown("#### 👕 Printify Integration")
             try:
-                from app.services.api_service import PrintifyAPI as PrintifyClient
+                from printify import PrintifyClient
                 printify_token = st.session_state.get('printify_api_key') or os.getenv('PRINTIFY_API_TOKEN')
                 
                 if printify_token:
@@ -667,11 +759,11 @@ def render_file_library_tab():
             
             if st.button("🚀 Generate Product", use_container_width=True, type="primary", key="gen_product_btn"):
                 if product_idea:
-                    replicate_token = st.session_state.get('replicate_api_key') or get_api_key('REPLICATE_API_TOKEN')
+                    replicate_token = st.session_state.get('replicate_api_key') or os.getenv('REPLICATE_API_TOKEN')
                     if replicate_token:
                         with st.spinner(f"🎨 Generating {variations} {product_type} variations in parallel..."):
                             try:
-                                from app.services.api_service import ReplicateAPI
+                                from api_service import ReplicateAPI
                                 import time
                                 api = ReplicateAPI(replicate_token)
                                 
@@ -959,7 +1051,7 @@ def render_file_library_tab():
         
         # Import chat history manager
         try:
-            from app.services.chat_assistant import get_chat_history_manager
+            from chat_assistant import get_chat_history_manager
             chat_manager = get_chat_history_manager()
             
             # Search and filter

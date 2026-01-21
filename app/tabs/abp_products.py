@@ -5,8 +5,8 @@ from datetime import datetime as dt
 import requests
 import json
 
-from app.utils.cross_page_state import restore_page_to_session
-from app.services.platform_helpers import (
+from cross_page_state import restore_page_to_session
+from platform_helpers import (
     _render_printify_product_config,
     _ensure_replicate_client,
     _get_replicate_token,
@@ -14,14 +14,14 @@ from app.services.platform_helpers import (
     _printify_selection_ready,
     _send_design_to_printify
 )
-from app.services.platform_integrations import tracked_replicate_run
-from app.services.tab_job_helpers import (
+from platform_integrations import tracked_replicate_run
+from tab_job_helpers import (
     submit_batch_product_designs,
     collect_job_results,
     check_jobs_progress,
     are_all_jobs_done
 )
-from app.services.global_job_queue import JobType
+from global_job_queue import JobType
 
 # Style and color prompts for Product Studio
 STYLE_PROMPTS = {
@@ -268,7 +268,7 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                 img_params = advanced_model_params.get("image", {})
                 
                 # Submit batch jobs
-                from app.services.global_job_queue import get_global_job_queue
+                from global_job_queue import get_global_job_queue
                 queue = get_global_job_queue()
                 
                 job_ids = []
@@ -511,14 +511,21 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                 col_thumb, col_details = st.columns([1, 2])
                 with col_thumb:
                     design_path = upload.get('design_path', '')
-                    if design_path and Path(design_path).exists():
-                        st.image(design_path, width=100)
+                    if design_path:
+                        if Path(design_path).exists():
+                            st.image(design_path, width=100)
+                        else:
+                            # Show placeholder if file was moved/deleted but still show upload record
+                            st.caption("🖼️ Design")
+                            st.caption("_(file moved)_")
                     else:
-                        st.caption("🖼️ Image")
+                        st.caption("🖼️ Design")
                 with col_details:
                     st.markdown(f"**Upload ID:** `{upload['upload_id']}`")
                     st.caption(f"{upload['timestamp']}")
                     st.caption(f"Prompt: {upload['prompt'][:80]}...")
+                    if design_path:
+                        st.caption(f"📁 `{design_path}`")
 
     if st.session_state.get('printify_products'):
         st.markdown("---")
@@ -528,8 +535,15 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                 col_thumb, col_details = st.columns([1, 2])
                 with col_thumb:
                     design_path = product.get('design_path')
-                    if design_path and Path(design_path).exists():
-                        st.image(design_path, width=100)
+                    if design_path:
+                        if Path(design_path).exists():
+                            st.image(design_path, width=100)
+                        else:
+                            # Show placeholder even if file doesn't exist
+                            st.caption("🖼️ Design")
+                            st.caption("_(file moved)_")
+                    else:
+                        st.caption("🖼️ Design")
                 with col_details:
                     title = product.get('title') or "Printify Product"
                     product_id = product.get('product_id') or "draft"
@@ -538,6 +552,8 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                     st.caption(
                         f"Blueprint: {product.get('blueprint_id', 'N/A')} • Variants: {len(product.get('variant_ids', []) or [])}"
                     )
+                    if design_path:
+                        st.caption(f"📁 `{design_path}`")
                     if product.get('published'):
                         st.success("Published to store")
                     else:
