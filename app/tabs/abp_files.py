@@ -141,6 +141,8 @@ def render_file_grid(files, key_prefix, cols_count=4):
                                 if file_info['type'] in ['.png', '.jpg', '.jpeg', '.gif', '.webp']:
                                     if st.button("🎬", key=f"vid_{key_prefix}_{idx}"):
                                         st.session_state[f'make_video_{key_prefix}_{idx}'] = file_info['path']
+
+
                             
                             # Video creation modal
                             if st.session_state.get(f'make_video_{key_prefix}_{idx}'):
