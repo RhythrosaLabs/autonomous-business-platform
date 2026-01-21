@@ -99,3 +99,6 @@ jsonschema>=4.20.0
 
 # === MARKDOWN ===
 markdown>=3.5.0
+
+# === VISUALIZATION ===
+plotly>=5.18.0
