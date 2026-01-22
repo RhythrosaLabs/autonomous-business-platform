@@ -380,45 +380,47 @@ Your hyperintelligent multi-agent AI powered by Claude Sonnet 3.5/4:
 
 ### Quick Start
 
-1. **Clone & Install**
+> **🆕 First time?** See [QUICKSTART.md](QUICKSTART.md) for the absolute beginner guide!
+
+**Fast Track (5 minutes):**
+
 ```bash
+# 1. Clone and setup
 git clone https://github.com/RhythrosaLabs/autonomous-business-platform.git
 cd autonomous-business-platform
-python3.11 -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-```
 
-2. **Configure Environment**
-```bash
+# 2. Configure (add your API keys)
 cp .env.example .env
-nano .env  # Add your API keys
+nano .env  # Add at minimum: REPLICATE_API_TOKEN and ANTHROPIC_API_KEY
+
+# 3. Launch!
+streamlit run autonomous_business_platform.py
 ```
 
-**Required Keys** (get from links below):
-- [Replicate API](https://replicate.com/account/api-tokens)
-- [Anthropic API](https://console.anthropic.com/) (for Claude/Otto)
-- [Printify API](https://printify.com/app/account/api)
-- [Shopify API](https://shopify.dev/docs/apps/auth)
-- [YouTube API](https://console.cloud.google.com)
+**Then open:** http://localhost:8501 and test your APIs in Settings → 🔌 Test Connections
 
-**Optional Keys**:
+**Get API Keys** (both have free trials):
+- [Replicate API](https://replicate.com/account/api-tokens) - For AI models
+- [Anthropic API](https://console.anthropic.com/) - For Claude/Otto AI
+
+**Optional APIs** (add later):
+- [Printify](https://printify.com/app/account/api) - Product mockups
+- [Shopify](https://shopify.dev/docs/apps/auth) - E-commerce
+- [YouTube](https://console.cloud.google.com) - Video publishing
 - OpenAI, Pinterest, TikTok, Instagram, LinkedIn, Facebook, Twitter
 
-3. **Launch Platform**
+**Advanced Launch** (with backend API):
 ```bash
 cd scripts
-./start_platform.sh        # Starts all services (same as ./start_platform.sh all)
-# OR specific services:
-# ./start_platform.sh backend   # Only FastAPI backend
-# ./start_platform.sh frontend  # Only Streamlit UI
-# ./start_platform.sh stop      # Stop all services
-# ./start_platform.sh status    # Check service status
+./start_platform.sh  # Starts all services
 ```
 
 Access:
 - 🎨 **Frontend**: http://localhost:8501
-- �� **API**: http://localhost:8000/docs
+- 🔧 **API**: http://localhost:8000/docs
 - 📊 **Ray Dashboard**: http://localhost:8265
 
 ---
