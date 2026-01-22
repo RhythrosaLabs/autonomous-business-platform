@@ -62,38 +62,6 @@ This isn't just another AI wrapper - it's a **complete business operating system
 
 #
 
-## 📁 File Storage Locations
-
-**Local Installation:**
-- **Generated Files**: Saved to `file_library/` in your project directory
-  - Images: `file_library/generated_images/`
-  - Videos: `file_library/generated_videos/`
-  - Audio: `file_library/generated_audio/`
-  - Documents: `file_library/documents/`
-- **Campaign Files**: Organized by campaign name in subdirectories
-- **Backup Files**: `.backup` extension files stored alongside originals
-
-**Streamlit Demo (otto-mate.streamlit.app):**
-- Files are stored in temporary memory during your session
-- ⚠️ **Important**: Files are lost when the session ends or app restarts
-- Download files immediately after generation to save them locally
-
-### Streamlit Demo Limitations
-
-The hosted demo at **[otto-mate.streamlit.app](https://otto-mate.streamlit.app)** has these limitations:
-
-- **No Persistent File Storage**: Files exist only during your active session
-  - ⚠️ **CRITICAL**: Generated files cannot be saved to disk on Streamlit Cloud
-  - Files are stored in temporary memory only and will be lost when session ends
-  - Always download files immediately after generation
-- **Session Timeout**: Inactive sessions automatically disconnect after 15-20 minutes
-- **Limited Resources**: Shared computing resources may result in slower generation
-- **No System Access**: Cannot access your local files or install dependencies
-- **No Environment Variables**: Some integrations requiring API keys may not work
-- **Cold Starts**: First load may take 30-60 seconds while container spins up
-
-**Recommendation**: For production use with persistent file storage, local API integrations, and optimal performance, install locally by following the Setup section below.
-
 ## 🤖 Otto AI Assistant
 Your hyperintelligent multi-agent AI powered by Claude Sonnet 3.5/4:
 - **Slash Commands** (`/image`, `/video`, `/music`, `/pdf`, `/python`, `/chain`, `/help`) - 100+ built-in commands
@@ -623,6 +591,71 @@ pylint **/*.py    # Linting
 
 ---
 
+
+## 📁 File Storage Locations
+
+**Local Installation:**
+- **Generated Files**: Saved to `file_library/` in your project directory
+  - Images: `file_library/generated_images/`
+  - Videos: `file_library/generated_videos/`
+  - Audio: `file_library/generated_audio/`
+  - Documents: `file_library/documents/`
+- **Campaign Files**: Organized by campaign name in subdirectories
+- **Backup Files**: `.backup` extension files stored alongside originals
+
+**Streamlit Demo (otto-mate.streamlit.app):**
+- Files are stored in temporary memory during your session
+- ⚠️ **Important**: Files are lost when the session ends or app restarts
+- Download files immediately after generation to save them locally
+
+### Streamlit Demo Limitations
+
+The hosted demo at **[otto-mate.streamlit.app](https://otto-mate.streamlit.app)** has these limitations:
+
+- **No Persistent File Storage**: Files exist only during your active session
+  - ⚠️ **CRITICAL**: Generated files cannot be saved to disk on Streamlit Cloud
+  - Files are stored in temporary memory only and will be lost when session ends
+  - Always download files immediately after generation
+- **Session Timeout**: Inactive sessions automatically disconnect after 15-20 minutes
+- **Limited Resources**: Shared computing resources may result in slower generation
+- **No System Access**: Cannot access your local files or install dependencies
+- **No Environment Variables**: Some integrations requiring API keys may not work
+- **Cold Starts**: First load may take 30-60 seconds while container spins up
+
+**Recommendation**: For production use with persistent file storage, local API integrations, and optimal performance, install locally by following the Setup section below.
+
+
+## 🔒 Security & Privacy
+
+### API Key Safety
+
+**Your API keys are completely private and secure:**
+
+1. **Session Isolation**: Each user gets their own isolated session in Streamlit
+   - Your API keys stored in session_state are NOT visible to other users
+   - Session data is isolated per-browser, per-tab
+   - Keys are never shared between users
+
+2. **Storage Priority** (most secure first):
+   - **User Input** → Stored in your browser session only (most private)
+   - **Streamlit Secrets** → Owner-only secrets in Streamlit Cloud dashboard
+   - **Local .env** → Local environment file (never committed to repo)
+
+3. **No Hardcoded Keys**: 
+   - ✅ No API keys are hardcoded in the source code
+   - ✅ No keys are committed to the repository
+   - ✅ `.env` files are in `.gitignore`
+
+4. **Demo vs Local**:
+   - **Demo (otto-mate.streamlit.app)**: You must enter your own API keys each session
+   - **Local Installation**: Keys saved in `.env` file on your computer only
+
+### File Privacy
+
+- **Streamlit Cloud**: Files stored in temporary memory, lost after session ends
+- **Local Installation**: Files saved to `file_library/` directory (in `.gitignore`)
+- **No files are ever committed to the public GitHub repository**
+
 ## 🤝 Contributing
 
 We love contributions! Here's how:
@@ -674,35 +707,4 @@ MIT License - see [LICENSE](LICENSE) file
 
 **Made with ❤️ by Dan Sheils**
 
-
-## 🔒 Security & Privacy
-
-### API Key Safety
-
-**Your API keys are completely private and secure:**
-
-1. **Session Isolation**: Each user gets their own isolated session in Streamlit
-   - Your API keys stored in session_state are NOT visible to other users
-   - Session data is isolated per-browser, per-tab
-   - Keys are never shared between users
-
-2. **Storage Priority** (most secure first):
-   - **User Input** → Stored in your browser session only (most private)
-   - **Streamlit Secrets** → Owner-only secrets in Streamlit Cloud dashboard
-   - **Local .env** → Local environment file (never committed to repo)
-
-3. **No Hardcoded Keys**: 
-   - ✅ No API keys are hardcoded in the source code
-   - ✅ No keys are committed to the repository
-   - ✅ `.env` files are in `.gitignore`
-
-4. **Demo vs Local**:
-   - **Demo (otto-mate.streamlit.app)**: You must enter your own API keys each session
-   - **Local Installation**: Keys saved in `.env` file on your computer only
-
-### File Privacy
-
-- **Streamlit Cloud**: Files stored in temporary memory, lost after session ends
-- **Local Installation**: Files saved to `file_library/` directory (in `.gitignore`)
-- **No files are ever committed to the public GitHub repository**
 
