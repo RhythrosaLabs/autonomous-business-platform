@@ -28,6 +28,13 @@ from app.services.social_media_automation import SocialMediaAutomation
 from app.services.digital_products_service import DigitalProductsService, DigitalProductGenerator
 from app.services.ai_model_manager import ModelFallbackManager
 from app.utils.prompt_templates import PromptTemplateLibrary
+from app.utils.ray_campaign_wrapper import RayCampaignWrapper, show_ray_status
+from app.utils.ray_campaign_operations import (
+    ray_generate_product_images_parallel,
+    ray_generate_campaign_videos_parallel,
+    ray_generate_single_product_image,
+    show_ray_performance_info
+)
 from app.utils.unified_storage import auto_save_generated_content
 import moviepy.editor as mpe  # Don't use * import - it shadows 'time' module
 import re
@@ -122,6 +129,9 @@ def run_campaign_generation(
 
     campaign_dir = create_campaign_directory(concept_input)
     st.info(f"📁 Campaign files will be saved to: `{campaign_dir}`")
+    
+    # Show Ray status
+    show_ray_performance_info()
         
     # Save campaign state immediately so it persists across page switches
     campaign_state = {
