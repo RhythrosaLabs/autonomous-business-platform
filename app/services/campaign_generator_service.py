@@ -5,6 +5,8 @@ Implements sophisticated multi-step workflow from magic-marketer with:
 - GPT-powered content enhancement
 - Knowledge base integration
 - Master document compilation
+- Automatic retry logic for API calls
+- Partial success tracking
 """
 
 import os
@@ -19,6 +21,24 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Import reliability utilities
+try:
+    from app.utils.error_recovery import retry_with_backoff, safe_execute
+    RELIABILITY_AVAILABLE = True
+    logger.info("✅ Reliability features available")
+except ImportError:
+    RELIABILITY_AVAILABLE = False
+    logger.warning("⚠️ Reliability utilities not available - using basic error handling")
+    
+    # Fallback decorator that does nothing
+    def retry_with_backoff(*args, **kwargs):
+        def decorator(func):
+            return func
+        return decorator
+    
+    def safe_execute(func, *args, **kwargs):
+        return func(*args, **kwargs)
 
 
 class EnhancedCampaignGenerator:
@@ -56,37 +76,44 @@ class EnhancedCampaignGenerator:
     def _generate_text(self, prompt: str, max_tokens: int = 600, temperature: float = 0.7) -> str:
         """
         Helper to generate text using appropriate model based on mode
+        WITH AUTOMATIC RETRY LOGIC
         
         In fast mode: Uses generate_text_fast (Llama 3 8B) - 3-5x faster
         In normal mode: Uses generate_text (Claude) - higher quality
         Falls back to fast model if primary times out
+        
+        Automatically retries on transient failures with exponential backoff
         """
-        if self.skip_enhancement:
-            # Fast mode: Use fast Llama model with reduced tokens
-            fast_max_tokens = min(max_tokens, 400)  # Cap tokens for speed
-            return self.replicate_api.generate_text_fast(
-                prompt,
-                max_tokens=fast_max_tokens,
-                temperature=temperature
-            )
-        else:
-            # Normal mode: Use Claude for best quality, with fallback
-            try:
-                return self.replicate_api.generate_text(
+        @retry_with_backoff(max_retries=3, initial_delay=2.0, backoff_factor=2.0)
+        def _generate_with_retry():
+            if self.skip_enhancement:
+                # Fast mode: Use fast Llama model with reduced tokens
+                fast_max_tokens = min(max_tokens, 400)  # Cap tokens for speed
+                return self.replicate_api.generate_text_fast(
                     prompt,
-                    max_tokens=max_tokens,
+                    max_tokens=fast_max_tokens,
                     temperature=temperature
                 )
-            except Exception as e:
-                error_msg = str(e).lower()
-                if "timeout" in error_msg or "timed out" in error_msg:
-                    logger.warning(f"⚠️ Primary model timed out, falling back to fast model...")
-                    return self.replicate_api.generate_text_fast(
+            else:
+                # Normal mode: Use Claude for best quality, with fallback
+                try:
+                    return self.replicate_api.generate_text(
                         prompt,
                         max_tokens=max_tokens,
                         temperature=temperature
                     )
-                raise
+                except Exception as e:
+                    error_msg = str(e).lower()
+                    if "timeout" in error_msg or "timed out" in error_msg:
+                        logger.warning(f"⚠️ Primary model timed out, falling back to fast model...")
+                        return self.replicate_api.generate_text_fast(
+                            prompt,
+                            max_tokens=max_tokens,
+                            temperature=temperature
+                        )
+                    raise
+        
+        return _generate_with_retry()
         
     def enhance_content(self, content: str, content_type: str) -> str:
         """
@@ -794,8 +821,8 @@ Key Patterns from Magic-Marketer:
 - Professional ZIP packaging
 
 Usage:
-    from .campaign_generator_service import EnhancedCampaignGenerator
-    from app.services.api_service import ReplicateAPI
+    from campaign_generator_service import EnhancedCampaignGenerator
+    from api_service import ReplicateAPI
     
     api = ReplicateAPI(token)
     generator = EnhancedCampaignGenerator(api)

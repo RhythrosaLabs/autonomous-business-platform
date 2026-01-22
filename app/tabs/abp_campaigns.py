@@ -2,7 +2,6 @@ from app.tabs.abp_imports_common import (
     st, os, Path, datetime, requests, json, setup_logger
 )
 import time
-from app.services.secure_config import get_api_key
 
 # Maintain backward compatibility alias
 dt = datetime
@@ -18,6 +17,15 @@ from app.services.tab_job_helpers import (
     are_all_jobs_done
 )
 from app.services.global_job_queue import JobType, get_global_job_queue
+
+# Import reliability utilities
+try:
+    from app.utils.progress_tracking import create_progress_tracker
+    from app.utils.error_recovery import batch_process_with_recovery, PartialSuccessHandler
+    RELIABILITY_AVAILABLE = True
+except ImportError:
+    RELIABILITY_AVAILABLE = False
+    logger.warning("⚠️ Reliability utilities not available - using basic progress")
 
 def render_campaign_creator_tab():
     st.header("🎯 Campaign Creator")
@@ -177,11 +185,11 @@ Format: Just the 5 headlines, numbered."""
             try:
                 # Initialize replicate_api if not in session state
                 if 'replicate_api' not in st.session_state or st.session_state.replicate_api is None:
-                    replicate_token = get_api_key('REPLICATE_API_TOKEN')
+                    replicate_token = os.getenv('REPLICATE_API_TOKEN')
                     if not replicate_token:
                         st.error("❌ REPLICATE_API_TOKEN not found. Please set it in your environment or Settings.")
                         st.stop()
-                    from app.services.api_service import ReplicateAPI
+                    from api_service import ReplicateAPI
                     st.session_state.replicate_api = ReplicateAPI(replicate_token)
                 
                 # Create generator with fast_mode option
