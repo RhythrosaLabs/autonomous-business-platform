@@ -93,12 +93,19 @@ nano .env  # or: code .env  # or: open .env
 
 ## Step 6: Launch the Platform 🚀
 
-### Option A: Simple Launch (Recommended for Beginners)
+### Option A: Simple Launch (Recommended for First Test)
 
 ```bash
-# Just run the Streamlit app
+# Just run the Streamlit app - perfect for testing!
 streamlit run autonomous_business_platform.py
 ```
+
+**What you get:**
+- ✅ Full Streamlit UI (all tabs, all features)
+- ✅ API validation test buttons
+- ✅ Campaign generation works
+- ⚠️ No parallel processing (slower for batch operations)
+- ⚠️ No background job queue
 
 **You'll see:**
 ```
@@ -109,16 +116,32 @@ streamlit run autonomous_business_platform.py
 
 **Open that URL in your browser!** 🎉
 
-### Option B: Full Launch (Backend + Frontend)
+### Option B: Full Launch (Backend + Ray + Frontend) - Recommended for Production
 
 ```bash
 cd scripts
 ./start_platform.sh
 ```
 
+**What you get:**
+- ✅ Everything from Option A
+- ✅ FastAPI backend (async job processing)
+- ✅ Ray distributed computing (7x faster campaigns)
+- ✅ Background job queue
+- ✅ Advanced monitoring dashboard
+
 **Access:**
-- Frontend: http://localhost:8501
+- Frontend (UI): http://localhost:8501
 - API Docs: http://localhost:8000/docs
+- Ray Dashboard: http://localhost:8265
+
+**When to use Full Launch:**
+- 📦 Batch processing (hundreds of products/campaigns)
+- 🚀 Need maximum speed (7x faster with Ray parallelization)
+- 🔄 Long-running background jobs
+- 💼 Production deployment
+
+**For your first test, stick with Option A!** ✨
 
 ---
 

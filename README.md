@@ -382,7 +382,7 @@ Your hyperintelligent multi-agent AI powered by Claude Sonnet 3.5/4:
 
 > **🆕 First time?** See [QUICKSTART.md](QUICKSTART.md) for the absolute beginner guide!
 
-**Fast Track (5 minutes):**
+**Fast Track (5 minutes) - Simple Launch:**
 
 ```bash
 # 1. Clone and setup
@@ -402,6 +402,8 @@ streamlit run autonomous_business_platform.py
 
 **Then open:** http://localhost:8501 and test your APIs in Settings → 🔌 Test Connections
 
+> **Note:** This simple launch works great for testing! For production with parallel processing (7x faster campaigns), see Advanced Launch below.
+
 **Get API Keys** (both have free trials):
 - [Replicate API](https://replicate.com/account/api-tokens) - For AI models
 - [Anthropic API](https://console.anthropic.com/) - For Claude/Otto AI
@@ -412,11 +414,17 @@ streamlit run autonomous_business_platform.py
 - [YouTube](https://console.cloud.google.com) - Video publishing
 - OpenAI, Pinterest, TikTok, Instagram, LinkedIn, Facebook, Twitter
 
-**Advanced Launch** (with backend API):
+**Advanced Launch** (with backend API + Ray):
 ```bash
 cd scripts
 ./start_platform.sh  # Starts all services
 ```
+
+**What this adds:**
+- ✅ FastAPI backend (async job processing)
+- ✅ Ray distributed computing (7x faster campaigns!)
+- ✅ Background job queue
+- ✅ Advanced monitoring
 
 Access:
 - 🎨 **Frontend**: http://localhost:8501
