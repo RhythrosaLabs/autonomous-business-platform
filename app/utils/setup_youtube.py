@@ -5,24 +5,26 @@ Run this script to set up YouTube credentials for auto-uploading videos
 """
 
 import os
+import pickle
 import sys
 from pathlib import Path
-import pickle
-from google_auth_oauthlib.flow import InstalledAppFlow
+
 from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
 
 # YouTube API scope
-SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
+SCOPES = ["https://www.googleapis.com/auth/youtube.upload"]
+
 
 def main():
     print("=" * 60)
     print("🎬 YouTube API Setup - Let's Get You Connected!")
     print("=" * 60)
     print()
-    
+
     # Check for client_secret.json
-    client_secret_path = Path(__file__).parent / 'client_secret.json'
-    
+    client_secret_path = Path(__file__).parent / "client_secret.json"
+
     if not client_secret_path.exists():
         print("❌ STEP 1: Get your client_secret.json file")
         print()
@@ -38,27 +40,28 @@ def main():
         print()
         print("📖 Need detailed help? Check: YOUTUBE_SETUP_GUIDE.md")
         print()
-        
+
         response = input("❓ Do you have client_secret.json ready? (y/n): ").lower()
-        if response != 'y':
+        if response != "y":
             print("\n👋 Come back when you have client_secret.json!")
             sys.exit(0)
-        
+
         # Ask them to paste the path
         print("\n📁 Drag your downloaded client_secret.json file here and press Enter:")
-        file_path = input().strip().replace("'", "").replace('"', '')
-        
+        file_path = input().strip().replace("'", "").replace('"', "")
+
         if not os.path.exists(file_path):
             print(f"\n❌ Could not find file at: {file_path}")
             sys.exit(1)
-        
+
         # Copy to current directory
         import shutil
+
         shutil.copy(file_path, client_secret_path)
         print(f"✅ Copied to {client_secret_path}")
     else:
         print("✅ Found client_secret.json")
-    
+
     print()
     print("=" * 60)
     print("🔐 STEP 2: Authorize with your Google account")
@@ -69,28 +72,25 @@ def main():
     print("2. Select the YouTube channel to use")
     print("3. Grant permission to upload videos")
     print()
-    
+
     input("Press Enter to open browser and start authorization... ")
-    
+
     try:
         # Start OAuth flow
-        flow = InstalledAppFlow.from_client_secrets_file(
-            str(client_secret_path),
-            SCOPES
-        )
-        
+        flow = InstalledAppFlow.from_client_secrets_file(str(client_secret_path), SCOPES)
+
         # This will open in your default browser (Atlas)
         # Using port=0 lets it pick any available port automatically
         credentials = flow.run_local_server(
             port=0,
-            success_message="✅ Authorization successful! You can close this window and return to the terminal."
+            success_message="✅ Authorization successful! You can close this window and return to the terminal.",
         )
-        
+
         # Save credentials
-        token_path = Path(__file__).parent / 'token.pickle'
-        with open(token_path, 'wb') as token_file:
+        token_path = Path(__file__).parent / "token.pickle"
+        with open(token_path, "wb") as token_file:
             pickle.dump(credentials, token_file)
-        
+
         print()
         print("=" * 60)
         print("🎉 SUCCESS! YouTube API is ready!")
@@ -107,7 +107,7 @@ def main():
         print()
         print("🚀 Run your Streamlit app and try the YouTube auto-upload!")
         print()
-        
+
     except Exception as e:
         print()
         print("=" * 60)
@@ -123,5 +123,6 @@ def main():
         print()
         sys.exit(1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

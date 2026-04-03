@@ -1,9 +1,10 @@
 # local_models_manager.py
 import os
-from pathlib import Path
 import subprocess
-import time
 import sys
+import time
+from pathlib import Path
+
 
 class LocalModelsManager:
     """Manages local AI model downloads and inference"""
@@ -22,36 +23,39 @@ class LocalModelsManager:
                     "name": "FLUX.1-schnell (Image Generation)",
                     "size_gb": 23.8,
                     "description": "Fast, high-quality image generation",
-                    "source": "black-forest-labs/FLUX.1-schnell"
+                    "source": "black-forest-labs/FLUX.1-schnell",
                 },
                 {
                     "name": "DeepSeek-Coder-1.3B (Text Enhancement)",
                     "size_gb": 2.7,
                     "description": "Prompt enhancement and SEO optimization",
-                    "source": "deepseek-ai/deepseek-coder-1.3b-instruct"
+                    "source": "deepseek-ai/deepseek-coder-1.3b-instruct",
                 },
                 {
                     "name": "Dependencies (diffusers, transformers, torch)",
                     "size_gb": 2.0,
-                    "description": "Required Python libraries"
-                }
+                    "description": "Required Python libraries",
+                },
             ],
             "estimated_time": "20-40 minutes (depending on internet speed)",
-            "disk_space_needed": "30 GB free recommended"
+            "disk_space_needed": "30 GB free recommended",
         }
 
     def is_installed(self) -> bool:
         """Check if models are already installed"""
-        return (self.flux_model_path.exists() and
-                self.text_model_path.exists() and
-                self._check_dependencies())
+        return (
+            self.flux_model_path.exists()
+            and self.text_model_path.exists()
+            and self._check_dependencies()
+        )
 
     def _check_dependencies(self) -> bool:
         """Check if required packages are installed"""
         try:
-            import torch
             import diffusers
+            import torch
             import transformers
+
             return True
         except ImportError:
             return False
@@ -73,17 +77,16 @@ class LocalModelsManager:
                 "transformers",
                 "accelerate",
                 "safetensors",
-                "sentencepiece"
+                "sentencepiece",
             ]
 
             for pkg in packages:
-                subprocess.check_call([
-                    sys.executable, "-m", "pip", "install", "-q", pkg
-                ])
+                subprocess.check_call([sys.executable, "-m", "pip", "install", "-q", pkg])
 
             # Now import after installation
+            import torch
             from diffusers import FluxPipeline
-            from transformers import AutoTokenizer, AutoModelForCausalLM
+            from transformers import AutoModelForCausalLM, AutoTokenizer
 
             # Download FLUX model
             if progress_callback:
@@ -92,7 +95,7 @@ class LocalModelsManager:
             flux_pipe = FluxPipeline.from_pretrained(
                 "black-forest-labs/FLUX.1-schnell",
                 torch_dtype=torch.bfloat16,
-                cache_dir=str(self.models_dir)
+                cache_dir=str(self.models_dir),
             )
             flux_pipe.save_pretrained(str(self.flux_model_path))
             del flux_pipe
@@ -102,13 +105,12 @@ class LocalModelsManager:
                 progress_callback("Downloading DeepSeek model (5-10 minutes)...")
 
             tokenizer = AutoTokenizer.from_pretrained(
-                "deepseek-ai/deepseek-coder-1.3b-instruct",
-                cache_dir=str(self.models_dir)
+                "deepseek-ai/deepseek-coder-1.3b-instruct", cache_dir=str(self.models_dir)
             )
             model = AutoModelForCausalLM.from_pretrained(
                 "deepseek-ai/deepseek-coder-1.3b-instruct",
                 torch_dtype=torch.float16,
-                cache_dir=str(self.models_dir)
+                cache_dir=str(self.models_dir),
             )
 
             tokenizer.save_pretrained(str(self.text_model_path))
@@ -121,21 +123,23 @@ class LocalModelsManager:
                 progress_callback(f"Installation failed: {str(e)}")
             return False
 
-    def generate_image_local(self, prompt: str, width: int = 1024,
-                             height: int = 1024) -> str:
+    def generate_image_local(self, prompt: str, width: int = 1024, height: int = 1024) -> str:
         """Generate image using local FLUX model"""
         try:
-            from diffusers import FluxPipeline
             import torch
+            from diffusers import FluxPipeline
 
             # Load pipeline
             pipe = FluxPipeline.from_pretrained(
-                str(self.flux_model_path),
-                torch_dtype=torch.bfloat16
+                str(self.flux_model_path), torch_dtype=torch.bfloat16
             )
 
             # Move to GPU if available
-            device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+            device = (
+                "cuda"
+                if torch.cuda.is_available()
+                else "mps" if torch.backends.mps.is_available() else "cpu"
+            )
             pipe = pipe.to(device)
 
             # Generate image
@@ -144,7 +148,7 @@ class LocalModelsManager:
                 width=width,
                 height=height,
                 num_inference_steps=4,  # Schnell is fast, only needs 4 steps
-                guidance_scale=0.0  # Schnell doesn't use guidance
+                guidance_scale=0.0,  # Schnell doesn't use guidance
             ).images[0]
 
             # Save to temp file
@@ -159,28 +163,28 @@ class LocalModelsManager:
     def enhance_prompt_local(self, prompt: str) -> str:
         """Enhance prompt using local text model"""
         try:
-            from transformers import AutoTokenizer, AutoModelForCausalLM
             import torch
+            from transformers import AutoModelForCausalLM, AutoTokenizer
 
             tokenizer = AutoTokenizer.from_pretrained(str(self.text_model_path))
             model = AutoModelForCausalLM.from_pretrained(
-                str(self.text_model_path),
-                torch_dtype=torch.float16
+                str(self.text_model_path), torch_dtype=torch.float16
             )
 
-            device = "cuda" if torch.cuda.is_available() else "mps" if torch.backends.mps.is_available() else "cpu"
+            device = (
+                "cuda"
+                if torch.cuda.is_available()
+                else "mps" if torch.backends.mps.is_available() else "cpu"
+            )
             model = model.to(device)
 
             # Create enhancement prompt
-            enhancement_query = f"Enhance this image generation prompt to be more detailed and artistic: {prompt}"
+            enhancement_query = (
+                f"Enhance this image generation prompt to be more detailed and artistic: {prompt}"
+            )
 
             inputs = tokenizer(enhancement_query, return_tensors="pt").to(device)
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=100,
-                temperature=0.7,
-                do_sample=True
-            )
+            outputs = model.generate(**inputs, max_new_tokens=100, temperature=0.7, do_sample=True)
 
             enhanced = tokenizer.decode(outputs[0], skip_special_tokens=True)
 

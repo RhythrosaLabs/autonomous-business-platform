@@ -47,7 +47,7 @@
 ## 🎯 What is This?
 
 The Autonomous Business Platform is a **production-ready, self-hosted AI business automation suite** that combines:
-- **30+ specialized modules** for every aspect of digital business
+- **21 specialized tabs + 70 service modules** for every aspect of digital business
 - **100+ AI models** from Replicate, OpenAI, Anthropic, and more
 - **15+ platform integrations** (Printify, Shopify, YouTube, social media)
 - **Otto AI** - Your hyperintelligent multi-agent assistant
@@ -331,7 +331,7 @@ Your hyperintelligent multi-agent AI powered by Claude Sonnet 3.5/4:
 ```
 ┌─────────────────────────────────────────────────────┐
 │           Streamlit Frontend (Port 8501)             │
-│  • 34 specialized tabs                               │
+│  • 21 specialized tabs + lazy loading                 │
 │  • Real-time updates via WebSocket                  │
 │  • Session state management                         │
 └──────────────────────┬──────────────────────────────┘
@@ -542,29 +542,36 @@ Type `/` in any text field:
 ### Project Structure
 ```
 autonomous-business-platform/
+├── autonomous_business_platform.py  # Main Streamlit entry point
 ├── app/
-│   ├── tabs/               # 34 feature modules
+│   ├── core/               # App factory, DI container, error handling
+│   ├── tabs/               # 21 feature tab modules
 │   │   ├── abp_dashboard.py
+│   │   ├── abp_products.py
 │   │   ├── abp_content.py
+│   │   ├── abp_video.py
+│   │   ├── abp_campaigns.py
 │   │   ├── abp_custom_workflows.py
-│   │   └── ...
-│   ├── services/           # Core business logic
-│   │   ├── api_service.py
+│   │   ├── abp_playground.py
+│   │   ├── abp_browser_use.py
+│   │   └── ...              # + 13 more tabs
+│   ├── services/           # 70+ service modules
+│   │   ├── otto_engine.py   # Otto AI brain
+│   │   ├── chat_assistant.py
 │   │   ├── global_job_queue.py
-│   │   ├── platform_helpers.py
+│   │   ├── printify.py
+│   │   ├── shopify_service.py
 │   │   └── ...
-│   └── utils/              # Shared utilities
-├── backend/
-│   └── fastapi_backend.py  # API server
-├── modules/                # Shared modules
-│   ├── orchestrator.py     # Job orchestration
+│   ├── ui/                 # Layout and shared UI
+│   └── utils/              # Helpers, validation, caching
+├── modules/                # Shared orchestration modules
+│   ├── orchestrator.py
 │   ├── video_generation.py
 │   └── ...
-├── brand/                  # Brand templates
+├── brand/                  # Brand templates & generator
 ├── scripts/
-│   └── start_platform.sh   # Startup script
-├── otto_engine.py          # Otto AI system
-├── autonomous_business_platform.py  # Main app
+│   └── start_platform.sh   # Multi-service launcher
+├── tests/                  # Unit & integration tests
 ├── requirements.txt
 ├── Dockerfile
 └── docker-compose.yml
@@ -636,6 +643,17 @@ The hosted demo at **[otto-mate.streamlit.app](https://otto-mate.streamlit.app)*
 
 
 ## 🔒 Security & Privacy
+
+### Security Hardening
+
+This platform has been audited and hardened against common security risks:
+
+- **No `exec()`/`eval()` on user input** — Code playground runs user code in an isolated subprocess with a configurable timeout, not via `exec()`
+- **No shell injection** — All subprocess calls use list-based arguments (no `shell=True` with user data)
+- **HTML output sanitization** — AI-generated text is escaped before rendering with `unsafe_allow_html=True`
+- **Validated deserialization** — Pickle-loaded OAuth tokens are validated to be actual credential objects before use
+- **No hardcoded secrets** — All API keys are loaded from environment variables, Streamlit secrets, or user input
+- **Proper exception handling** — Specific exception types caught instead of bare `except:` in security-critical paths
 
 ### API Key Safety
 

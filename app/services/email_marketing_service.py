@@ -13,17 +13,18 @@ Author: Autonomous Business Platform
 Version: 2.0
 """
 
-import os
-import smtplib
-import logging
 import base64
+import logging
+import os
 import pickle
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from email.mime.image import MIMEImage
-from pathlib import Path
-from typing import List, Dict, Optional
+import smtplib
 from datetime import datetime
+from email.mime.image import MIMEImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from pathlib import Path
+from typing import Dict, List, Optional
+
 import requests
 
 logging.basicConfig(level=logging.INFO)
@@ -33,23 +34,23 @@ logger = logging.getLogger(__name__)
 class EmailMarketingService:
     """
     Generate and send professional marketing emails with AI-powered content.
-    
+
     Supports multiple providers:
     - sendgrid: Uses SendGrid API (easiest, free 100/day)
     - gmail_oauth: Uses Google OAuth2 (same as YouTube)
     - smtp: Traditional SMTP (requires app password for Gmail)
     """
-    
+
     # Email template types
     TEMPLATE_TYPES = {
-        'product_launch': 'Product Launch Announcement',
-        'newsletter': 'Weekly/Monthly Newsletter',
-        'promotion': 'Special Offer/Discount',
-        'cart_abandonment': 'Cart Abandonment Reminder',
-        'welcome': 'Welcome Series',
-        're_engagement': 'Win-Back Campaign'
+        "product_launch": "Product Launch Announcement",
+        "newsletter": "Weekly/Monthly Newsletter",
+        "promotion": "Special Offer/Discount",
+        "cart_abandonment": "Cart Abandonment Reminder",
+        "welcome": "Welcome Series",
+        "re_engagement": "Win-Back Campaign",
     }
-    
+
     def __init__(
         self,
         provider: Optional[str] = None,
@@ -59,11 +60,11 @@ class EmailMarketingService:
         smtp_password: Optional[str] = None,
         from_email: Optional[str] = None,
         from_name: Optional[str] = None,
-        sendgrid_api_key: Optional[str] = None
+        sendgrid_api_key: Optional[str] = None,
     ):
         """
         Initialize email marketing service.
-        
+
         Args:
             provider: 'sendgrid', 'gmail_oauth', or 'smtp' (auto-detected if not specified)
             smtp_host: SMTP server hostname
@@ -75,29 +76,29 @@ class EmailMarketingService:
             sendgrid_api_key: SendGrid API key
         """
         # Load from env
-        self.sendgrid_api_key = sendgrid_api_key or os.getenv('SENDGRID_API_KEY')
-        self.smtp_host = smtp_host or os.getenv('EMAIL_SMTP_HOST', 'smtp.gmail.com')
-        self.smtp_port = smtp_port or int(os.getenv('EMAIL_SMTP_PORT', '587'))
-        self.smtp_username = smtp_username or os.getenv('EMAIL_USERNAME')
-        self.smtp_password = smtp_password or os.getenv('EMAIL_PASSWORD')
-        self.from_email = from_email or os.getenv('EMAIL_FROM_ADDRESS', self.smtp_username)
-        self.from_name = from_name or os.getenv('EMAIL_FROM_NAME', 'Husky Hub')
-        
+        self.sendgrid_api_key = sendgrid_api_key or os.getenv("SENDGRID_API_KEY")
+        self.smtp_host = smtp_host or os.getenv("EMAIL_SMTP_HOST", "smtp.gmail.com")
+        self.smtp_port = smtp_port or int(os.getenv("EMAIL_SMTP_PORT", "587"))
+        self.smtp_username = smtp_username or os.getenv("EMAIL_USERNAME")
+        self.smtp_password = smtp_password or os.getenv("EMAIL_PASSWORD")
+        self.from_email = from_email or os.getenv("EMAIL_FROM_ADDRESS", self.smtp_username)
+        self.from_name = from_name or os.getenv("EMAIL_FROM_NAME", "Husky Hub")
+
         # Auto-detect provider (prioritize SendGrid as it's easiest)
         if provider:
             self.provider = provider
         elif self.sendgrid_api_key:
-            self.provider = 'sendgrid'
+            self.provider = "sendgrid"
         elif self._check_gmail_oauth():
-            self.provider = 'gmail_oauth'
+            self.provider = "gmail_oauth"
         elif self.smtp_username and self.smtp_password:
-            self.provider = 'smtp'
+            self.provider = "smtp"
         else:
             self.provider = None
-        
+
         # Gmail OAuth credentials (reuse YouTube token)
         self.gmail_service = None
-        
+
         if self.provider:
             logger.info(f"✅ Email Marketing Service initialized (provider: {self.provider})")
         else:
@@ -105,44 +106,51 @@ class EmailMarketingService:
             logger.warning("   1. Add SENDGRID_API_KEY to .env (easiest, free 100/day)")
             logger.warning("   2. Gmail OAuth will use your existing YouTube credentials")
             logger.warning("   3. Add EMAIL_USERNAME + EMAIL_PASSWORD for SMTP")
-    
+
     def _check_gmail_oauth(self) -> bool:
         """Check if Gmail OAuth credentials exist (from YouTube setup)."""
-        token_path = Path(__file__).parent / 'token.pickle'
+        token_path = Path(__file__).parent / "token.pickle"
         return token_path.exists()
-    
+
     def _get_gmail_service(self):
         """Get Gmail API service using existing OAuth credentials."""
         if self.gmail_service:
             return self.gmail_service
-        
+
         try:
             from google.oauth2.credentials import Credentials
             from googleapiclient.discovery import build
-            
-            token_path = Path(__file__).parent / 'token.pickle'
-            
+
+            token_path = Path(__file__).parent / "token.pickle"
+
             if not token_path.exists():
                 logger.error("❌ No OAuth token found. Run YouTube setup first.")
                 return None
-            
-            with open(token_path, 'rb') as token:
-                creds = pickle.load(token)
-            
+
+            with open(token_path, "rb") as token:
+                creds = pickle.load(
+                    token
+                )  # nosec B301 - trusted local OAuth token created by Google Auth library
+
+            # Validate loaded object is actually a Google credential
+            if not hasattr(creds, "valid") or not hasattr(creds, "token"):
+                logger.error("❌ Token file contains unexpected data - may be corrupted")
+                return None
+
             # Check if we have Gmail scope
             if creds and creds.valid:
                 # Build Gmail service
-                self.gmail_service = build('gmail', 'v1', credentials=creds)
+                self.gmail_service = build("gmail", "v1", credentials=creds)
                 logger.info("✅ Gmail OAuth service initialized")
                 return self.gmail_service
             else:
                 logger.warning("⚠️ OAuth credentials expired or invalid")
                 return None
-                
+
         except Exception as e:
             logger.error(f"❌ Failed to initialize Gmail OAuth: {e}")
             return None
-    
+
     def _send_via_gmail_oauth(self, to_email: str, subject: str, html_content: str) -> bool:
         """Send email using Gmail OAuth2 API."""
         try:
@@ -150,89 +158,88 @@ class EmailMarketingService:
             if not service:
                 logger.error("❌ Gmail OAuth not available")
                 return False
-            
+
             # Create message
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = f"{self.from_name} <{self.from_email}>"
-            msg['To'] = to_email
-            msg.attach(MIMEText(html_content, 'html'))
-            
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = f"{self.from_name} <{self.from_email}>"
+            msg["To"] = to_email
+            msg.attach(MIMEText(html_content, "html"))
+
             # Encode message
             raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
-            
+
             # Send via Gmail API
-            service.users().messages().send(
-                userId='me',
-                body={'raw': raw}
-            ).execute()
-            
+            service.users().messages().send(userId="me", body={"raw": raw}).execute()
+
             logger.info(f"✅ Email sent via Gmail OAuth to {to_email}")
             return True
-            
+
         except Exception as e:
             error_str = str(e)
-            if 'insufficient' in error_str.lower() or 'scope' in error_str.lower():
-                logger.error("❌ Gmail OAuth missing email scope. Need to re-authorize with Gmail permissions.")
+            if "insufficient" in error_str.lower() or "scope" in error_str.lower():
+                logger.error(
+                    "❌ Gmail OAuth missing email scope. Need to re-authorize with Gmail permissions."
+                )
                 logger.info("💡 Easiest fix: Use SendGrid instead (add SENDGRID_API_KEY to .env)")
             else:
                 logger.error(f"❌ Gmail OAuth send failed: {e}")
             return False
-    
+
     def _send_via_sendgrid(self, to_email: str, subject: str, html_content: str) -> bool:
         """Send email using SendGrid API."""
         if not self.sendgrid_api_key:
             logger.error("❌ SendGrid API key not configured")
             return False
-        
+
         try:
             url = "https://api.sendgrid.com/v3/mail/send"
             headers = {
                 "Authorization": f"Bearer {self.sendgrid_api_key}",
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
             }
-            
+
             data = {
                 "personalizations": [{"to": [{"email": to_email}]}],
                 "from": {"email": self.from_email, "name": self.from_name},
                 "subject": subject,
-                "content": [{"type": "text/html", "value": html_content}]
+                "content": [{"type": "text/html", "value": html_content}],
             }
-            
+
             response = requests.post(url, headers=headers, json=data, timeout=30)
-            
+
             if response.status_code in [200, 202]:
                 logger.info(f"✅ Email sent via SendGrid to {to_email}")
                 return True
             else:
                 logger.error(f"❌ SendGrid error: {response.status_code} - {response.text}")
                 return False
-                
+
         except Exception as e:
             logger.error(f"❌ SendGrid send failed: {e}")
             return False
-    
+
     def _send_via_smtp(self, to_email: str, subject: str, html_content: str) -> bool:
         """Send email using traditional SMTP."""
         if not all([self.smtp_username, self.smtp_password]):
             logger.error("❌ SMTP credentials not configured")
             return False
-        
+
         try:
-            msg = MIMEMultipart('alternative')
-            msg['Subject'] = subject
-            msg['From'] = f"{self.from_name} <{self.from_email}>"
-            msg['To'] = to_email
-            msg.attach(MIMEText(html_content, 'html'))
-            
+            msg = MIMEMultipart("alternative")
+            msg["Subject"] = subject
+            msg["From"] = f"{self.from_name} <{self.from_email}>"
+            msg["To"] = to_email
+            msg.attach(MIMEText(html_content, "html"))
+
             with smtplib.SMTP(self.smtp_host, self.smtp_port) as server:
                 server.starttls()
                 server.login(self.smtp_username, self.smtp_password)
                 server.send_message(msg)
-            
+
             logger.info(f"✅ Email sent via SMTP to {to_email}")
             return True
-            
+
         except smtplib.SMTPAuthenticationError as e:
             logger.error(f"❌ SMTP Authentication failed: {e}")
             logger.error("💡 For Gmail without App Passwords, use SendGrid instead:")
@@ -243,23 +250,19 @@ class EmailMarketingService:
         except Exception as e:
             logger.error(f"❌ SMTP send failed: {e}")
             return False
-    
+
     def send_email(
-        self,
-        to_email: str,
-        subject: str,
-        html_content: str,
-        text_content: Optional[str] = None
+        self, to_email: str, subject: str, html_content: str, text_content: Optional[str] = None
     ) -> bool:
         """
         Send email using the configured provider.
-        
+
         Args:
             to_email: Recipient email address
             subject: Email subject
             html_content: HTML email body
             text_content: Plain text alternative (optional)
-        
+
         Returns:
             True if sent successfully
         """
@@ -268,17 +271,17 @@ class EmailMarketingService:
             logger.error("💡 Easiest option: Add SENDGRID_API_KEY to .env")
             logger.error("   Sign up free at https://sendgrid.com")
             return False
-        
-        if self.provider == 'sendgrid':
+
+        if self.provider == "sendgrid":
             return self._send_via_sendgrid(to_email, subject, html_content)
-        elif self.provider == 'gmail_oauth':
+        elif self.provider == "gmail_oauth":
             return self._send_via_gmail_oauth(to_email, subject, html_content)
-        elif self.provider == 'smtp':
+        elif self.provider == "smtp":
             return self._send_via_smtp(to_email, subject, html_content)
         else:
             logger.error(f"❌ Unknown provider: {self.provider}")
             return False
-    
+
     def generate_email_content(
         self,
         template_type: str,
@@ -286,16 +289,16 @@ class EmailMarketingService:
         product_description: str,
         target_audience: str = "general consumers",
         special_offer: str = "",
-        tone: str = "professional and friendly"
+        tone: str = "professional and friendly",
     ) -> Dict[str, str]:
         """
         Generate AI-powered email content.
         """
         logger.info(f"📝 Generating {template_type} email content...")
-        
+
         try:
             import replicate
-            
+
             prompt = f"""Generate a professional marketing email with these specifications:
 
 Template Type: {self.TEMPLATE_TYPES.get(template_type, template_type)}
@@ -316,36 +319,37 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
 
             output = replicate.run(
                 "meta/meta-llama-3-70b-instruct",
-                input={"prompt": prompt, "max_tokens": 1000, "temperature": 0.7}
+                input={"prompt": prompt, "max_tokens": 1000, "temperature": 0.7},
             )
-            
+
             response = "".join(output)
-            
+
             try:
                 import json
+
                 content = json.loads(response)
             except:
                 content = {
-                    'subject': f"Introducing {product_name}!",
-                    'preview_text': product_description[:100],
-                    'headline': f"Discover {product_name}",
-                    'body': f"We're excited to introduce {product_name}. {product_description}\n\n{special_offer if special_offer else 'Shop now!'}",
-                    'cta': "Shop Now"
+                    "subject": f"Introducing {product_name}!",
+                    "preview_text": product_description[:100],
+                    "headline": f"Discover {product_name}",
+                    "body": f"We're excited to introduce {product_name}. {product_description}\n\n{special_offer if special_offer else 'Shop now!'}",
+                    "cta": "Shop Now",
                 }
-            
+
             logger.info(f"✅ Generated email content: {content['subject']}")
             return content
-            
+
         except Exception as e:
             logger.error(f"❌ Email content generation failed: {e}")
             return {
-                'subject': f"Introducing {product_name}",
-                'preview_text': product_description[:100],
-                'headline': f"New: {product_name}",
-                'body': product_description,
-                'cta': "Learn More"
+                "subject": f"Introducing {product_name}",
+                "preview_text": product_description[:100],
+                "headline": f"New: {product_name}",
+                "body": product_description,
+                "cta": "Learn More",
             }
-    
+
     def create_html_email(
         self,
         subject: str,
@@ -358,35 +362,42 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
         brand_color: str = "#6366f1",
         product_name: str = "New Product",
         price: str = "",
-        discount: str = ""
+        discount: str = "",
     ) -> str:
         """Create stunning, modern HTML email template with rich visuals."""
-        
+
         # Generate gradient colors based on brand color
         from datetime import datetime
+
         current_year = datetime.now().year
-        
+
         # Clean up body text - handle paragraphs properly
-        body_paragraphs = body.split('\n') if body else ["Discover something amazing."]
-        body_html = ''.join([f'<p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.7; color: #4b5563;">{p.strip()}</p>' for p in body_paragraphs if p.strip()])
-        
+        body_paragraphs = body.split("\n") if body else ["Discover something amazing."]
+        body_html = "".join(
+            [
+                f'<p style="margin: 0 0 16px 0; font-size: 16px; line-height: 1.7; color: #4b5563;">{p.strip()}</p>'
+                for p in body_paragraphs
+                if p.strip()
+            ]
+        )
+
         # Price display
         price_html = ""
         if price:
             if discount:
-                price_html = f'''
+                price_html = f"""
                 <div style="text-align: center; margin: 24px 0;">
                     <span style="font-size: 18px; color: #9ca3af; text-decoration: line-through; margin-right: 12px;">{price}</span>
                     <span style="font-size: 32px; font-weight: 800; color: #10b981;">{discount}</span>
                 </div>
-                '''
+                """
             else:
-                price_html = f'''
+                price_html = f"""
                 <div style="text-align: center; margin: 24px 0;">
                     <span style="font-size: 32px; font-weight: 800; color: #1f2937;">{price}</span>
                 </div>
-                '''
-        
+                """
+
         # Build hero image section separately to avoid nested f-string issues
         hero_image_html = ""
         if product_image_url:
@@ -400,10 +411,10 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                         </td>
                     </tr>
             """
-        
+
         margin_top = "-60px" if product_image_url else "0"
-        
-        html = f'''
+
+        html = f"""
 <!DOCTYPE html>
 <html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
@@ -645,38 +656,36 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
     
 </body>
 </html>
-'''
+"""
         return html
-    
+
     def send_batch_emails(
-        self,
-        recipients: List[str],
-        subject: str,
-        html_content: str,
-        delay_seconds: float = 1.0
+        self, recipients: List[str], subject: str, html_content: str, delay_seconds: float = 1.0
     ) -> Dict[str, int]:
         """Send emails to multiple recipients."""
         import time
-        
-        results = {'sent': 0, 'failed': 0}
-        
+
+        results = {"sent": 0, "failed": 0}
+
         if not self.provider:
             logger.error("❌ No email provider configured")
-            return {'sent': 0, 'failed': len(recipients)}
-        
-        logger.info(f"📧 Sending batch email to {len(recipients)} recipients via {self.provider}...")
-        
+            return {"sent": 0, "failed": len(recipients)}
+
+        logger.info(
+            f"📧 Sending batch email to {len(recipients)} recipients via {self.provider}..."
+        )
+
         for email in recipients:
             if self.send_email(email, subject, html_content):
-                results['sent'] += 1
+                results["sent"] += 1
             else:
-                results['failed'] += 1
-            
+                results["failed"] += 1
+
             time.sleep(delay_seconds)
-        
+
         logger.info(f"✅ Batch complete: {results['sent']} sent, {results['failed']} failed")
         return results
-    
+
     def generate_and_send_campaign(
         self,
         template_type: str,
@@ -686,88 +695,89 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
         cta_link: str,
         product_image_url: Optional[str] = None,
         special_offer: str = "",
-        target_audience: str = "general consumers"
+        target_audience: str = "general consumers",
     ) -> Dict:
         """Complete workflow: Generate AI content and send email campaign."""
-        
+
         # Sanitize inputs - handle None values
         product_name = str(product_name or "New Product")
         product_description = str(product_description or "Check out our latest product!")
         cta_link = str(cta_link or "https://example.com")
         special_offer = str(special_offer or "")
         target_audience = str(target_audience or "general consumers")
-        
+
         logger.info(f"🚀 Launching email campaign: {template_type}")
-        
+
         # Check if we can send
         if not self.provider:
             logger.error("❌ No email provider configured!")
             return {
-                'subject': f"Introducing {product_name}!",
-                'success_count': 0,
-                'failed_count': len(recipients) if recipients else 0,
-                'error': 'No email provider configured. Add SENDGRID_API_KEY to .env'
+                "subject": f"Introducing {product_name}!",
+                "success_count": 0,
+                "failed_count": len(recipients) if recipients else 0,
+                "error": "No email provider configured. Add SENDGRID_API_KEY to .env",
             }
-        
+
         try:
             # Generate content
             content = self.generate_email_content(
-                template_type, product_name, product_description,
-                target_audience, special_offer
+                template_type, product_name, product_description, target_audience, special_offer
             )
-            
+
             # Ensure content has all required keys
             if not content or not isinstance(content, dict):
                 content = {
-                    'subject': f"Introducing {product_name}!",
-                    'preview_text': product_description[:100] if product_description else '',
-                    'headline': f"New: {product_name}",
-                    'body': product_description or "Check out our latest product!",
-                    'cta': "Shop Now"
+                    "subject": f"Introducing {product_name}!",
+                    "preview_text": product_description[:100] if product_description else "",
+                    "headline": f"New: {product_name}",
+                    "body": product_description or "Check out our latest product!",
+                    "cta": "Shop Now",
                 }
-            
+
             # Ensure all required keys exist with defaults
-            content.setdefault('subject', f"Introducing {product_name}!")
-            content.setdefault('preview_text', product_description[:100] if product_description else '')
-            content.setdefault('headline', f"New: {product_name}")
-            content.setdefault('body', product_description or "Check out our latest!")
-            content.setdefault('cta', "Shop Now")
-            
+            content.setdefault("subject", f"Introducing {product_name}!")
+            content.setdefault(
+                "preview_text", product_description[:100] if product_description else ""
+            )
+            content.setdefault("headline", f"New: {product_name}")
+            content.setdefault("body", product_description or "Check out our latest!")
+            content.setdefault("cta", "Shop Now")
+
             # Create HTML email with new gorgeous template
             html = self.create_html_email(
-                subject=content['subject'],
-                preview_text=content['preview_text'],
-                headline=content['headline'],
-                body=content['body'],
-                cta_text=content['cta'],
+                subject=content["subject"],
+                preview_text=content["preview_text"],
+                headline=content["headline"],
+                body=content["body"],
+                cta_text=content["cta"],
                 cta_link=cta_link,
                 product_image_url=product_image_url,
                 brand_color="#6366f1",
                 product_name=product_name,
                 price=special_offer if special_offer else "",
-                discount=""
+                discount="",
             )
-            
+
             # Send to recipients
-            results = self.send_batch_emails(recipients, content['subject'], html)
-            
+            results = self.send_batch_emails(recipients, content["subject"], html)
+
             return {
-                'subject': content['subject'],
-                'content': content,
-                'html': html,
-                'success_count': results['sent'],
-                'failed_count': results['failed'],
-                'failed_emails': [],
-                'delivery_results': results
+                "subject": content["subject"],
+                "content": content,
+                "html": html,
+                "success_count": results["sent"],
+                "failed_count": results["failed"],
+                "failed_emails": [],
+                "delivery_results": results,
             }
-            
+
         except Exception as e:
             logger.error(f"❌ Email campaign error: {e}")
             return {
-                'subject': f"Introducing {product_name}!",
-                'success_count': 0,
-                'failed_count': len(recipients),
-                'error': str(e)
+                "subject": f"Introducing {product_name}!",
+                "success_count": 0,
+                "failed_count": len(recipients),
+                "error": str(e),
             }
 
 
@@ -775,14 +785,14 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
 if __name__ == "__main__":
     service = EmailMarketingService()
     print(f"Provider: {service.provider}")
-    
+
     if service.provider:
         # Test send
         results = service.generate_and_send_campaign(
-            template_type='product_launch',
-            product_name='Test Product',
-            product_description='This is a test email.',
-            recipients=['test@example.com'],
-            cta_link='https://example.com'
+            template_type="product_launch",
+            product_name="Test Product",
+            product_description="This is a test email.",
+            recipients=["test@example.com"],
+            cta_link="https://example.com",
         )
         print(f"Results: {results['delivery_results']}")

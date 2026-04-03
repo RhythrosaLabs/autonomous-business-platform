@@ -1,0 +1,31 @@
+# Development dependencies for Autonomous Business Platform
+# Install with: pip install -r requirements-dev.txt
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.1
+
+# Code quality
+black>=24.1.0
+ruff>=0.1.15
+isort>=5.13.0
+mypy>=1.8.0
+
+# Pre-commit hooks
+pre-commit>=3.6.0
+
+# Security
+bandit[toml]>=1.7.6
+
+# Type stubs
+types-requests
+types-Pillow
+
+# Documentation
+mkdocs>=1.5.3
+mkdocs-material>=9.5.3
+
+# Notebook support
+nbstripout>=0.6.1

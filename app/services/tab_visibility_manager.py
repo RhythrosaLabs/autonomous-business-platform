@@ -3,8 +3,9 @@ Tab Visibility Manager
 Allows users to customize which tabs are displayed based on their role or preferences
 """
 
+from typing import Dict, List
+
 import streamlit as st
-from typing import List, Dict
 
 # Define all available tabs
 ALL_TABS = [
@@ -28,7 +29,7 @@ ALL_TABS = [
     "💌 Email Outreach",
     "🎵 Music Platforms",
     "📁 File Library",
-    "🌐 Browser-Use"
+    "🌐 Browser-Use",
 ]
 
 # Role-based tab presets
@@ -46,8 +47,8 @@ ROLE_PRESETS = {
             "👥 Customers",
             "🤖 Task Queue",
             "📁 File Library",
-            "🌐 Browser-Use"
-        ]
+            "🌐 Browser-Use",
+        ],
     },
     "creator": {
         "name": "🎨 Content Creator",
@@ -60,8 +61,8 @@ ROLE_PRESETS = {
             "🎨 Brand Templates",
             "⚡ Shortcuts",
             "📁 File Library",
-            "🌐 Browser-Use"
-        ]
+            "🌐 Browser-Use",
+        ],
     },
     "developer": {
         "name": "⚙️ Developer",
@@ -74,8 +75,8 @@ ROLE_PRESETS = {
             "📝 Content Generator",
             "📊 Analytics",
             "📁 File Library",
-            "🌐 Browser-Use"
-        ]
+            "🌐 Browser-Use",
+        ],
     },
     "analyst": {
         "name": "📊 Marketing Analyst",
@@ -87,8 +88,8 @@ ROLE_PRESETS = {
             "📓 Journal",
             "💌 Email Outreach",
             "📁 File Library",
-            "🌐 Browser-Use"
-        ]
+            "🌐 Browser-Use",
+        ],
     },
     "label_owner": {
         "name": "🎵 Label Owner",
@@ -103,8 +104,8 @@ ROLE_PRESETS = {
             "💌 Email Outreach",
             "🎨 Brand Templates",
             "📁 File Library",
-            "🌐 Browser-Use"
-        ]
+            "🌐 Browser-Use",
+        ],
     },
     "online_seller": {
         "name": "🛒 Online Seller",
@@ -119,8 +120,8 @@ ROLE_PRESETS = {
             "⚡ Shortcuts",
             "🤖 Task Queue",
             "📁 File Library",
-            "🌐 Browser-Use"
-        ]
+            "🌐 Browser-Use",
+        ],
     },
     "youtube_bot": {
         "name": "📺 YouTube Bot",
@@ -134,19 +135,11 @@ ROLE_PRESETS = {
             "📊 Analytics",
             "⚡ Shortcuts",
             "📁 File Library",
-            "🌐 Browser-Use"
-        ]
+            "🌐 Browser-Use",
+        ],
     },
-    "otto_only": {
-        "name": "🤖 Otto Only",
-        "tabs": [
-            "🏠 Dashboard"
-        ]
-    },
-    "all": {
-        "name": "🌟 Show All (Default)",
-        "tabs": ALL_TABS.copy()
-    }
+    "otto_only": {"name": "🤖 Otto Only", "tabs": ["🏠 Dashboard"]},
+    "all": {"name": "🌟 Show All (Default)", "tabs": ALL_TABS.copy()},
 }
 
 # Custom presets storage key
@@ -155,7 +148,7 @@ CUSTOM_PRESETS_KEY = "custom_tab_presets"
 
 def initialize_tab_visibility():
     """Initialize tab visibility in session state"""
-    if 'visible_tabs' not in st.session_state:
+    if "visible_tabs" not in st.session_state:
         st.session_state.visible_tabs = ALL_TABS.copy()
     else:
         # Auto-add any new tabs that were added to ALL_TABS
@@ -163,7 +156,7 @@ def initialize_tab_visibility():
         for tab in ALL_TABS:
             if tab not in current_visible:
                 st.session_state.visible_tabs.append(tab)
-    
+
     if CUSTOM_PRESETS_KEY not in st.session_state:
         st.session_state[CUSTOM_PRESETS_KEY] = {}
 
@@ -190,11 +183,8 @@ def save_custom_preset(name: str, tabs: List[str]):
     """Save a custom tab preset"""
     if CUSTOM_PRESETS_KEY not in st.session_state:
         st.session_state[CUSTOM_PRESETS_KEY] = {}
-    
-    st.session_state[CUSTOM_PRESETS_KEY][name] = {
-        "name": name,
-        "tabs": tabs.copy()
-    }
+
+    st.session_state[CUSTOM_PRESETS_KEY][name] = {"name": name, "tabs": tabs.copy()}
 
 
 def load_custom_preset(name: str):
@@ -215,59 +205,55 @@ def render_tab_preferences():
     """Render tab visibility preferences UI"""
     st.markdown("### 📑 Tab Visibility Preferences")
     st.markdown("Customize which tabs appear in your navigation")
-    
+
     # Show current preset
-    current_preset = st.session_state.get('current_preset', 'all')
+    current_preset = st.session_state.get("current_preset", "all")
     if current_preset in ROLE_PRESETS:
         st.info(f"**Current:** {ROLE_PRESETS[current_preset]['name']}")
-    elif current_preset.startswith('custom_'):
-        preset_name = current_preset.replace('custom_', '')
+    elif current_preset.startswith("custom_"):
+        preset_name = current_preset.replace("custom_", "")
         st.info(f"**Current:** Custom - {preset_name}")
-    
+
     st.divider()
-    
+
     # Role presets
     st.markdown("#### 🎯 Role-Based Presets")
     st.caption("Quick presets based on your role")
-    
+
     preset_cols = st.columns(2)
     for idx, (role_key, preset) in enumerate(ROLE_PRESETS.items()):
         with preset_cols[idx % 2]:
-            is_active = st.session_state.get('current_preset') == role_key
+            is_active = st.session_state.get("current_preset") == role_key
             button_type = "primary" if is_active else "secondary"
-            
+
             if st.button(
                 preset["name"] + (" ✓" if is_active else ""),
                 use_container_width=True,
                 type=button_type,
-                key=f"preset_{role_key}"
+                key=f"preset_{role_key}",
             ):
                 apply_role_preset(role_key)
                 st.success(f"Applied {preset['name']} preset!")
                 st.rerun()
-    
+
     st.divider()
-    
+
     # Custom tab selection
     st.markdown("#### ✏️ Custom Selection")
     st.caption("Choose exactly which tabs you want to see")
-    
+
     initialize_tab_visibility()
     current_visible = st.session_state.visible_tabs
-    
+
     # Create columns for checkboxes
     col1, col2 = st.columns(2)
-    
+
     new_visible = []
     for idx, tab in enumerate(ALL_TABS):
         with col1 if idx % 2 == 0 else col2:
-            if st.checkbox(
-                tab,
-                value=tab in current_visible,
-                key=f"tab_check_{idx}"
-            ):
+            if st.checkbox(tab, value=tab in current_visible, key=f"tab_check_{idx}"):
                 new_visible.append(tab)
-    
+
     # Update button
     if st.button("💾 Apply Custom Selection", type="primary", use_container_width=True):
         if len(new_visible) == 0:
@@ -277,26 +263,24 @@ def render_tab_preferences():
             st.session_state.current_preset = "custom"
             st.success(f"✅ Updated! Now showing {len(new_visible)} tabs")
             st.rerun()
-    
+
     st.divider()
-    
+
     # Save/Load custom presets
     st.markdown("#### 💾 Save Custom Presets")
     st.caption("Save your current selection for later")
-    
+
     col_save, col_name = st.columns([2, 1])
     with col_save:
         preset_name = st.text_input(
-            "Preset name",
-            placeholder="e.g., My Workflow",
-            label_visibility="collapsed"
+            "Preset name", placeholder="e.g., My Workflow", label_visibility="collapsed"
         )
     with col_name:
         if st.button("💾 Save", use_container_width=True, disabled=not preset_name):
             save_custom_preset(preset_name, current_visible)
             st.success(f"Saved '{preset_name}'!")
             st.rerun()
-    
+
     # Load custom presets
     custom_presets = st.session_state.get(CUSTOM_PRESETS_KEY, {})
     if custom_presets:
@@ -304,7 +288,11 @@ def render_tab_preferences():
         for name, preset in custom_presets.items():
             col_load, col_del = st.columns([3, 1])
             with col_load:
-                if st.button(f"📂 {name} ({len(preset['tabs'])} tabs)", use_container_width=True, key=f"load_{name}"):
+                if st.button(
+                    f"📂 {name} ({len(preset['tabs'])} tabs)",
+                    use_container_width=True,
+                    key=f"load_{name}",
+                ):
                     load_custom_preset(name)
                     st.success(f"Loaded '{name}'!")
                     st.rerun()
@@ -312,9 +300,9 @@ def render_tab_preferences():
                 if st.button("🗑️", key=f"del_{name}", help=f"Delete {name}"):
                     delete_custom_preset(name)
                     st.rerun()
-    
+
     st.divider()
-    
+
     # Reset to default
     if st.button("🔄 Reset to All Tabs", use_container_width=True):
         apply_role_preset("all")
@@ -325,16 +313,16 @@ def render_tab_preferences():
 def get_filtered_tabs(all_tabs_list: List[str]) -> List[str]:
     """
     Filter a list of tabs based on user's visibility preferences
-    
+
     Args:
         all_tabs_list: Complete list of tab names
-        
+
     Returns:
         Filtered list of only visible tabs in the order they appear in visible_tabs
     """
     initialize_tab_visibility()
     visible = get_visible_tabs()
-    
+
     # Return only tabs that are in visible_tabs AND exist in all_tabs_list
     # Preserve the order from visible_tabs
     return [tab for tab in visible if tab in all_tabs_list]

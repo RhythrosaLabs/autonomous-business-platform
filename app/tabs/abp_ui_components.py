@@ -1,13 +1,15 @@
 import streamlit as st
 
+
 def render_about_guide():
     """Comprehensive guide covering all platform features and setup"""
     st.markdown("### 📖 Complete Platform Guide")
     st.markdown("---")
-    
+
     # Platform Overview
     with st.expander("🌟 Platform Overview", expanded=True):
-        st.markdown("""
+        st.markdown(
+            """
         **Autonomous Business Platform Pro** (Otto Mate) is the ultimate AI-powered automation suite 
         for creating, managing, and scaling print-on-demand e-commerce businesses.
         
@@ -30,11 +32,13 @@ def render_about_guide():
         - 📊 **Analytics** — Track performance across all channels
         
         **Version**: 2.1 Pro | **Last Updated**: December 2025
-        """)
-    
+        """
+        )
+
     # Otto AI Assistant
     with st.expander("🧠 Otto AI Assistant - Your Autonomous Agent"):
-        st.markdown("""
+        st.markdown(
+            """
         **Otto** is your hyperintelligent AI assistant with complete platform control.
         
         ### Core Capabilities
@@ -69,11 +73,13 @@ def render_about_guide():
         - Use specific details for better results
         - Otto can chain multiple actions together
         - All Otto actions are tracked in the task queue
-        """)
-    
+        """
+        )
+
     # Contact Finder
     with st.expander("🔍 Contact Finder - Real Outreach Opportunities"):
-        st.markdown("""
+        st.markdown(
+            """
         Find real contacts for marketing outreach with AI-powered discovery.
         
         ### Features
@@ -109,11 +115,13 @@ def render_about_guide():
         6. Export contacts and integrate with campaign
         
         **No Hallucinations**: All contacts are realistic patterns based on actual discovery methods.
-        """)
-    
+        """
+        )
+
     # Page-by-Page Breakdown
     with st.expander("📚 Page-by-Page Feature Breakdown"):
-        st.markdown("""
+        st.markdown(
+            """
         ### 🏠 Dashboard
         - **Quick Concept Generator**: Randomize product ideas or input your own
         - **Campaign Launcher**: One-click campaign generation with all assets
@@ -207,11 +215,13 @@ def render_about_guide():
         - **Quick Notes**: Capture ideas instantly
         - **Idea Bank**: Store concepts for later
         - **Campaign Notes**: Document decisions
-        """)
-    
+        """
+        )
+
     # Advanced Features
     with st.expander("🚀 Advanced Features & Power User Tips"):
-        st.markdown("""
+        st.markdown(
+            """
         ### ControlNet for Video Quality (BETA)
         Dramatically improve video generation with multi-control:
         
@@ -258,11 +268,13 @@ def render_about_guide():
         - Generate multiple product variations simultaneously
         - Create campaigns for entire product lines
         - Schedule social media posts in advance
-        """)
-    
+        """
+        )
+
     # Setup Guide
     with st.expander("⚙️ Complete Setup Guide - Start to Finish"):
-        st.markdown("""
+        st.markdown(
+            """
         ### 1. Initial Setup (Required)
         
         **Replicate API Key** (REQUIRED):
@@ -324,11 +336,13 @@ def render_about_guide():
         **"Shopify publish failed"**: Verify API permissions
         **"Background removal failed"**: Image may need different format
         **"Video generation slow"**: Normal! Videos take 30-90s per segment
-        """)
-    
+        """
+        )
+
     # Backend Architecture
     with st.expander("🔧 How the Platform Works (Backend)"):
-        st.markdown("""
+        st.markdown(
+            """
         ### Architecture Overview
         
         **Core Components**:
@@ -405,11 +419,13 @@ def render_about_guide():
         - **Exponential Backoff**: Automatic retry on failures
         - **Lazy Loading**: Heavy modules load on-demand
         - **Fragment Rendering**: Partial UI updates
-        """)
-    
+        """
+        )
+
     # Integrations
     with st.expander("🔗 Integrations & Platforms"):
-        st.markdown("""
+        st.markdown(
+            """
         ### E-Commerce Platforms
         | Platform | Capabilities |
         |----------|--------------|
@@ -444,18 +460,21 @@ def render_about_guide():
         |---------|---------|
         | **Hunter.io** | Email verification |
         | **Apollo.io** | Contact enrichment |
-        """)
-    
+        """
+        )
+
     st.markdown("---")
     st.markdown("**Need help?** Use the chat assistant for specific questions!")
+
 
 def render_command_line_guide():
     """Enhanced command line interface with universal file generation and smart autocomplete"""
     st.markdown("### ⌨️ Slash Command Reference")
     st.markdown("---")
-    
+
     # Quick Reference Card
-    st.markdown("""
+    st.markdown(
+        """
     <style>
     .cmd-card { background: linear-gradient(135deg, #667eea15, #764ba215); border-radius: 12px; padding: 16px; margin: 8px 0; border-left: 4px solid #667eea; }
     .cmd-title { font-weight: bold; color: #667eea; margin-bottom: 8px; }
@@ -463,11 +482,14 @@ def render_command_line_guide():
     .cmd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
     .cmd-item { background: #f8f9fa; padding: 6px 10px; border-radius: 6px; font-family: monospace; font-size: 0.85em; }
     </style>
-    """, unsafe_allow_html=True)
-    
+    """,
+        unsafe_allow_html=True,
+    )
+
     # Media Commands (Most Popular)
     with st.expander("🎨 Media Generation", expanded=True):
-        st.markdown("""
+        st.markdown(
+            """
 | Command | Description | Example |
 |---------|-------------|---------|
 | `/image` | Generate images with AI | `/image sunset over mountains` |
@@ -476,35 +498,44 @@ def render_command_line_guide():
 | `/speak` `/tts` | Text-to-speech audio | `/speak Hello world` |
 | `/sound` `/sfx` | Sound effects | `/sound explosion` |
 | `/3d` `/model3d` | Generate 3D models | `/3d low-poly house` |
-        """)
-    
+        """
+        )
+
     # Document Commands
     with st.expander("📄 Documents & Files"):
         col1, col2 = st.columns(2)
         with col1:
-            st.markdown("""
+            st.markdown(
+                """
 **Text Documents:**
 - `/pdf` - PDF document
 - `/doc` `/docx` - Word document  
 - `/txt` - Plain text
 - `/rtf` - Rich text format
 - `/md` - Markdown
-            """)
+            """
+            )
         with col2:
-            st.markdown("""
+            st.markdown(
+                """
 **Spreadsheets:**
 - `/xlsx` `/xls` - Excel file
 - `/csv` - CSV data
-            """)
-    
+            """
+            )
+
     # Code Commands
     with st.expander("💻 Code Generation"):
-        st.markdown("""
+        st.markdown(
+            """
 <div class="cmd-grid">
-""", unsafe_allow_html=True)
+""",
+            unsafe_allow_html=True,
+        )
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown("""
+            st.markdown(
+                """
 **Languages:**
 - `/python` - Python
 - `/js` - JavaScript
@@ -517,9 +548,11 @@ def render_command_line_guide():
 - `/php` - PHP
 - `/swift` - Swift
 - `/kt` - Kotlin
-            """)
+            """
+            )
         with col2:
-            st.markdown("""
+            st.markdown(
+                """
 **Web:**
 - `/html` - HTML
 - `/css` - CSS
@@ -528,9 +561,11 @@ def render_command_line_guide():
 - `/vue` - Vue.js
 - `/svelte` - Svelte
 - `/astro` - Astro
-            """)
+            """
+            )
         with col3:
-            st.markdown("""
+            st.markdown(
+                """
 **Scripts & Config:**
 - `/sh` `/bash` - Shell
 - `/ps1` - PowerShell
@@ -539,11 +574,13 @@ def render_command_line_guide():
 - `/makefile` - Make
 - `/nginx` - Nginx config
 - `/gitignore` - Git ignore
-            """)
-    
+            """
+            )
+
     # Data Commands
     with st.expander("📊 Data & Config Files"):
-        st.markdown("""
+        st.markdown(
+            """
 | Command | Format | Example Use |
 |---------|--------|-------------|
 | `/json` | JSON | `/json user profile schema` |
@@ -555,11 +592,13 @@ def render_command_line_guide():
 | `/env` | .env | `/env environment variables template` |
 | `/sql` | SQL | `/sql create users table` |
 | `/graphql` | GraphQL | `/graphql user schema` |
-        """)
-    
+        """
+        )
+
     # AI Models
     with st.expander("🤖 Direct AI Model Access"):
-        st.markdown("""
+        st.markdown(
+            """
 Call AI models directly by name:
 
 **Image Models:**
@@ -579,11 +618,13 @@ Call AI models directly by name:
 
 **Marketing:**
 `/flux-ads` `/product-ads` `/logo-context` `/ad-inpaint`
-        """)
-    
+        """
+        )
+
     # Workflow Commands
     with st.expander("🔗 Workflow & Chaining"):
-        st.markdown("""
+        st.markdown(
+            """
 **Chain multiple commands:**
 ```
 /chain /image cat | /video animate | /music relaxing
@@ -593,11 +634,13 @@ Call AI models directly by name:
 **Separators:** Use `|` or `->` between commands
 
 **Context passing:** Results flow to next command automatically
-        """)
-    
+        """
+        )
+
     # Quick Examples
     with st.expander("⚡ Quick Examples"):
-        st.code("""
+        st.code(
+            """
 # Generate a logo and animate it
 /chain /image minimalist tech logo | /video subtle rotation
 
@@ -614,7 +657,9 @@ Call AI models directly by name:
 /xlsx quarterly sales report template
 /pdf business proposal outline
 /json API response schema
-        """, language="bash")
-    
+        """,
+            language="bash",
+        )
+
     st.markdown("---")
     st.caption("💡 Type `/help` in chat for interactive command list")

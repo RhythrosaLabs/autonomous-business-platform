@@ -4,8 +4,16 @@ Handles task creation, analysis, planning, and execution with multi-agent orches
 """
 
 from app.tabs.abp_imports_common import (
-    os, json, logging, asyncio, datetime, Dict, List, Any, Optional,
-    setup_logger
+    Any,
+    Dict,
+    List,
+    Optional,
+    asyncio,
+    datetime,
+    json,
+    logging,
+    os,
+    setup_logger,
 )
 
 logger = setup_logger(__name__)
@@ -13,7 +21,7 @@ logger = setup_logger(__name__)
 
 class TaskQueueItem:
     """Represents a single task in the autonomous queue."""
-    
+
     def __init__(self, task_id: str, description: str):
         self.id = task_id
         self.description = description
@@ -37,14 +45,14 @@ class AutonomousTaskQueue:
     3. Executes tasks autonomously in the background
     4. Allows real-time task addition while running
     """
-    
+
     def __init__(self, replicate_api):
         # Import here to avoid circular dependencies
         from app.services.chat_assistant import MultiAgentOrchestrator
-        
+
         self.replicate = replicate_api
         self.orchestrator = MultiAgentOrchestrator(replicate_api)
-        
+
     def analyze_task(self, description: str) -> Dict[str, Any]:
         """
         Use AI to analyze a task and determine:
@@ -52,7 +60,7 @@ class AutonomousTaskQueue:
         - Which agents/models are needed
         - The sequence of steps required
         """
-        
+
         analysis_prompt = f"""Analyze this task and create an execution plan.
 
 TASK: {description}
@@ -79,22 +87,20 @@ Respond in this JSON format:
     "requires_confirmation": true/false
 }}
 """
-        
+
         try:
             response = self.replicate.generate_text(
-                prompt=analysis_prompt,
-                max_tokens=800,
-                temperature=0.3
+                prompt=analysis_prompt, max_tokens=800, temperature=0.3
             )
-            
+
             # Parse JSON from response
-            json_start = response.find('{')
-            json_end = response.rfind('}') + 1
+            json_start = response.find("{")
+            json_end = response.rfind("}") + 1
             if json_start >= 0 and json_end > json_start:
                 return json.loads(response[json_start:json_end])
         except Exception as e:
             logger.error(f"Task analysis failed: {e}")
-        
+
         # Fallback plan
         return {
             "summary": description,
@@ -102,36 +108,32 @@ Respond in this JSON format:
             "agents_needed": ["writer"],
             "steps": [{"step": 1, "action": description, "agent": "writer", "output_type": "text"}],
             "estimated_time": "1-2 minutes",
-            "requires_confirmation": False
+            "requires_confirmation": False,
         }
-    
+
     async def execute_task(self, task: TaskQueueItem, progress_callback=None) -> Dict[str, Any]:
         """Execute a single task using the multi-agent orchestrator."""
-        
+
         task.status = "executing"
         task.started_at = datetime.now()
-        
+
         try:
             # Use the orchestrator to execute
             results = await self.orchestrator.orchestrate(
-                task.description,
-                context={'task_id': task.id, 'plan': task.plan}
+                task.description, context={"task_id": task.id, "plan": task.plan}
             )
-            
+
             task.results = results
-            task.status = "completed" if results.get('success', False) else "failed"
+            task.status = "completed" if results.get("success", False) else "failed"
             task.completed_at = datetime.now()
-            
+
             return results
-            
+
         except Exception as e:
             task.status = "failed"
             task.error = str(e)
             task.completed_at = datetime.now()
-            return {'success': False, 'error': str(e)}
+            return {"success": False, "error": str(e)}
 
 
-__all__ = [
-    'TaskQueueItem',
-    'AutonomousTaskQueue'
-]
+__all__ = ["TaskQueueItem", "AutonomousTaskQueue"]

@@ -11,9 +11,10 @@ Provides:
 import json
 import os
 import uuid
-from pathlib import Path
 from datetime import datetime
-from typing import List, Dict, Any, Optional
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
 import streamlit as st
 
 # Default storage path - use a folder for future expansion
@@ -26,39 +27,161 @@ SHORTCUTS_DIR.mkdir(parents=True, exist_ok=True)
 # Extended icon options
 SHORTCUT_ICONS = [
     # Actions
-    "⚡", "🚀", "🎯", "💰", "🔥", "✨", "💎", "⭐", "💫", "🌟",
+    "⚡",
+    "🚀",
+    "🎯",
+    "💰",
+    "🔥",
+    "✨",
+    "💎",
+    "⭐",
+    "💫",
+    "🌟",
     # Content
-    "🎨", "📦", "🛒", "📱", "📧", "🎬", "🎵", "📊", "📝", "📸",
+    "🎨",
+    "📦",
+    "🛒",
+    "📱",
+    "📧",
+    "🎬",
+    "🎵",
+    "📊",
+    "📝",
+    "📸",
     # Social
-    "🐦", "📷", "▶️", "🔗", "💬", "📣", "📢", "🎤", "🎧", "🎙️",
+    "🐦",
+    "📷",
+    "▶️",
+    "🔗",
+    "💬",
+    "📣",
+    "📢",
+    "🎤",
+    "🎧",
+    "🎙️",
     # Business
-    "💼", "📈", "📉", "💵", "💳", "🏪", "🛍️", "🎁", "🏆", "🥇",
+    "💼",
+    "📈",
+    "📉",
+    "💵",
+    "💳",
+    "🏪",
+    "🛍️",
+    "🎁",
+    "🏆",
+    "🥇",
     # Tech
-    "🤖", "⚙️", "🔧", "🔨", "🛠️", "💻", "🖥️", "📡", "🔌", "💡",
+    "🤖",
+    "⚙️",
+    "🔧",
+    "🔨",
+    "🛠️",
+    "💻",
+    "🖥️",
+    "📡",
+    "🔌",
+    "💡",
     # Nature
-    "🌈", "🌸", "🌺", "🌻", "🍀", "🌙", "☀️", "⛅", "🌊", "🔮",
+    "🌈",
+    "🌸",
+    "🌺",
+    "🌻",
+    "🍀",
+    "🌙",
+    "☀️",
+    "⛅",
+    "🌊",
+    "🔮",
     # Food & Drink
-    "☕", "🍕", "🍔", "🎂", "🍦", "🍩", "🍪", "🧁", "🍷", "🍸",
+    "☕",
+    "🍕",
+    "🍔",
+    "🎂",
+    "🍦",
+    "🍩",
+    "🍪",
+    "🧁",
+    "🍷",
+    "🍸",
     # Animals
-    "🦁", "🐯", "🦊", "🐺", "🦄", "🐉", "🦋", "🐝", "🦅", "🐬",
+    "🦁",
+    "🐯",
+    "🦊",
+    "🐺",
+    "🦄",
+    "🐉",
+    "🦋",
+    "🐝",
+    "🦅",
+    "🐬",
     # Objects
-    "💎", "👑", "🎪", "🎭", "🎨", "🎯", "🎲", "🃏", "🎰", "🎮",
+    "💎",
+    "👑",
+    "🎪",
+    "🎭",
+    "🎨",
+    "🎯",
+    "🎲",
+    "🃏",
+    "🎰",
+    "🎮",
     # Misc
-    "❤️", "💜", "💙", "💚", "💛", "🧡", "🖤", "🤍", "💖", "💝"
+    "❤️",
+    "💜",
+    "💙",
+    "💚",
+    "💛",
+    "🧡",
+    "🖤",
+    "🤍",
+    "💖",
+    "💝",
 ]
 
 # Button color/style options
 BUTTON_STYLES = {
-    "primary": {"label": "Primary (Purple)", "streamlit_type": "primary", "css_class": "btn-primary"},
-    "success": {"label": "Success (Green)", "streamlit_type": "secondary", "css_class": "btn-success"},
-    "warning": {"label": "Warning (Orange)", "streamlit_type": "secondary", "css_class": "btn-warning"},
+    "primary": {
+        "label": "Primary (Purple)",
+        "streamlit_type": "primary",
+        "css_class": "btn-primary",
+    },
+    "success": {
+        "label": "Success (Green)",
+        "streamlit_type": "secondary",
+        "css_class": "btn-success",
+    },
+    "warning": {
+        "label": "Warning (Orange)",
+        "streamlit_type": "secondary",
+        "css_class": "btn-warning",
+    },
     "danger": {"label": "Danger (Red)", "streamlit_type": "secondary", "css_class": "btn-danger"},
     "info": {"label": "Info (Blue)", "streamlit_type": "secondary", "css_class": "btn-info"},
-    "secondary": {"label": "Secondary (Gray)", "streamlit_type": "secondary", "css_class": "btn-secondary"},
-    "gradient_purple": {"label": "Gradient Purple", "streamlit_type": "primary", "css_class": "btn-gradient-purple"},
-    "gradient_blue": {"label": "Gradient Blue", "streamlit_type": "primary", "css_class": "btn-gradient-blue"},
-    "gradient_green": {"label": "Gradient Green", "streamlit_type": "primary", "css_class": "btn-gradient-green"},
-    "gradient_orange": {"label": "Gradient Orange", "streamlit_type": "primary", "css_class": "btn-gradient-orange"},
+    "secondary": {
+        "label": "Secondary (Gray)",
+        "streamlit_type": "secondary",
+        "css_class": "btn-secondary",
+    },
+    "gradient_purple": {
+        "label": "Gradient Purple",
+        "streamlit_type": "primary",
+        "css_class": "btn-gradient-purple",
+    },
+    "gradient_blue": {
+        "label": "Gradient Blue",
+        "streamlit_type": "primary",
+        "css_class": "btn-gradient-blue",
+    },
+    "gradient_green": {
+        "label": "Gradient Green",
+        "streamlit_type": "primary",
+        "css_class": "btn-gradient-green",
+    },
+    "gradient_orange": {
+        "label": "Gradient Orange",
+        "streamlit_type": "primary",
+        "css_class": "btn-gradient-orange",
+    },
     "outline": {"label": "Outline", "streamlit_type": "secondary", "css_class": "btn-outline"},
     "ghost": {"label": "Ghost (Minimal)", "streamlit_type": "secondary", "css_class": "btn-ghost"},
 }
@@ -92,9 +215,9 @@ def load_shortcuts() -> List[Dict[str, Any]]:
     """Load shortcuts from disk"""
     try:
         if SHORTCUTS_FILE.exists():
-            with open(SHORTCUTS_FILE, 'r') as f:
+            with open(SHORTCUTS_FILE, "r") as f:
                 data = json.load(f)
-                return data.get('shortcuts', [])
+                return data.get("shortcuts", [])
     except Exception as e:
         print(f"Error loading shortcuts: {e}")
     return []
@@ -103,12 +226,8 @@ def load_shortcuts() -> List[Dict[str, Any]]:
 def save_shortcuts(shortcuts: List[Dict[str, Any]]) -> bool:
     """Save shortcuts to disk"""
     try:
-        data = {
-            'version': '1.0',
-            'updated_at': datetime.now().isoformat(),
-            'shortcuts': shortcuts
-        }
-        with open(SHORTCUTS_FILE, 'w') as f:
+        data = {"version": "1.0", "updated_at": datetime.now().isoformat(), "shortcuts": shortcuts}
+        with open(SHORTCUTS_FILE, "w") as f:
             json.dump(data, f, indent=2)
         return True
     except Exception as e:
@@ -118,17 +237,17 @@ def save_shortcuts(shortcuts: List[Dict[str, Any]]) -> bool:
 
 def init_shortcuts():
     """Initialize shortcuts from disk into session state"""
-    if 'magic_shortcuts' not in st.session_state:
+    if "magic_shortcuts" not in st.session_state:
         st.session_state.magic_shortcuts = load_shortcuts()
-    if 'shortcut_results' not in st.session_state:
+    if "shortcut_results" not in st.session_state:
         st.session_state.shortcut_results = {}
 
 
 def add_shortcut(shortcut: Dict[str, Any]) -> bool:
     """Add a shortcut and save to disk"""
-    if 'magic_shortcuts' not in st.session_state:
+    if "magic_shortcuts" not in st.session_state:
         st.session_state.magic_shortcuts = []
-    
+
     st.session_state.magic_shortcuts.append(shortcut)
     return save_shortcuts(st.session_state.magic_shortcuts)
 
@@ -136,7 +255,7 @@ def add_shortcut(shortcut: Dict[str, Any]) -> bool:
 def update_shortcut(shortcut_id: str, updates: Dict[str, Any]) -> bool:
     """Update a shortcut and save to disk"""
     for shortcut in st.session_state.magic_shortcuts:
-        if shortcut.get('id') == shortcut_id:
+        if shortcut.get("id") == shortcut_id:
             shortcut.update(updates)
             return save_shortcuts(st.session_state.magic_shortcuts)
     return False
@@ -145,8 +264,7 @@ def update_shortcut(shortcut_id: str, updates: Dict[str, Any]) -> bool:
 def delete_shortcut(shortcut_id: str) -> bool:
     """Delete a shortcut and save to disk"""
     st.session_state.magic_shortcuts = [
-        s for s in st.session_state.magic_shortcuts 
-        if s.get('id') != shortcut_id
+        s for s in st.session_state.magic_shortcuts if s.get("id") != shortcut_id
     ]
     return save_shortcuts(st.session_state.magic_shortcuts)
 
@@ -163,10 +281,11 @@ def import_shortcuts(json_str: str) -> int:
         if isinstance(imported, list):
             # Add unique IDs to avoid conflicts
             import uuid
+
             for shortcut in imported:
-                shortcut['id'] = str(uuid.uuid4())[:8]
-                shortcut['imported_at'] = datetime.now().isoformat()
-            
+                shortcut["id"] = str(uuid.uuid4())[:8]
+                shortcut["imported_at"] = datetime.now().isoformat()
+
             st.session_state.magic_shortcuts.extend(imported)
             save_shortcuts(st.session_state.magic_shortcuts)
             return len(imported)
@@ -267,7 +386,7 @@ def get_shortcut_css() -> str:
 def render_icon_picker(key: str = "icon_picker") -> str:
     """Render an icon picker grid"""
     st.markdown("**Choose an Icon:**")
-    
+
     # Group icons by category
     icon_groups = {
         "Actions": SHORTCUT_ICONS[0:10],
@@ -281,47 +400,47 @@ def render_icon_picker(key: str = "icon_picker") -> str:
         "Objects": SHORTCUT_ICONS[80:90],
         "Hearts": SHORTCUT_ICONS[90:100],
     }
-    
-    selected_icon = st.session_state.get(f'{key}_selected', '⚡')
-    
+
+    selected_icon = st.session_state.get(f"{key}_selected", "⚡")
+
     # Show current selection
     st.markdown(f"Selected: **{selected_icon}**")
-    
+
     # Create icon grid with tabs for categories
     icon_tabs = st.tabs(list(icon_groups.keys()))
-    
+
     for tab, (group_name, icons) in zip(icon_tabs, icon_groups.items()):
         with tab:
             cols = st.columns(10)
             for idx, icon in enumerate(icons):
                 with cols[idx % 10]:
                     if st.button(icon, key=f"{key}_{group_name}_{idx}", help=f"Select {icon}"):
-                        st.session_state[f'{key}_selected'] = icon
+                        st.session_state[f"{key}_selected"] = icon
                         st.rerun()
-    
-    return st.session_state.get(f'{key}_selected', '⚡')
+
+    return st.session_state.get(f"{key}_selected", "⚡")
 
 
 def render_style_picker(key: str = "style_picker") -> str:
     """Render a button style picker with previews"""
     st.markdown("**Choose a Style:**")
-    
+
     style_options = list(BUTTON_STYLES.keys())
     style_labels = [BUTTON_STYLES[s]["label"] for s in style_options]
-    
+
     selected_idx = st.selectbox(
         "Button Style",
         range(len(style_options)),
         format_func=lambda i: style_labels[i],
-        key=f"{key}_select"
+        key=f"{key}_select",
     )
-    
+
     selected_style = style_options[selected_idx]
-    
+
     # Show preview
     st.markdown("**Preview:**")
     style_info = BUTTON_STYLES[selected_style]
-    
+
     # Create a styled preview div
     preview_html = f"""
     <div style="
@@ -347,7 +466,7 @@ def render_style_picker(key: str = "style_picker") -> str:
     </div>
     """
     st.markdown(preview_html, unsafe_allow_html=True)
-    
+
     return selected_style
 
 
@@ -355,15 +474,15 @@ def render_size_picker(key: str = "size_picker") -> str:
     """Render a button size picker"""
     size_options = list(BUTTON_SIZES.keys())
     size_labels = [BUTTON_SIZES[s]["label"] for s in size_options]
-    
+
     selected_idx = st.selectbox(
         "Button Size",
         range(len(size_options)),
         format_func=lambda i: size_labels[i],
         index=1,  # Default to medium
-        key=f"{key}_select"
+        key=f"{key}_select",
     )
-    
+
     return size_options[selected_idx]
 
 
@@ -373,7 +492,7 @@ class ShortcutsManager:
     Provides the same functionality as the module-level functions
     but encapsulated in a class for cleaner code organization.
     """
-    
+
     def __init__(self, storage_path: Optional[Path] = None):
         if storage_path is None:
             self.storage_path = SHORTCUTS_FILE
@@ -383,117 +502,113 @@ class ShortcutsManager:
             self.storage_path = storage_path
         # Ensure parent directory exists
         self.storage_path.parent.mkdir(parents=True, exist_ok=True)
-    
+
     def load_shortcuts(self) -> List[Dict[str, Any]]:
         """Load shortcuts from disk"""
         try:
             if self.storage_path.exists():
-                with open(self.storage_path, 'r') as f:
+                with open(self.storage_path, "r") as f:
                     data = json.load(f)
-                    return data.get('shortcuts', [])
+                    return data.get("shortcuts", [])
         except Exception as e:
             print(f"Error loading shortcuts: {e}")
         return []
-    
+
     def save_shortcut(self, shortcut: Dict[str, Any]) -> bool:
         """Add or update a shortcut and save to disk"""
         shortcuts = self.load_shortcuts()
-        
+
         # Generate ID if not present
-        if not shortcut.get('id'):
+        if not shortcut.get("id"):
             import uuid
-            shortcut['id'] = str(uuid.uuid4())[:8]
-        
+
+            shortcut["id"] = str(uuid.uuid4())[:8]
+
         # Check if shortcut already exists (update) or is new (add)
         existing_idx = next(
-            (i for i, s in enumerate(shortcuts) if s.get('id') == shortcut.get('id')),
-            None
+            (i for i, s in enumerate(shortcuts) if s.get("id") == shortcut.get("id")), None
         )
-        
+
         if existing_idx is not None:
             shortcuts[existing_idx] = shortcut
         else:
             shortcuts.append(shortcut)
-        
+
         return self._save_to_disk(shortcuts)
-    
+
     def delete_shortcut(self, shortcut_id: str) -> bool:
         """Delete a shortcut by ID"""
         shortcuts = self.load_shortcuts()
-        shortcuts = [s for s in shortcuts if s.get('id') != shortcut_id]
+        shortcuts = [s for s in shortcuts if s.get("id") != shortcut_id]
         return self._save_to_disk(shortcuts)
-    
+
     def export_shortcuts(self) -> str:
         """Export all shortcuts as JSON string"""
         shortcuts = self.load_shortcuts()
-        data = {
-            'version': '1.0',
-            'exported_at': datetime.now().isoformat(),
-            'shortcuts': shortcuts
-        }
+        data = {"version": "1.0", "exported_at": datetime.now().isoformat(), "shortcuts": shortcuts}
         return json.dumps(data, indent=2)
-    
+
     def import_shortcuts(self, json_str: str, merge: bool = True, replace: bool = False) -> int:
         """
         Import shortcuts from JSON string.
-        
+
         Args:
             json_str: JSON string with shortcuts data
             merge: If True, add new shortcuts, skip duplicates by name
             replace: If True, replace all existing shortcuts
-        
+
         Returns:
             Number of shortcuts imported
         """
         try:
             data = json.loads(json_str)
-            
+
             # Handle different JSON structures
-            if isinstance(data, dict) and 'shortcuts' in data:
-                imported = data['shortcuts']
+            if isinstance(data, dict) and "shortcuts" in data:
+                imported = data["shortcuts"]
             elif isinstance(data, list):
                 imported = data
             else:
                 return 0
-            
+
             if replace:
                 # Replace all shortcuts
                 for shortcut in imported:
-                    shortcut['id'] = str(uuid.uuid4())[:8]
-                    shortcut['imported_at'] = datetime.now().isoformat()
+                    shortcut["id"] = str(uuid.uuid4())[:8]
+                    shortcut["imported_at"] = datetime.now().isoformat()
                 self._save_to_disk(imported)
                 return len(imported)
-            
+
             # Merge logic
             existing = self.load_shortcuts()
-            existing_names = {s.get('name') for s in existing}
+            existing_names = {s.get("name") for s in existing}
             added_count = 0
-            
+
             for shortcut in imported:
-                if merge and shortcut.get('name') in existing_names:
+                if merge and shortcut.get("name") in existing_names:
                     continue  # Skip duplicates
-                
-                shortcut['id'] = str(uuid.uuid4())[:8]
-                shortcut['imported_at'] = datetime.now().isoformat()
+
+                shortcut["id"] = str(uuid.uuid4())[:8]
+                shortcut["imported_at"] = datetime.now().isoformat()
                 existing.append(shortcut)
                 added_count += 1
-            
+
             self._save_to_disk(existing)
             return added_count
-            
+
         except Exception as e:
             print(f"Error importing shortcuts: {e}")
             return 0
-    
+
     def _save_to_disk(self, shortcuts: List[Dict[str, Any]]) -> bool:
         """Internal method to save shortcuts to disk"""
         try:
             data = {
-                'version': '1.0',
-                'updated_at': datetime.now().isoformat(),
-                'shortcuts': shortcuts
+                "version": "1.0",
+                "updated_at": datetime.now().isoformat(),
+                "shortcuts": shortcuts,
             }
-            with open(self.storage_path, 'w') as f:
+            with open(self.storage_path, "w") as f:
                 json.dump(data, f, indent=2)
             return True
         except Exception as e:
@@ -503,22 +618,22 @@ class ShortcutsManager:
 
 # Ensure ShortcutsManager is exported
 __all__ = [
-    'ShortcutsManager',
-    'load_shortcuts',
-    'save_shortcuts', 
-    'init_shortcuts',
-    'add_shortcut',
-    'update_shortcut',
-    'delete_shortcut',
-    'export_shortcuts',
-    'import_shortcuts',
-    'get_shortcut_css',
-    'render_icon_picker',
-    'render_style_picker',
-    'render_size_picker',
-    'SHORTCUT_ICONS',
-    'BUTTON_STYLES',
-    'BUTTON_SIZES',
-    'SHORTCUT_CATEGORIES',
-    'SHORTCUTS_FILE'
+    "ShortcutsManager",
+    "load_shortcuts",
+    "save_shortcuts",
+    "init_shortcuts",
+    "add_shortcut",
+    "update_shortcut",
+    "delete_shortcut",
+    "export_shortcuts",
+    "import_shortcuts",
+    "get_shortcut_css",
+    "render_icon_picker",
+    "render_style_picker",
+    "render_size_picker",
+    "SHORTCUT_ICONS",
+    "BUTTON_STYLES",
+    "BUTTON_SIZES",
+    "SHORTCUT_CATEGORIES",
+    "SHORTCUTS_FILE",
 ]

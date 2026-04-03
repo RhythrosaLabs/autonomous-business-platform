@@ -3,30 +3,33 @@ UI Components Module
 Reusable UI components for the platform
 """
 
-import streamlit as st
-from pathlib import Path
 import logging
+from pathlib import Path
+
+import streamlit as st
 
 logger = logging.getLogger(__name__)
 
 
 def render_header():
     """Render the main platform header."""
-    st.markdown('<h1 class="main-header">🚀 Autonomous Business Platform Pro</h1>', unsafe_allow_html=True)
+    st.markdown(
+        '<h1 class="main-header">🚀 Autonomous Business Platform Pro</h1>', unsafe_allow_html=True
+    )
 
 
 def render_sidebar_stats():
     """Render statistics in the sidebar."""
     st.markdown("## 📊 Stats")
-    
+
     # Session stats
-    if 'total_campaigns' not in st.session_state:
+    if "total_campaigns" not in st.session_state:
         st.session_state.total_campaigns = 0
-    if 'total_products' not in st.session_state:
+    if "total_products" not in st.session_state:
         st.session_state.total_products = 0
-    if 'total_videos' not in st.session_state:
+    if "total_videos" not in st.session_state:
         st.session_state.total_videos = 0
-    
+
     col1, col2 = st.columns(2)
     with col1:
         st.metric("Campaigns", st.session_state.total_campaigns)
@@ -38,7 +41,8 @@ def render_sidebar_stats():
 def render_about_page():
     """Render the About page content."""
     with st.expander("🌟 Platform Overview", expanded=True):
-        st.markdown("""
+        st.markdown(
+            """
         ### Autonomous Business Platform Pro (Otto Mate)
         
         The ultimate AI-powered automation suite for print-on-demand e-commerce.
@@ -54,10 +58,12 @@ def render_about_page():
         - 🤖 **Agent Builder**: Visual workflow automation with 50+ nodes
         
         **Version**: 2.1 Pro | **December 2025**
-        """)
-    
+        """
+        )
+
     with st.expander("🧠 Otto AI Assistant"):
-        st.markdown("""
+        st.markdown(
+            """
         Your hyperintelligent AI assistant with complete platform control.
         
         **Slash Commands**:
@@ -75,10 +81,12 @@ def render_about_page():
         - Request caching (1-hour TTL)
         - Parallel execution (up to 4 concurrent)
         - Exponential backoff retry logic
-        """)
-    
+        """
+        )
+
     with st.expander("📚 Feature Breakdown"):
-        st.markdown("""
+        st.markdown(
+            """
         ### 🎯 Campaign Generator
         12-step full campaign generation:
         - Marketing plan & strategy
@@ -102,13 +110,15 @@ def render_about_page():
         - **Video**: YouTube
         - **Social**: Twitter, Pinterest, TikTok, Instagram, Facebook, Reddit
         - **Email**: SendGrid, Gmail OAuth, SMTP
-        """)
+        """
+        )
 
 
 def render_command_reference():
     """Render command reference guide."""
     with st.expander("📖 Complete Slash Command Dictionary", expanded=True):
-        st.markdown("""
+        st.markdown(
+            """
         ## 🎨 Design & Creation Commands
         
         **Product Design:**
@@ -146,19 +156,16 @@ def render_command_reference():
         - `/automate <workflow>` - Set up automation
         - `/schedule <task> <time>` - Schedule generation
         - `/batch <operation>` - Batch processing
-        """)
+        """
+        )
 
 
 def render_feature_card(icon: str, title: str, description: str, color: str = "blue"):
     """Render a feature card."""
-    colors = {
-        "blue": "#667eea",
-        "purple": "#764ba2",
-        "green": "#2f855a",
-        "orange": "#ed8936"
-    }
-    
-    st.markdown(f"""
+    colors = {"blue": "#667eea", "purple": "#764ba2", "green": "#2f855a", "orange": "#ed8936"}
+
+    st.markdown(
+        f"""
     <div style="
         background: linear-gradient(135deg, {colors.get(color, colors['blue'])} 0%, #764ba2 100%);
         padding: 1.5rem;
@@ -170,7 +177,9 @@ def render_feature_card(icon: str, title: str, description: str, color: str = "b
         <h3>{icon} {title}</h3>
         <p>{description}</p>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_progress_indicator(current: int, total: int, label: str = "Progress"):
@@ -202,7 +211,9 @@ def render_error_message(message: str, details: str = None, show_help: bool = Tr
         with st.expander("🔍 Error Details"):
             st.code(details, language="text")
     if show_help:
-        st.info("💡 Try checking your API keys in Settings, or contact support if the issue persists.")
+        st.info(
+            "💡 Try checking your API keys in Settings, or contact support if the issue persists."
+        )
 
 
 def render_info_box(title: str, content: str, icon: str = "ℹ️"):

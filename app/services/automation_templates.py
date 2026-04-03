@@ -5,11 +5,11 @@ Pre-built templates for common browser automation tasks.
 """
 
 import json
-from typing import Dict, List, Optional, Any
-from pathlib import Path
-from datetime import datetime
-import uuid
 import logging
+import uuid
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +29,7 @@ AUTOMATION_TEMPLATES = {
             "Click on the compose tweet button",
             "Type the tweet content: {{content}}",
             "Attach image if provided: {{image_url}}",
-            "Click the Tweet button to post"
+            "Click the Tweet button to post",
         ],
         "task_template": """
 Go to twitter.com and post a tweet with the following content:
@@ -44,7 +44,7 @@ Make sure to:
 1. Log in if needed (credentials should be auto-filled)
 2. Wait for the page to fully load
 3. Confirm the tweet was posted successfully
-"""
+""",
     },
     "post_instagram": {
         "id": "post_instagram",
@@ -59,7 +59,7 @@ Make sure to:
             "Click the create post button (+)",
             "Upload the image: {{image_path}}",
             "Add caption: {{caption}}",
-            "Click Share to post"
+            "Click Share to post",
         ],
         "task_template": """
 Go to instagram.com and create a new post:
@@ -71,7 +71,7 @@ Hashtags: {{hashtags}}
 {{/if}}
 
 Complete the posting process and confirm success.
-"""
+""",
     },
     "post_linkedin": {
         "id": "post_linkedin",
@@ -89,7 +89,7 @@ Image: {{image_url}}
 {{/if}}
 
 Make sure the post is published to your feed.
-"""
+""",
     },
     "post_facebook": {
         "id": "post_facebook",
@@ -107,9 +107,8 @@ Attach image: {{image_url}}
 {{/if}}
 
 Post to your timeline and confirm success.
-"""
+""",
     },
-    
     # ===== RESEARCH TEMPLATES =====
     "research_competitor": {
         "id": "research_competitor",
@@ -130,7 +129,7 @@ Gather the following information:
 6. Contact information
 
 Compile a summary of findings.
-"""
+""",
     },
     "research_trends": {
         "id": "research_trends",
@@ -150,7 +149,7 @@ Search Google, social media, and trend sites to find:
 5. Successful examples
 
 Provide a summary with actionable insights.
-"""
+""",
     },
     "research_product_prices": {
         "id": "research_product_prices",
@@ -174,9 +173,8 @@ Find:
 4. Bundle or discount patterns
 
 Summarize findings with pricing recommendations.
-"""
+""",
     },
-    
     # ===== E-COMMERCE TEMPLATES =====
     "check_etsy_listings": {
         "id": "check_etsy_listings",
@@ -196,7 +194,7 @@ Check:
 5. Any messages or notifications
 
 Provide a summary of shop status.
-"""
+""",
     },
     "check_amazon_seller": {
         "id": "check_amazon_seller",
@@ -215,9 +213,8 @@ Go to sellercentral.amazon.com and check:
 5. Any alerts or action required
 
 Summarize the seller account status.
-"""
+""",
     },
-    
     # ===== CONTENT COLLECTION =====
     "scrape_product_images": {
         "id": "scrape_product_images",
@@ -236,7 +233,7 @@ Save them in a structured format with:
 3. Image dimensions
 
 Note: Only collect images that appear to be product photos.
-"""
+""",
     },
     "collect_testimonials": {
         "id": "collect_testimonials",
@@ -256,9 +253,8 @@ For each review, capture:
 4. Date if shown
 
 Compile into a formatted list.
-"""
+""",
     },
-    
     # ===== MONITORING TEMPLATES =====
     "monitor_brand_mentions": {
         "id": "monitor_brand_mentions",
@@ -282,7 +278,7 @@ Find:
 - Opportunities for engagement
 
 Summarize findings with any action items.
-"""
+""",
     },
     "check_seo_rankings": {
         "id": "check_seo_rankings",
@@ -303,9 +299,8 @@ For each keyword, record:
 3. Top 3 competitors for that keyword
 
 Compile into a rankings report.
-"""
+""",
     },
-    
     # ===== FORM FILLING =====
     "fill_contact_form": {
         "id": "fill_contact_form",
@@ -324,7 +319,7 @@ Find the contact form and fill it with:
 - Message: {{message}}
 
 Submit the form and confirm submission.
-"""
+""",
     },
     "submit_guest_post": {
         "id": "submit_guest_post",
@@ -344,124 +339,129 @@ Submit a pitch with:
 - Brief outline: {{outline}}
 
 Complete the submission process.
-"""
-    }
+""",
+    },
 }
 
 
 class AutomationTemplateManager:
     """Manage browser automation templates."""
-    
+
     def __init__(self, storage_dir: Optional[Path] = None):
         self.storage_dir = storage_dir or Path.home() / ".pod_wizard" / "automation_templates"
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         self.templates = {**AUTOMATION_TEMPLATES}
         self._load_custom_templates()
-    
+
     def _load_custom_templates(self):
         """Load custom templates from storage."""
         for file in self.storage_dir.glob("*.json"):
             try:
-                with open(file, 'r') as f:
+                with open(file, "r") as f:
                     data = json.load(f)
-                    self.templates[data['id']] = data
+                    self.templates[data["id"]] = data
             except Exception as e:
                 logger.warning(f"Failed to load automation template {file}: {e}")
-    
+
     def get_template(self, template_id: str) -> Optional[Dict]:
         return self.templates.get(template_id)
-    
+
     def list_templates(self, category: Optional[str] = None) -> List[Dict]:
         templates = list(self.templates.values())
         if category:
-            templates = [t for t in templates if t.get('category') == category]
-        return sorted(templates, key=lambda t: t.get('name', ''))
-    
+            templates = [t for t in templates if t.get("category") == category]
+        return sorted(templates, key=lambda t: t.get("name", ""))
+
     def get_categories(self) -> List[str]:
-        return sorted(set(t.get('category', 'Other') for t in self.templates.values()))
-    
+        return sorted(set(t.get("category", "Other") for t in self.templates.values()))
+
     def build_task(self, template_id: str, variables: Dict) -> str:
         """Build a task string from a template with variables filled in."""
         template = self.get_template(template_id)
         if not template:
             raise ValueError(f"Template not found: {template_id}")
-        
-        task = template.get('task_template', '')
-        
+
+        task = template.get("task_template", "")
+
         # Simple variable substitution
         for key, value in variables.items():
             task = task.replace(f"{{{{{key}}}}}", str(value))
-        
+
         # Handle conditionals (simple version)
         import re
+
         # Remove unfilled conditionals
-        task = re.sub(r'\{\{#if \w+\}\}.*?\{\{/if\}\}', '', task, flags=re.DOTALL)
-        
+        task = re.sub(r"\{\{#if \w+\}\}.*?\{\{/if\}\}", "", task, flags=re.DOTALL)
+
         return task.strip()
-    
+
     def save_template(self, template: Dict):
         """Save a custom template."""
-        template_id = template.get('id', str(uuid.uuid4()))
-        template['id'] = template_id
-        template['modified_at'] = datetime.now().isoformat()
-        template['custom'] = True
-        
+        template_id = template.get("id", str(uuid.uuid4()))
+        template["id"] = template_id
+        template["modified_at"] = datetime.now().isoformat()
+        template["custom"] = True
+
         self.templates[template_id] = template
-        
+
         file_path = self.storage_dir / f"{template_id}.json"
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             json.dump(template, f, indent=2)
 
 
 def render_automation_templates():
     """Render automation templates UI in Streamlit."""
     import streamlit as st
-    
+
     st.markdown("### 🤖 Browser Automation Templates")
     st.caption("Pre-built templates for automating web tasks")
-    
+
     manager = AutomationTemplateManager()
-    
+
     # Category filter
     categories = manager.get_categories()
-    selected_category = st.selectbox("Filter by Category", ["All"] + categories, key="auto_template_cat")
-    
+    selected_category = st.selectbox(
+        "Filter by Category", ["All"] + categories, key="auto_template_cat"
+    )
+
     templates = manager.list_templates(
         category=None if selected_category == "All" else selected_category
     )
-    
+
     for template in templates:
         with st.expander(f"**{template['name']}** ({template.get('platform', 'web')})"):
-            st.markdown(template.get('description', ''))
-            
-            if template.get('requires_credentials'):
+            st.markdown(template.get("description", ""))
+
+            if template.get("requires_credentials"):
                 st.warning("⚠️ This template requires login credentials")
-            
-            if template.get('steps'):
+
+            if template.get("steps"):
                 st.markdown("**Steps:**")
-                for i, step in enumerate(template['steps'][:5]):
+                for i, step in enumerate(template["steps"][:5]):
                     st.text(f"  {i+1}. {step}")
-            
+
             # Variable inputs
-            task_template = template.get('task_template', '')
+            task_template = template.get("task_template", "")
             import re
-            variables = re.findall(r'\{\{(\w+)\}\}', task_template)
+
+            variables = re.findall(r"\{\{(\w+)\}\}", task_template)
             variables = list(set(variables))  # Remove duplicates
-            
+
             if variables:
                 st.markdown("**Configure:**")
                 var_values = {}
                 for var in variables:
-                    if var not in ['#if', '/if']:
+                    if var not in ["#if", "/if"]:
                         var_values[var] = st.text_input(
-                            var.replace('_', ' ').title(),
-                            key=f"var_{template['id']}_{var}"
+                            var.replace("_", " ").title(), key=f"var_{template['id']}_{var}"
                         )
-                
-                if st.button("Run Automation", key=f"run_{template['id']}", use_container_width=True):
+
+                if st.button(
+                    "Run Automation", key=f"run_{template['id']}", use_container_width=True
+                ):
                     if all(var_values.values()):
-                        task = manager.build_task(template['id'], var_values)
-                        st.session_state['pending_automation_task'] = task
+                        task = manager.build_task(template["id"], var_values)
+                        st.session_state["pending_automation_task"] = task
                         st.success("✅ Task prepared! Go to Otto Mate to execute.")
                         st.code(task)
                     else:

@@ -1,6 +1,8 @@
-import unittest
 import os
+import unittest
+
 from modules.video_generation import generate_ken_burns_video
+
 
 class TestKenBurnsVideo(unittest.TestCase):
     def setUp(self):
@@ -9,7 +11,8 @@ class TestKenBurnsVideo(unittest.TestCase):
         # Create a simple image if not present
         if not os.path.exists(self.test_image):
             from PIL import Image
-            img = Image.new('RGB', (640, 480), color='blue')
+
+            img = Image.new("RGB", (640, 480), color="blue")
             img.save(self.test_image)
         self.output_path = "kenburns_test_output.mp4"
 
@@ -26,10 +29,11 @@ class TestKenBurnsVideo(unittest.TestCase):
             output_path=self.output_path,
             duration=2,
             fps=10,
-            resolution="720p"
+            resolution="720p",
         )
         self.assertTrue(result)
         self.assertTrue(os.path.exists(self.output_path))
+
 
 if __name__ == "__main__":
     unittest.main()

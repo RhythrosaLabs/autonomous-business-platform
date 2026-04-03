@@ -12,7 +12,7 @@
 #   ./start_platform.sh stop     # Stop all services
 #
 # Services:
-#   - FastAPI Backend: http://localhost:8000 (API + WebSocket)
+#   - FastAPI Backend: http://localhost:8601 (API + WebSocket)
 #   - Streamlit Frontend: http://localhost:8501 (UI)
 #   - Ray Dashboard: http://127.0.0.1:8265 (Monitoring)
 
@@ -30,7 +30,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-BACKEND_PORT=${BACKEND_PORT:-8000}
+BACKEND_PORT=${BACKEND_PORT:-8601}
 FRONTEND_PORT=${FRONTEND_PORT:-8501}
 BACKEND_HOST=${BACKEND_HOST:-0.0.0.0}
 FRONTEND_HOST=${FRONTEND_HOST:-0.0.0.0}
@@ -132,7 +132,7 @@ start_backend() {
     
     # Start FastAPI
     cd "$PROJECT_ROOT"
-    nohup python3 -m uvicorn backend.fastapi_backend:app \
+    nohup python3 -m uvicorn app.services.fastapi_backend:app \
         --host $BACKEND_HOST \
         --port $BACKEND_PORT \
         --log-level info \

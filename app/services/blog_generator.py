@@ -7,14 +7,16 @@ Generates a rich blog post about a product using Replicate GPT-OSS for text and 
 - If a product image is provided, it's used as the hero image at the top
 """
 
+import json
 import os
 import re
-import json
-import requests
 from datetime import datetime
+
+import requests
 
 try:
     from weasyprint import HTML  # requires system libs (pango, gobject)
+
     _WEASYPRINT_AVAILABLE = True
 except Exception:
     _WEASYPRINT_AVAILABLE = False
@@ -28,7 +30,12 @@ def _strip_code_fences(text: str) -> str:
     return re.sub(r"^```[a-zA-Z]*\n|\n```$", "", text.strip())
 
 
-def generate_blog_content(product_name: str, product_description: str, tone: str = "Professional", replicate_token: str | None = None) -> dict:
+def generate_blog_content(
+    product_name: str,
+    product_description: str,
+    tone: str = "Professional",
+    replicate_token: str | None = None,
+) -> dict:
     """Use Replicate GPT-OSS to produce a structured JSON for the blog.
 
     Returns a dict with keys: title, sections (list of {heading, html}), image_captions (list of 3 strings)
@@ -65,14 +72,20 @@ Constraints:
 - Avoid cheesy claims; be specific and product-focused.
 - Keep it 800-1200 words overall.
 """
-    raw = client.generate_text(user_prompt, max_tokens=1500, temperature=0.7, system_prompt=sys_prompt)
+    raw = client.generate_text(
+        user_prompt, max_tokens=1500, temperature=0.7, system_prompt=sys_prompt
+    )
     text = _strip_code_fences(raw)
     try:
         data = json.loads(text)
     except Exception:
         # best-effort: try to extract JSON
         m = re.search(r"\{[\s\S]*\}$", text)
-        data = json.loads(m.group(0)) if m else {"title": f"{product_name} - Product Blog", "sections": [], "image_captions": []}
+        data = (
+            json.loads(m.group(0))
+            if m
+            else {"title": f"{product_name} - Product Blog", "sections": [], "image_captions": []}
+        )
     # Validate minimal structure
     data.setdefault("title", f"{product_name} - Product Blog")
     data.setdefault("sections", [])
@@ -80,9 +93,11 @@ Constraints:
     return data
 
 
-def generate_images_for_blog(captions: list[str], out_dir: str, replicate_token: str | None = None) -> list[str]:
+def generate_images_for_blog(
+    captions: list[str], out_dir: str, replicate_token: str | None = None
+) -> list[str]:
     """Generate three images using Replicate Flux Fast based on provided captions.
-    
+
     Returns list of Replicate-hosted URLs (no local download needed).
     """
     os.makedirs(out_dir, exist_ok=True)
@@ -91,11 +106,13 @@ def generate_images_for_blog(captions: list[str], out_dir: str, replicate_token:
     for i, cap in enumerate((captions or [])[:3], start=1):
         prompt = f"High-quality, modern blog illustration about: {cap}. Clean, commercial-ready, no text overlays."
         try:
-            url = client.generate_image(prompt, width=1280, height=720, aspect_ratio="16:9", output_format="png")
+            url = client.generate_image(
+                prompt, width=1280, height=720, aspect_ratio="16:9", output_format="png"
+            )
             if url:
                 # Keep the Replicate CDN URL directly - no download needed!
                 urls.append(url)
-                
+
                 # Also save locally for backup/reference
                 try:
                     resp = requests.get(url, timeout=60)
@@ -117,12 +134,14 @@ def insert_images_smart(html_content: str, image_paths: list[str]) -> str:
     # split by </h2> boundaries if present
     parts = re.split(r"(</h2>)", html_content, maxsplit=0)
     img_tag_tpl = '<img src="{src}" alt="Blog illustration" style="width:100%;max-width:720px;height:auto;border-radius:12px;margin:1.5rem 0;box-shadow:0 4px 20px rgba(0,0,0,0.1);">'
+
     def ins(where_idx: int, src_idx: int):
         if src_idx >= len(image_paths):
             return
         tag = img_tag_tpl.format(src=image_paths[src_idx])
         if len(parts) >= where_idx + 1:
             parts[where_idx] = parts[where_idx] + tag
+
     # After first </h2>
     if len(parts) >= 2:
         ins(1, 0)
@@ -165,16 +184,26 @@ def export_blog_as_html(title, html_content, output_path):
 
 def export_blog_as_pdf(html_path, pdf_path):
     if not _WEASYPRINT_AVAILABLE:
-        with open(html_path, 'r', encoding='utf-8') as f_in, open(pdf_path.replace('.pdf', '_fallback.txt'), 'w', encoding='utf-8') as f_out:
+        with (
+            open(html_path, "r", encoding="utf-8") as f_in,
+            open(pdf_path.replace(".pdf", "_fallback.txt"), "w", encoding="utf-8") as f_out,
+        ):
             f_out.write("PDF generation unavailable (missing system deps). Content below:\n\n")
             f_out.write(f_in.read())
-        return pdf_path.replace('.pdf', '_fallback.txt')
+        return pdf_path.replace(".pdf", "_fallback.txt")
     from weasyprint import HTML as _HTML
+
     _HTML(html_path).write_pdf(pdf_path)
     return pdf_path
 
 
-def generate_product_blog(product_name: str, product_description: str, tone: str = "Professional", output_dir: str = "blogs", image_path: str | None = None):
+def generate_product_blog(
+    product_name: str,
+    product_description: str,
+    tone: str = "Professional",
+    output_dir: str = "blogs",
+    image_path: str | None = None,
+):
     os.makedirs(output_dir, exist_ok=True)
 
     data = generate_blog_content(product_name, product_description, tone)
@@ -202,7 +231,9 @@ def generate_product_blog(product_name: str, product_description: str, tone: str
     html_with_images = insert_images_smart(html_content, img_paths)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    safe = re.sub(r"[^A-Za-z0-9_-]+", "_", product_name.strip().replace(" ", "_")).lower() or "product"
+    safe = (
+        re.sub(r"[^A-Za-z0-9_-]+", "_", product_name.strip().replace(" ", "_")).lower() or "product"
+    )
     html_path = os.path.join(output_dir, f"{safe}_{timestamp}.html")
     pdf_path = os.path.join(output_dir, f"{safe}_{timestamp}.pdf")
     export_blog_as_html(data.get("title", product_name), html_with_images, html_path)

@@ -19,53 +19,71 @@ Usage:
 Organized by category for clarity.
 """
 
+import asyncio
+import base64
+import hashlib
+import json
+import logging
+
 # ============================================================================
 # STANDARD LIBRARY - Core functionality
 # ============================================================================
 import os
-import sys
-import json
+import pickle
+import platform
+import random
 import re
+import shutil
+import sys
+import tempfile
+import threading
 import time
 import uuid
-import logging
-import asyncio
-import threading
-import random
-import shutil
-from pathlib import Path
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
+from dataclasses import asdict, dataclass, field
 from datetime import datetime, timedelta
-import pickle
-import tempfile
-import base64
-import hashlib
-import platform
+from enum import Enum
+from functools import lru_cache, partial, wraps
+import io
 from io import BytesIO
+from pathlib import Path
 
 # ============================================================================
 # STANDARD LIBRARY - Type hints and functional programming
 # ============================================================================
 from typing import (
-    Any, Dict, List, Tuple, Optional, Set, Union, Callable,
-    Iterator, Generator, Protocol, Type, TypeVar, Generic,
-    Sequence, Mapping, Iterable, Pattern
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Generic,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Pattern,
+    Protocol,
+    Sequence,
+    Set,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
 )
-from dataclasses import dataclass, field, asdict
-from enum import Enum
-from functools import wraps, lru_cache, partial
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+
+import requests
 
 # ============================================================================
 # THIRD-PARTY - Web and API
 # ============================================================================
 import streamlit as st
-import requests
 
 # ============================================================================
 # THIRD-PARTY - Data processing and ML
 # ============================================================================
 try:
-    from PIL import Image, ImageFilter, ImageOps, ImageEnhance
+    from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 except ImportError:
     Image = None
 
@@ -81,16 +99,17 @@ except ImportError:
 # Usage: from app.tabs.abp_imports_common import lazy_import
 # result = lazy_import('platform_integrations')
 
+
 def lazy_import(module_name: str) -> Any:
     """
     Safely import local project modules on-demand to avoid circular imports.
-    
+
     Args:
         module_name: Name of the module to import (e.g., 'platform_integrations')
-    
+
     Returns:
         The imported module, or None if import fails
-    
+
     Example:
         >>> platform_integrations = lazy_import('platform_integrations')
         >>> if platform_integrations:
@@ -107,23 +126,22 @@ def lazy_import(module_name: str) -> Any:
 # UTILITY FUNCTIONS - Common patterns used across the codebase
 # ============================================================================
 
+
 def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """
     Set up a logger with consistent formatting across the project.
-    
+
     Args:
         name: Logger name (typically __name__)
         level: Logging level (default: logging.INFO)
-    
+
     Returns:
         Configured logger instance
     """
     logger = logging.getLogger(name)
     if not logger.handlers:
         handler = logging.StreamHandler()
-        formatter = logging.Formatter(
-            '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        )
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         logger.setLevel(level)
@@ -133,7 +151,7 @@ def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
 def get_project_root() -> Path:
     """
     Get the root directory of the project.
-    
+
     Returns:
         Path object pointing to project root
     """
@@ -143,11 +161,11 @@ def get_project_root() -> Path:
 def get_cache_dir() -> Path:
     """
     Get or create the cache directory for the project.
-    
+
     Returns:
         Path object pointing to .cache directory
     """
-    cache_dir = get_project_root() / '.cache'
+    cache_dir = get_project_root() / ".cache"
     cache_dir.mkdir(exist_ok=True)
     return cache_dir
 
@@ -155,21 +173,21 @@ def get_cache_dir() -> Path:
 def safe_dict_get(d: Dict[str, Any], path: str, default: Any = None) -> Any:
     """
     Safely get nested dictionary values using dot notation.
-    
+
     Args:
         d: Dictionary to traverse
         path: Dot-separated path (e.g., 'config.database.host')
         default: Default value if path not found
-    
+
     Returns:
         Value at path or default
-    
+
     Example:
         >>> config = {'db': {'host': 'localhost'}}
         >>> safe_dict_get(config, 'db.host', 'unknown')
         'localhost'
     """
-    keys = path.split('.')
+    keys = path.split(".")
     for key in keys:
         if isinstance(d, dict):
             d = d.get(key)
@@ -194,26 +212,71 @@ __project_root__ = get_project_root()
 
 __all__ = [
     # Standard library - Core
-    'os', 'sys', 'json', 're', 'time', 'uuid', 'logging', 'asyncio', 'threading',
-    'random', 'shutil', 'Path', 'datetime', 'timedelta', 'pickle', 'tempfile', 'base64',
-    'hashlib', 'platform', 'io', 'BytesIO',
-    
+    "os",
+    "sys",
+    "json",
+    "re",
+    "time",
+    "uuid",
+    "logging",
+    "asyncio",
+    "threading",
+    "random",
+    "shutil",
+    "Path",
+    "datetime",
+    "timedelta",
+    "pickle",
+    "tempfile",
+    "base64",
+    "hashlib",
+    "platform",
+    "io",
+    "BytesIO",
     # Standard library - Types
-    'Any', 'Dict', 'List', 'Tuple', 'Optional', 'Set', 'Union', 'Callable',
-    'Iterator', 'Generator', 'Protocol', 'Type', 'TypeVar', 'Generic',
-    'Sequence', 'Mapping', 'Iterable', 'Pattern',
-    'dataclass', 'field', 'asdict', 'Enum',
-    'wraps', 'lru_cache', 'partial',
-    'ThreadPoolExecutor', 'ProcessPoolExecutor',
-    
+    "Any",
+    "Dict",
+    "List",
+    "Tuple",
+    "Optional",
+    "Set",
+    "Union",
+    "Callable",
+    "Iterator",
+    "Generator",
+    "Protocol",
+    "Type",
+    "TypeVar",
+    "Generic",
+    "Sequence",
+    "Mapping",
+    "Iterable",
+    "Pattern",
+    "dataclass",
+    "field",
+    "asdict",
+    "Enum",
+    "wraps",
+    "lru_cache",
+    "partial",
+    "ThreadPoolExecutor",
+    "ProcessPoolExecutor",
     # Third-party
-    'st', 'requests', 'Image', 'ImageFilter', 'ImageOps', 'ImageEnhance',
-    'replicate',
-    
+    "st",
+    "requests",
+    "Image",
+    "ImageFilter",
+    "ImageOps",
+    "ImageEnhance",
+    "replicate",
     # Utilities
-    'lazy_import', 'setup_logger', 'get_project_root', 'get_cache_dir',
-    'safe_dict_get',
-    
+    "lazy_import",
+    "setup_logger",
+    "get_project_root",
+    "get_cache_dir",
+    "safe_dict_get",
     # Version info
-    '__version__', '__author__', '__project_root__',
+    "__version__",
+    "__author__",
+    "__project_root__",
 ]

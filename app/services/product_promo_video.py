@@ -4,10 +4,11 @@ from __future__ import annotations
 
 import os
 import re
-import requests
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
+
+import requests
 
 from app.services.api_service import ReplicateAPI
 
@@ -20,19 +21,19 @@ concatenate_audioclips = None
 concatenate_videoclips = None
 AudioClip = None
 
+
 def _ensure_moviepy():
     """Lazy import moviepy to avoid SDL thread issues on macOS."""
     global AudioFileClip, CompositeAudioClip, VideoFileClip, concatenate_audioclips, concatenate_videoclips, AudioClip
     if AudioFileClip is None:
         try:
-            from moviepy.editor import (
-                AudioFileClip as _AudioFileClip,
-                CompositeAudioClip as _CompositeAudioClip,
-                VideoFileClip as _VideoFileClip,
-                concatenate_audioclips as _concatenate_audioclips,
-                concatenate_videoclips as _concatenate_videoclips,
-            )
             from moviepy.audio.AudioClip import AudioClip as _AudioClip
+            from moviepy.editor import AudioFileClip as _AudioFileClip
+            from moviepy.editor import CompositeAudioClip as _CompositeAudioClip
+            from moviepy.editor import VideoFileClip as _VideoFileClip
+            from moviepy.editor import concatenate_audioclips as _concatenate_audioclips
+            from moviepy.editor import concatenate_videoclips as _concatenate_videoclips
+
             AudioFileClip = _AudioFileClip
             CompositeAudioClip = _CompositeAudioClip
             VideoFileClip = _VideoFileClip
@@ -41,6 +42,7 @@ def _ensure_moviepy():
             AudioClip = _AudioClip
         except ImportError as exc:
             raise ImportError("moviepy is required for promo video generation") from exc
+
 
 try:
     from replicate.client import Client
@@ -78,7 +80,10 @@ def _download_asset(url: str, target_path: Path) -> Path:
 def _extract_segments(script_text: str, expected: int) -> List[str]:
     matches = re.findall(r"^(?:\s*)(\d+)[:\-)]\s*(.+)$", script_text, re.MULTILINE)
     if matches:
-        ordered = sorted(((int(idx), seg.strip()) for idx, seg in matches if seg.strip()), key=lambda item: item[0])
+        ordered = sorted(
+            ((int(idx), seg.strip()) for idx, seg in matches if seg.strip()),
+            key=lambda item: item[0],
+        )
         segments = [seg for _, seg in ordered][:expected]
         if len(segments) == expected:
             return segments
@@ -119,6 +124,7 @@ def _music_prompt(title: str) -> str:
         "Professional commercial quality, seamless loop, non-distracting."
     )
 
+
 def generate_product_promo_video(
     title: str,
     description: str,
@@ -129,7 +135,7 @@ def generate_product_promo_video(
     segment_count: int = DEFAULT_SEGMENT_COUNT,
 ) -> Optional[str]:
     """Generate a persuasive multi-segment advertisement video for the product."""
-    
+
     # Lazy load moviepy to avoid SDL/pygame thread issues on macOS
     _ensure_moviepy()
 
@@ -143,11 +149,15 @@ def generate_product_promo_video(
     replicate_client = Client(api_token=token)
 
     segment_count = max(1, segment_count)
-    segment_duration = max(3, int(total_duration / max(segment_count, 1)) or SEGMENT_DURATION_SECONDS)
+    segment_duration = max(
+        3, int(total_duration / max(segment_count, 1)) or SEGMENT_DURATION_SECONDS
+    )
     total_duration = segment_duration * segment_count
 
     launch_ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    safe_slug = re.sub(r"[^A-Za-z0-9_-]+", "_", title.strip().replace(" ", "_")).lower() or "product"
+    safe_slug = (
+        re.sub(r"[^A-Za-z0-9_-]+", "_", title.strip().replace(" ", "_")).lower() or "product"
+    )
 
     script_prompt = (
         f"You are an expert video scriptwriter. Write a compelling, persuasive script for a {total_duration}-second "
@@ -195,7 +205,11 @@ def generate_product_promo_video(
         )
 
         prompt_input = sanitize_for_api(visual_prompt)
-        use_image = image_url if idx == 0 and isinstance(image_url, str) and image_url.startswith("http") else None
+        use_image = (
+            image_url
+            if idx == 0 and isinstance(image_url, str) and image_url.startswith("http")
+            else None
+        )
         video_url = replicate_api.generate_video(
             prompt=prompt_input,
             image_url=use_image,
@@ -251,7 +265,12 @@ def generate_product_promo_video(
             if music_clip.duration < total_duration:
                 loops = int(total_duration / max(music_clip.duration, 0.1)) + 1
                 music_clip = concatenate_audioclips([music_clip] * loops)
-            music_clip = music_clip.subclip(0, total_duration).audio_fadein(0.4).audio_fadeout(1.8).volumex(0.35)
+            music_clip = (
+                music_clip.subclip(0, total_duration)
+                .audio_fadein(0.4)
+                .audio_fadeout(1.8)
+                .volumex(0.35)
+            )
             voice_clip = voice_clip.volumex(1.15)
             final_audio = CompositeAudioClip([music_clip, voice_clip])
         except Exception:
