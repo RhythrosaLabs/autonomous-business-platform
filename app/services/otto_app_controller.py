@@ -13,11 +13,8 @@ Otto can now:
 This extends beyond just documents and task queue - Otto has FULL platform access.
 """
 
-import asyncio
 import logging
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +47,8 @@ class OttoAppController:
     # ========================================================================
 
     async def generate_campaign(
-        self, brand_name: str, product_type: str, style: str = "modern", platforms: List[str] = None
-    ) -> Dict[str, Any]:
+        self, brand_name: str, product_type: str, style: str = "modern", platforms: list[str] = None
+    ) -> dict[str, Any]:
         """
         Generate a complete marketing campaign.
 
@@ -65,7 +62,7 @@ class OttoAppController:
 
         try:
             # Import campaign generator
-            from campaign_generator_service import CampaignGeneratorService
+            from app.services.campaign_generator_service import CampaignGeneratorService
 
             campaign_gen = CampaignGeneratorService(self.replicate)
 
@@ -94,7 +91,7 @@ class OttoAppController:
 
     async def generate_poster(
         self, prompt: str, style: str = "modern", size: str = "1024x1024"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate a poster/artwork with AI."""
         logger.info(f"🎨 Generating poster: {prompt[:50]}...")
 
@@ -122,7 +119,7 @@ class OttoAppController:
 
     async def generate_video(
         self, prompt: str, duration: int = 5, model: str = "luma/ray-2"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate a video with AI."""
         logger.info(f"🎬 Generating video: {prompt[:50]}...")
 
@@ -144,7 +141,7 @@ class OttoAppController:
 
     async def generate_audio(
         self, prompt: str, duration: int = 30, genre: str = "ambient"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate audio/music with AI."""
         logger.info(f"🎵 Generating audio: {prompt[:50]}...")
 
@@ -168,7 +165,7 @@ class OttoAppController:
 
     async def generate_mockup(
         self, product_image_url: str, mockup_type: str = "poster_on_wall"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate product mockup in realistic setting."""
         logger.info(f"🖼️ Generating {mockup_type} mockup")
 
@@ -205,7 +202,7 @@ class OttoAppController:
         price: float,
         image_url: str,
         product_type: str = "poster",
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Create product on Shopify."""
         logger.info(f"🛍️ Creating product: {title}")
 
@@ -238,7 +235,7 @@ class OttoAppController:
 
     async def update_pricing(
         self, product_id: str, new_price: float, compare_at_price: float = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Update product pricing."""
         logger.info(f"💰 Updating pricing for product {product_id}")
 
@@ -255,7 +252,7 @@ class OttoAppController:
         except Exception as e:
             return {"success": False, "error": str(e), "message": f"❌ Pricing update failed: {e}"}
 
-    async def check_inventory(self) -> Dict[str, Any]:
+    async def check_inventory(self) -> dict[str, Any]:
         """Check inventory levels across products."""
         logger.info("📦 Checking inventory")
 
@@ -289,8 +286,8 @@ class OttoAppController:
     # ========================================================================
 
     async def post_to_all_platforms(
-        self, content: str, media_url: str, platforms: List[str] = None
-    ) -> Dict[str, Any]:
+        self, content: str, media_url: str, platforms: list[str] = None
+    ) -> dict[str, Any]:
         """Post content to multiple social platforms."""
         logger.info(f"📱 Posting to platforms: {platforms}")
 
@@ -342,7 +339,7 @@ class OttoAppController:
 
     async def show_analytics(
         self, metric_type: str = "overview", time_period: str = "7d"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Show analytics and performance metrics."""
         logger.info(f"📊 Fetching {metric_type} analytics for {time_period}")
 
@@ -362,7 +359,7 @@ class OttoAppController:
         except Exception as e:
             return {"success": False, "error": str(e), "message": f"❌ Analytics fetch failed: {e}"}
 
-    async def _get_shopify_analytics(self, period: str) -> Dict:
+    async def _get_shopify_analytics(self, period: str) -> dict:
         """Get Shopify sales analytics."""
         if not self.shopify:
             return {"error": "Shopify not configured"}
@@ -376,7 +373,7 @@ class OttoAppController:
         except:
             return {"error": "Failed to fetch"}
 
-    async def _get_social_analytics(self, period: str) -> Dict:
+    async def _get_social_analytics(self, period: str) -> dict:
         """Get social media engagement analytics from session state."""
         try:
             import streamlit as st
@@ -405,7 +402,7 @@ class OttoAppController:
                 "note": "Social analytics require active session",
             }
 
-    async def _get_content_analytics(self, period: str) -> Dict:
+    async def _get_content_analytics(self, period: str) -> dict:
         """Get content performance analytics from session state."""
         try:
             import streamlit as st
@@ -436,8 +433,8 @@ class OttoAppController:
     # ========================================================================
 
     async def setup_automation(
-        self, automation_type: str, schedule: str, config: Dict
-    ) -> Dict[str, Any]:
+        self, automation_type: str, schedule: str, config: dict
+    ) -> dict[str, Any]:
         """Setup automated workflow."""
         logger.info(f"⚙️ Setting up {automation_type} automation")
 
@@ -473,8 +470,8 @@ class OttoAppController:
             }
 
     async def schedule_posts(
-        self, content_list: List[Dict], platforms: List[str], schedule: str = "daily"
-    ) -> Dict[str, Any]:
+        self, content_list: list[dict], platforms: list[str], schedule: str = "daily"
+    ) -> dict[str, Any]:
         """Schedule content posts across platforms."""
         logger.info(f"📅 Scheduling {len(content_list)} posts on {schedule} basis")
 

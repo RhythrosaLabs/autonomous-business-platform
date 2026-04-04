@@ -1,4 +1,4 @@
-from app.tabs.abp_imports_common import Path, datetime, json, logging, setup_logger, st
+from app.tabs.abp_imports_common import Path, datetime, json, setup_logger, st
 
 logger = setup_logger(__name__)
 
@@ -19,7 +19,7 @@ def render_customers_tab():
     def load_mailing_list_main():
         if MAILING_LIST_FILE.exists():
             try:
-                with open(MAILING_LIST_FILE, "r") as f:
+                with open(MAILING_LIST_FILE) as f:
                     return json.load(f)
             except:
                 return {"subscribers": [], "last_sync": None}
@@ -48,7 +48,7 @@ def render_customers_tab():
         # Try Shopify
         shopify_count = 0
         try:
-            from shopify_service import ShopifyAPI
+            from app.services.shopify_service import ShopifyAPI
 
             shopify_svc = ShopifyAPI()
             if shopify_svc.connected:
@@ -94,7 +94,7 @@ def render_customers_tab():
         st.markdown("### 🛒 Sync from Shopify")
 
         try:
-            from shopify_service import ShopifyAPI
+            from app.services.shopify_service import ShopifyAPI
 
             shopify_svc = ShopifyAPI()
 

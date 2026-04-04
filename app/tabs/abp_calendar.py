@@ -7,14 +7,7 @@ from datetime import timedelta
 
 import streamlit as st
 
-from app.services.global_job_queue import JobType, get_global_job_queue
 from app.services.platform_integrations import tracked_replicate_run
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-)
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -34,7 +27,7 @@ try:
 except ImportError:
     PERF_OPTIMIZATIONS_AVAILABLE = False
 
-    def get_replicate_client():
+    def get_replicate_client(api_token=None):
         return None
 
 
@@ -229,13 +222,15 @@ def render_calendar_tab():
                                 "video": "🎥",
                                 "image": "🖼️",
                             }.get(item.get("type", "post"), "📌")
-                            cell_html += f"<div style='font-size: 10px; margin-top: 2px;'>{icon} {item.get('title', 'Untitled')[:15]}</div>"
+                            import html as _html
+
+                            cell_html += f"<div style='font-size: 10px; margin-top: 2px;'>{icon} {_html.escape(item.get('title', 'Untitled')[:15])}</div>"
 
                         cell_html += "</div>"
                         st.markdown(cell_html, unsafe_allow_html=True)
 
                         # Click to view day details
-                        if st.button(f"📋", key=f"day_{day}", use_container_width=True):
+                        if st.button("📋", key=f"day_{day}", use_container_width=True):
                             st.session_state["selected_day"] = cell_date
 
         # Show selected day details
@@ -632,7 +627,7 @@ def render_calendar_tab():
                             st.success("✅ Task completed!")
 
                             # Save as Shortcut option
-                            from shortcut_saver import (
+                            from app.utils.shortcut_saver import (
                                 convert_task_to_steps,
                                 render_save_shortcut_button,
                             )
@@ -826,8 +821,10 @@ Format as a structured schedule with dates and times. Be specific and actionable
                             ai_plan = response if isinstance(response, str) else "".join(response)
 
                             st.markdown("### 📋 Your AI-Generated Content Plan")
+                            import html as _html
+
                             st.markdown(
-                                f'<div class="calendar-ai-suggestion">{ai_plan}</div>',
+                                f'<div class="calendar-ai-suggestion">{_html.escape(ai_plan)}</div>',
                                 unsafe_allow_html=True,
                             )
 
@@ -886,7 +883,9 @@ Format as a structured schedule with dates and times. Be specific and actionable
 
             if st.button("🤖 AI Optimize Schedule", type="primary", use_container_width=True):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = (
+                    get_replicate_client(replicate_token) if replicate_token else None
+                )
                 if replicate_token and replicate_client:
                     with st.spinner("🧠 AI is optimizing your schedule..."):
                         try:
@@ -1049,7 +1048,9 @@ Be specific with times and reasoning."""
                 "🚀 Generate Batch Content Ideas", type="primary", use_container_width=True
             ):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = (
+                    get_replicate_client(replicate_token) if replicate_token else None
+                )
                 if batch_topic and replicate_token and replicate_client:
                     with st.spinner(f"🧠 AI is generating {batch_count} content ideas..."):
                         try:
@@ -1206,7 +1207,9 @@ For each post, provide:
 
             if st.button("Get AI Insights", use_container_width=True):
                 replicate_token = _get_replicate_token()
-                replicate_client = get_replicate_client()
+                replicate_client = (
+                    get_replicate_client(replicate_token) if replicate_token else None
+                )
                 if replicate_token and replicate_client:
                     with st.spinner("Analyzing your patterns..."):
                         try:

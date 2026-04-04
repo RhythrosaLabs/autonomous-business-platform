@@ -14,9 +14,6 @@ Key Features:
 
 from app.services.secure_config import get_api_key
 from app.tabs.abp_imports_common import (
-    Any,
-    Dict,
-    List,
     Optional,
     Path,
     json,
@@ -29,14 +26,14 @@ from app.tabs.abp_imports_common import (
 )
 
 logger = setup_logger(__name__)
-import os
 import traceback
-from dataclasses import asdict, dataclass, field
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from functools import wraps
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -75,15 +72,15 @@ class BackgroundTask:
     current_step: str = ""
     total_steps: int = 0
     completed_steps: int = 0
-    result: Optional[Dict] = None
+    result: Optional[dict] = None
     error: Optional[str] = None
     started_at: Optional[str] = None
     completed_at: Optional[str] = None
-    logs: List[str] = field(default_factory=list)
-    artifacts: List[Dict] = field(default_factory=list)
-    metadata: Dict = field(default_factory=dict)
+    logs: list[str] = field(default_factory=list)
+    artifacts: list[dict] = field(default_factory=list)
+    metadata: dict = field(default_factory=dict)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "id": self.id,
             "name": self.name,
@@ -103,7 +100,7 @@ class BackgroundTask:
         }
 
     @classmethod
-    def from_dict(cls, data: Dict) -> "BackgroundTask":
+    def from_dict(cls, data: dict) -> "BackgroundTask":
         state = data.get("state", "pending")
         if isinstance(state, str):
             state = TaskState(state)
@@ -204,9 +201,9 @@ class BackgroundTaskManager:
             return
 
         self._initialized = True
-        self._tasks: Dict[str, BackgroundTask] = {}
-        self._threads: Dict[str, threading.Thread] = {}
-        self._stop_flags: Dict[str, threading.Event] = {}
+        self._tasks: dict[str, BackgroundTask] = {}
+        self._threads: dict[str, threading.Thread] = {}
+        self._stop_flags: dict[str, threading.Event] = {}
         self._state_lock = threading.Lock()
 
         # Load persisted state
@@ -217,7 +214,7 @@ class BackgroundTaskManager:
         """Load task state from disk."""
         try:
             if TASK_STATE_FILE.exists():
-                with open(TASK_STATE_FILE, "r") as f:
+                with open(TASK_STATE_FILE) as f:
                     data = json.load(f)
                 for task_data in data.get("tasks", []):
                     task = BackgroundTask.from_dict(task_data)
@@ -256,7 +253,7 @@ class BackgroundTaskManager:
             logger.warning(f"Could not save task state: {e}")
 
     def create_task(
-        self, name: str, description: str = "", metadata: Dict = None
+        self, name: str, description: str = "", metadata: dict = None
     ) -> BackgroundTask:
         """Create a new background task."""
         task_id = str(uuid.uuid4())[:8]
@@ -402,11 +399,11 @@ class BackgroundTaskManager:
         """Get a task by ID."""
         return self._tasks.get(task_id)
 
-    def get_all_tasks(self) -> List[BackgroundTask]:
+    def get_all_tasks(self) -> list[BackgroundTask]:
         """Get all tasks."""
         return list(self._tasks.values())
 
-    def get_running_tasks(self) -> List[BackgroundTask]:
+    def get_running_tasks(self) -> list[BackgroundTask]:
         """Get all currently running tasks."""
         running = [t for t in self._tasks.values() if t.state == TaskState.RUNNING]
 
@@ -464,7 +461,7 @@ class BackgroundTaskManager:
         def manual_retry_task(
             self,
             task_id: str,
-            override_kwargs: Dict = None,
+            override_kwargs: dict = None,
             reset_attempts: bool = False,
             max_attempts: Optional[int] = None,
         ):
@@ -535,6 +532,34 @@ class BackgroundTaskManager:
                 task.total_steps = total_steps
             self._save_state()
 
+    def update_task(self, task_id: str, **kwargs):
+        """Update arbitrary task fields (status, progress, result, error, current_step)."""
+        task = self._tasks.get(task_id)
+        if not task:
+            return
+        status = kwargs.get("status")
+        if status:
+            state_map = {
+                "running": TaskState.RUNNING,
+                "completed": TaskState.COMPLETED,
+                "failed": TaskState.FAILED,
+                "pending": TaskState.PENDING,
+            }
+            task.state = state_map.get(status, task.state)
+            if status == "completed":
+                task.completed_at = datetime.now().isoformat()
+        if "progress" in kwargs:
+            task.progress = min(1.0, max(0.0, kwargs["progress"]))
+        if "current_step" in kwargs:
+            task.current_step = str(kwargs["current_step"])
+        if "result" in kwargs:
+            task.result = kwargs["result"]
+        if "error" in kwargs:
+            task.error = kwargs["error"]
+            if not status:
+                task.state = TaskState.FAILED
+        self._save_state()
+
     def add_task_log(self, task_id: str, message: str):
         """Add a log message to a task."""
         task = self._tasks.get(task_id)
@@ -546,7 +571,7 @@ class BackgroundTaskManager:
                 task.logs = task.logs[-100:]
             self._save_state()
 
-    def add_task_artifact(self, task_id: str, artifact: Dict):
+    def add_task_artifact(self, task_id: str, artifact: dict):
         """Add an artifact to a task."""
         task = self._tasks.get(task_id)
         if task:
@@ -662,7 +687,7 @@ def render_task_monitor_page():
                     st.code(log_text, language=None)
 
                 # Stop button
-                if st.button(f"🛑 Stop", key=f"stop_{task.id}"):
+                if st.button("🛑 Stop", key=f"stop_{task.id}"):
                     manager.stop_task(task.id)
                     st.rerun()
 
@@ -701,14 +726,14 @@ def render_task_monitor_page():
                             task.metadata.get("background_kwargs", {}) if task.metadata else {}
                         )
                         kwargs_text = st.text_area(
-                            f"Override kwargs (JSON)",
+                            "Override kwargs (JSON)",
                             value=json.dumps(existing_kwargs, indent=2),
                             height=120,
                             key=f"kwargs_{task.id}",
                         )
                     except Exception:
                         kwargs_text = st.text_area(
-                            f"Override kwargs (JSON)",
+                            "Override kwargs (JSON)",
                             value="{}",
                             height=120,
                             key=f"kwargs_{task.id}",
@@ -755,7 +780,7 @@ def run_campaign_in_background(
     task: BackgroundTask,
     stop_flag: threading.Event,
     update_callback: Callable,
-    campaign_config: Dict,
+    campaign_config: dict,
 ):
     """
     Run campaign generation as a background task.
@@ -846,7 +871,7 @@ def run_campaign_in_background(
         check_cancelled()
 
         # Create campaign directory
-        from app.services.platform_helpers import _slugify, create_campaign_directory
+        from app.services.platform_helpers import create_campaign_directory
 
         campaign_dir = create_campaign_directory(concept_input)
         log(f"📁 Campaign directory: {campaign_dir}")
@@ -873,7 +898,7 @@ def run_campaign_in_background(
                 candidate_path = campaign_dir / candidate
                 if candidate_path.exists():
                     try:
-                        with open(candidate_path, "r") as f:
+                        with open(candidate_path) as f:
                             loaded = json.load(f)
                         # loaded may be a dict containing 'products' or a list of products
                         if isinstance(loaded, dict) and "products" in loaded:
@@ -920,12 +945,12 @@ def run_campaign_in_background(
                 concept_path = campaign_dir / "campaign_concept.txt"
                 with open(concept_path, "w") as f:
                     f.write(concept)
-                log(f"   📄 Saved: campaign_concept.txt")
+                log("   📄 Saved: campaign_concept.txt")
 
                 analyzed_path = campaign_dir / "analyzed_concept.txt"
                 with open(analyzed_path, "w") as f:
                     f.write(analyzed_concept)
-                log(f"   📄 Saved: analyzed_concept.txt")
+                log("   📄 Saved: analyzed_concept.txt")
 
             except Exception as e:
                 log(f"⚠️ Campaign plan error: {e}")
@@ -1127,7 +1152,7 @@ def run_campaign_in_background(
                     results["social_posts"].append(
                         {"content": social_text, "path": str(social_path)}
                     )
-                    log(f"✅ Social media content generated")
+                    log("✅ Social media content generated")
 
             except Exception as e:
                 log(f"⚠️ Social media error: {e}")
@@ -1152,13 +1177,13 @@ def run_campaign_in_background(
         with open(summary_path, "w") as f:
             json.dump(summary, f, indent=2)
 
-        log(f"📊 Campaign Summary:")
+        log("📊 Campaign Summary:")
         log(f"   Products: {summary['products_generated']}")
         log(f"   Blog: {'Yes' if summary['blog_generated'] else 'No'}")
         log(f"   Social: {'Yes' if summary['social_generated'] else 'No'}")
 
         progress(1.0, "Campaign complete!", 10, 10)
-        log(f"🎉 Campaign generation complete!")
+        log("🎉 Campaign generation complete!")
         log(f"📁 Files saved to: {campaign_dir}")
 
         return {
@@ -1185,7 +1210,7 @@ def _dummy_recovery_task(**kwargs):
     return {"recovered": True, "kwargs": kwargs}
 
 
-def start_background_campaign(campaign_config: Dict) -> str:
+def start_background_campaign(campaign_config: dict) -> str:
     """
     Start a campaign generation task in the background.
     Returns the task ID for tracking.

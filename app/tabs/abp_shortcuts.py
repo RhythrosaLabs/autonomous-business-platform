@@ -1,6 +1,4 @@
-import asyncio
 import logging
-import os
 from datetime import datetime as dt
 
 import streamlit as st
@@ -63,7 +61,7 @@ async def execute_shortcut_in_background(task_id, shortcut):
     """
     try:
         from app.services.api_service import ReplicateAPI
-        from app.services.background_task_manager import BackgroundTaskManager
+        from app.services.background_tasks import BackgroundTaskManager
         from app.services.otto_engine import get_slash_processor
 
         task_mgr = BackgroundTaskManager()
@@ -185,11 +183,11 @@ async def execute_shortcut_in_background(task_id, shortcut):
     except Exception as e:
         logger.error(f"Background execution error: {e}")
         try:
-            from app.services.background_task_manager import BackgroundTaskManager
+            from app.services.background_tasks import BackgroundTaskManager
 
             task_mgr = BackgroundTaskManager()
             task_mgr.update_task(task_id, status="failed", error=str(e))
-        except:
+        except Exception:
             pass
 
 
@@ -812,12 +810,14 @@ Now analyze the request above and provide the steps:"""
                                 gradient, gradient_styles["Purple Aurora"]
                             )
 
+                            import html as _html
+
                             st.markdown(
                                 f"""
                             <div style="border: none; border-radius: 12px; padding: 15px; margin-bottom: 10px; background: {bg_gradient}; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                                <h4 style="margin: 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">{shortcut['icon']} {shortcut['name']}</h4>
-                                <p style="font-size: 0.85em; color: rgba(255,255,255,0.9); margin: 5px 0;">{shortcut['description'][:80]}{'...' if len(shortcut['description']) > 80 else ''}</p>
-                                <p style="font-size: 0.75em; color: rgba(255,255,255,0.7);">📊 Run {shortcut['run_count']} times • {len(shortcut['steps'])} steps{' • ⌨️ ' + shortcut.get('hotkey', '') if shortcut.get('hotkey') else ''}</p>
+                                <h4 style="margin: 0; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">{_html.escape(shortcut['icon'])} {_html.escape(shortcut['name'])}</h4>
+                                <p style="font-size: 0.85em; color: rgba(255,255,255,0.9); margin: 5px 0;">{_html.escape(shortcut['description'][:80])}{'...' if len(shortcut['description']) > 80 else ''}</p>
+                                <p style="font-size: 0.75em; color: rgba(255,255,255,0.7);">📊 Run {shortcut['run_count']} times • {len(shortcut['steps'])} steps{' • ⌨️ ' + _html.escape(shortcut.get('hotkey', '')) if shortcut.get('hotkey') else ''}</p>
                             </div>
                             """,
                                 unsafe_allow_html=True,
@@ -826,7 +826,7 @@ Now analyze the request above and provide the steps:"""
                             col_run, col_edit, col_sidebar, col_del = st.columns([2, 1, 1, 1])
                             with col_run:
                                 run_clicked = st.button(
-                                    f"▶️ Run",
+                                    "▶️ Run",
                                     key=f"my_shortcuts_run_{shortcut['id']}",
                                     use_container_width=True,
                                     type="primary",
@@ -1282,13 +1282,13 @@ Now analyze the request above and provide the steps:"""
                                                             """,
                                                                 unsafe_allow_html=True,
                                                             )
-                                                    except Exception as e:
+                                                    except Exception:
                                                         results.append(
                                                             {"step": step_name, "status": "pending"}
                                                         )
                                                         with step_cols[col_idx]:
                                                             st.markdown(
-                                                                f"""
+                                                                """
                                                             <div style="
                                                                 padding: 15px;
                                                                 border-radius: 10px;
@@ -1312,7 +1312,7 @@ Now analyze the request above and provide the steps:"""
 
                                                     with step_cols[col_idx]:
                                                         st.markdown(
-                                                            f"""
+                                                            """
                                                         <div style="
                                                             padding: 15px;
                                                             border-radius: 8px;
@@ -1387,7 +1387,7 @@ Now analyze the request above and provide the steps:"""
                                                             )
                                                             with step_cols[col_idx]:
                                                                 st.markdown(
-                                                                    f"""
+                                                                    """
                                                                 <div style="
                                                                     padding: 15px;
                                                                     border-radius: 8px;
@@ -1412,7 +1412,7 @@ Now analyze the request above and provide the steps:"""
                                                         )
                                                         with step_cols[col_idx]:
                                                             st.markdown(
-                                                                f"""
+                                                                """
                                                             <div style="
                                                                     padding: 15px;
                                                                     border-radius: 8px;

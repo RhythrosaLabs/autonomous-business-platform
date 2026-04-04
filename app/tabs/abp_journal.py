@@ -1,4 +1,4 @@
-from app.tabs.abp_imports_common import datetime, json, logging, setup_logger, st, timedelta, uuid
+from app.tabs.abp_imports_common import datetime, json, setup_logger, st, timedelta, uuid
 
 # Maintain backward compatibility alias
 dt = datetime
@@ -261,10 +261,12 @@ Respond in JSON format:
                             )
                             result = "".join(response) if isinstance(response, list) else response
                             import html as _html
+
                             sanitized_result = _html.escape(str(result))
                             st.markdown("**AI Result:**")
                             st.markdown(
-                                f'<div class="ai-suggestion">{sanitized_result}</div>', unsafe_allow_html=True
+                                f'<div class="ai-suggestion">{sanitized_result}</div>',
+                                unsafe_allow_html=True,
                             )
                         except Exception as e:
                             st.error(f"Error: {e}")
@@ -488,9 +490,11 @@ Be specific and actionable."""
                             )
                             result = "".join(response) if isinstance(response, list) else response
                             import html as _html
+
                             sanitized_result = _html.escape(str(result))
                             st.markdown(
-                                f'<div class="ai-suggestion">{sanitized_result}</div>', unsafe_allow_html=True
+                                f'<div class="ai-suggestion">{sanitized_result}</div>',
+                                unsafe_allow_html=True,
                             )
                         except Exception as e:
                             st.error(f"Error: {e}")
@@ -686,8 +690,10 @@ Keep it warm, supportive, and under 200 words."""
                                 )
 
                                 st.markdown("### 🤖 AI Reflection")
+                                import html as _html
+
                                 st.markdown(
-                                    f'<div class="ai-suggestion">{reflection}</div>',
+                                    f'<div class="ai-suggestion">{_html.escape(reflection)}</div>',
                                     unsafe_allow_html=True,
                                 )
                             except Exception as e:
@@ -892,8 +898,11 @@ Format as a numbered list with clear, actionable items."""
                     style = (
                         "text-decoration: line-through; color: gray;" if task.get("done") else ""
                     )
+                    import html as _html
+
                     st.markdown(
-                        f"<span style='{style}'>{task['text']}</span>", unsafe_allow_html=True
+                        f"<span style='{style}'>{_html.escape(task['text'])}</span>",
+                        unsafe_allow_html=True,
                     )
                 with col_del:
                     if st.button("×", key=f"del_task_{task['id']}"):

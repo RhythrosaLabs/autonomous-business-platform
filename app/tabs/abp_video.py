@@ -1,26 +1,12 @@
 import logging
-import os
-import re
 from pathlib import Path
 
 import requests
 import streamlit as st
 
-from app.services.global_job_queue import JobType, get_global_job_queue
-from app.services.platform_helpers import _get_replicate_token, is_streamlit_cloud
+from app.services.platform_helpers import _get_replicate_token
 from app.services.platform_integrations import tracked_replicate_run
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-    submit_batch_videos,
-    submit_video_generation_job,
-)
-from app.services.youtube_upload_service import YouTubeUploadService
 from app.utils.cross_page_state import restore_page_to_session
-from app.utils.performance_optimizations import get_replicate_client
-from app.utils.ray_integration_helpers import get_ray_manager_if_enabled, is_ray_enabled
 from modules.video_generation import generate_ken_burns_video
 
 logger = logging.getLogger(__name__)
@@ -59,7 +45,7 @@ def render_video_producer_tab():
         col1, col2 = st.columns(2)
         with col1:
             if replicate_api_key:
-                st.success(f"✅ Replicate API configured (from .env)")
+                st.success("✅ Replicate API configured (from .env)")
             product_name = st.text_input(
                 "Product Name",
                 placeholder="e.g., 'EcoClean Detergent' or 'SmartFit Watch'",
@@ -546,7 +532,7 @@ def render_video_producer_tab():
                 for i, seg in enumerate(script_segments, 1):
                     st.write(f"**Segment {i}:** {seg}")
 
-            with open(script_path, "r") as f:
+            with open(script_path) as f:
                 st.download_button(
                     "📜 Download Script",
                     f.read(),
@@ -821,10 +807,10 @@ def render_video_producer_tab():
                     error_str = str(e)
                     if "429" in error_str or "throttled" in error_str.lower():
                         st.error(
-                            f"⏳ **Rate Limit Reached** - Your Replicate account has limited credits (< $5)"
+                            "⏳ **Rate Limit Reached** - Your Replicate account has limited credits (< $5)"
                         )
                         st.info(
-                            f"💡 **To continue:**\n- Wait 10-15 seconds\n- Click 'Generate Commercial' again\n- OR reduce number of segments\n- OR add more credits to your Replicate account"
+                            "💡 **To continue:**\n- Wait 10-15 seconds\n- Click 'Generate Commercial' again\n- OR reduce number of segments\n- OR add more credits to your Replicate account"
                         )
                     else:
                         st.error(f"Failed to generate segment {i+1}: {e}")
@@ -889,7 +875,7 @@ def render_video_producer_tab():
                     narrated_video_paths = []
 
                     for seg_idx, (video_path, script_segment) in enumerate(
-                        zip(temp_video_paths, script_segments)
+                        zip(temp_video_paths, script_segments, strict=False)
                     ):
                         st.info(f"🎙️ Narrating segment {seg_idx + 1}/{len(script_segments)}")
 
@@ -1119,26 +1105,11 @@ def render_video_producer_tab():
                                 key="download_final_commercial",
                             )
 
-                    except Exception as concat_error:
-                        st.error(f"Video concatenation failed: {concat_error}")
-                        # Clean up clips if they exist
-                        if "final_clip" in locals():
-                            try:
-                                final_clip.close()
-                            except Exception:
-                                pass
-                        if "clips" in locals():
-                            for clip in clips:
-                                try:
-                                    clip.close()
-                                except Exception:
-                                    pass
-
                         # YouTube Auto-Upload
                         if auto_publish_youtube:
                             st.info("📺 Uploading to YouTube...")
                             try:
-                                from youtube_upload_service import YouTubeUploadService
+                                from app.services.youtube_upload_service import YouTubeUploadService
 
                                 # Initialize YouTube service
                                 yt_service = YouTubeUploadService()
@@ -1168,7 +1139,7 @@ def render_video_producer_tab():
 
                                     if result and result.get("video_id"):
                                         video_id = result["video_id"]
-                                        st.success(f"✅ Uploaded to YouTube!")
+                                        st.success("✅ Uploaded to YouTube!")
                                         st.markdown(
                                             f"🎥 **Watch:** https://youtube.com/watch?v={video_id}"
                                         )
@@ -1184,8 +1155,21 @@ def render_video_producer_tab():
                                 st.info(
                                     "💡 Run `python setup_youtube.py` to authenticate YouTube API"
                                 )
-                    else:
-                        st.warning("No valid video clips to concatenate.")
+
+                    except Exception as concat_error:
+                        st.error(f"Video concatenation failed: {concat_error}")
+                        # Clean up clips if they exist
+                        if "final_clip" in locals():
+                            try:
+                                final_clip.close()
+                            except Exception:
+                                pass
+                        if "clips" in locals():
+                            for clip in clips:
+                                try:
+                                    clip.close()
+                                except Exception:
+                                    pass
 
                 except Exception as e:
                     st.error(f"Video concatenation failed: {e}")

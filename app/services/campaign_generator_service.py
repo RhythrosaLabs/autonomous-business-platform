@@ -9,14 +9,11 @@ Implements sophisticated multi-step workflow from magic-marketer with:
 - Partial success tracking
 """
 
-import json
 import logging
-import os
 import zipfile
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 import pandas as pd
 
@@ -105,7 +102,7 @@ class EnhancedCampaignGenerator:
                 except Exception as e:
                     error_msg = str(e).lower()
                     if "timeout" in error_msg or "timed out" in error_msg:
-                        logger.warning(f"⚠️ Primary model timed out, falling back to fast model...")
+                        logger.warning("⚠️ Primary model timed out, falling back to fast model...")
                         return self.replicate_api.generate_text_fast(
                             prompt, max_tokens=max_tokens, temperature=temperature
                         )
@@ -179,8 +176,8 @@ Return structured analysis followed by the enhanced content."""
         logger.info(f"Saved '{filename}' to storage")
 
     def generate_campaign_concept(
-        self, product_description: str, target_audience: str, budget: str, platforms: List[str]
-    ) -> Tuple[str, str]:
+        self, product_description: str, target_audience: str, budget: str, platforms: list[str]
+    ) -> tuple[str, str]:
         """
         Step 1: Generate and analyze DESIGN THEME campaign concept
 
@@ -230,8 +227,8 @@ Make it compelling for dropshipping print-on-demand merch."""
         return concept, analyzed_concept
 
     def generate_marketing_plan(
-        self, product_description: str, budget: str, platforms: List[str]
-    ) -> Tuple[str, str]:
+        self, product_description: str, budget: str, platforms: list[str]
+    ) -> tuple[str, str]:
         """
         Step 2: Generate and analyze detailed marketing plan
 
@@ -361,7 +358,7 @@ Be specific and tactical."""
         return excel_bytes
 
     def generate_social_media_schedule(
-        self, campaign_concept: str, platforms: List[str], duration_weeks: int = 4
+        self, campaign_concept: str, platforms: list[str], duration_weeks: int = 4
     ) -> bytes:
         """
         Step 4: Generate detailed social media posting schedule
@@ -455,7 +452,7 @@ Be specific and tactical."""
 
     def generate_resources_and_tips(
         self, product_description: str, target_audience: str
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         """
         Step 8: Generate campaign resources and optimization tips
 
@@ -500,8 +497,8 @@ Focus on print-on-demand dropshipping, NOT manufacturing or product development.
         return resources, analyzed_resources
 
     def generate_campaign_recap(
-        self, product_description: str, budget: str, platforms: List[str]
-    ) -> Tuple[str, str]:
+        self, product_description: str, budget: str, platforms: list[str]
+    ) -> tuple[str, str]:
         """
         Step 9: Generate comprehensive campaign recap/summary
 
@@ -593,7 +590,7 @@ Focus on DESIGN COLLECTION results for dropshipping merch, not product launches.
                 content = self.file_storage[filename]
                 if isinstance(content, bytes):
                     master_doc += f"[Binary file: {filename}]\n"
-                    master_doc += f"See attached spreadsheet for details.\n"
+                    master_doc += "See attached spreadsheet for details.\n"
                 else:
                     master_doc += content + "\n"
             else:
@@ -643,12 +640,12 @@ Focus on DESIGN COLLECTION results for dropshipping merch, not product launches.
         product_description: str,
         target_audience: str,
         budget: float,
-        platforms: List[str],
+        platforms: list[str],
         campaign_dir: Path,
         generate_images: bool = False,
         generate_audio: bool = False,
         generate_video: bool = False,
-    ) -> Dict:
+    ) -> dict:
         """
         Execute complete 12-step campaign generation workflow
 
@@ -793,12 +790,12 @@ Key Patterns from Magic-Marketer:
 - Professional ZIP packaging
 
 Usage:
-    from campaign_generator_service import EnhancedCampaignGenerator
-    from api_service import ReplicateAPI
-    
+    from app.services.campaign_generator_service import EnhancedCampaignGenerator
+    from app.services.api_service import ReplicateAPI
+
     api = ReplicateAPI(token)
     generator = EnhancedCampaignGenerator(api)
-    
+
     results = generator.generate_complete_campaign(
         product_description="EcoFlow Water Bottle",
         target_audience="Fitness Enthusiasts",

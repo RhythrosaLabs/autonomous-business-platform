@@ -6,9 +6,10 @@ Caching, parallelization, and background job management
 import asyncio
 import logging
 import time
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
-from typing import Any, Callable, List
+from typing import Any
 
 import streamlit as st
 
@@ -43,7 +44,7 @@ def get_shopify_api(shop_url: str, access_token: str):
     """Cached Shopify API client"""
     if not shop_url or not access_token:
         return None
-    from shopify_service import ShopifyAPI
+    from app.services.shopify_service import ShopifyAPI
 
     return ShopifyAPI(shop_url, access_token)
 
@@ -51,7 +52,7 @@ def get_shopify_api(shop_url: str, access_token: str):
 @st.cache_resource(show_spinner=False)
 def get_youtube_service():
     """Cached YouTube service"""
-    from youtube_upload_service import YouTubeUploadService
+    from app.services.youtube_upload_service import YouTubeUploadService
 
     return YouTubeUploadService()
 
@@ -112,12 +113,12 @@ def retry_on_failure(max_retries=3, delay=1, exponential_backoff=True):
 # ============================================
 
 
-async def run_parallel_async(tasks: List[Callable]):
+async def run_parallel_async(tasks: list[Callable]):
     """Run multiple async tasks in parallel"""
     return await asyncio.gather(*tasks, return_exceptions=True)
 
 
-def run_parallel_sync(funcs: List[Callable], *args_list) -> List[Any]:
+def run_parallel_sync(funcs: list[Callable], *args_list) -> list[Any]:
     """
     Run multiple synchronous functions in parallel using ThreadPoolExecutor
 
@@ -129,7 +130,7 @@ def run_parallel_sync(funcs: List[Callable], *args_list) -> List[Any]:
         List of results (same order as input)
     """
     futures = []
-    for func, args in zip(funcs, args_list):
+    for func, args in zip(funcs, args_list, strict=False):
         future = executor.submit(func, *args)
         futures.append(future)
 

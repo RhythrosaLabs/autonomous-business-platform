@@ -1,26 +1,15 @@
 import json
 
-from app.tabs.abp_imports_common import datetime, json, logging, os, setup_logger, st
+from app.tabs.abp_imports_common import datetime, json, os, setup_logger, st
 
 # Maintain backward compatibility alias
 dt = datetime
 logger = setup_logger(__name__)
 
-from app.services.global_job_queue import JobType, get_global_job_queue
-from app.services.platform_integrations import tracked_replicate_run
 from app.services.secure_config import get_api_key
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-    submit_workflow_job,
-    wait_for_all_jobs,
-)
-from app.utils.ray_integration_helpers import get_ray_manager_if_enabled, is_ray_enabled
 
 try:
-    from playground_models import (
+    from app.services.playground_models import (
         EDITING_MODELS,
         IMAGE_MODELS,
         MARKETING_MODELS,
@@ -510,7 +499,7 @@ def render_custom_workflows_tab():
                             # Define the task function
                             def run_workflow_async(task, stop_flag, update_callback):
                                 try:
-                                    from ultra_smart_executor import UltraSmartExecutor
+                                    from app.services.ultra_smart_executor import UltraSmartExecutor
 
                                     executor = UltraSmartExecutor()
 
@@ -584,7 +573,7 @@ def render_custom_workflows_tab():
                         # Execute in foreground with progress display
                         try:
                             # Use Ultra Smart Executor for maximum intelligence
-                            from ultra_smart_executor import (
+                            from app.services.ultra_smart_executor import (
                                 StepStatus,
                                 UltraSmartExecutor,
                                 get_execution_summary,
@@ -743,7 +732,7 @@ def render_custom_workflows_tab():
 
                                 # Save as Shortcut button
                                 st.markdown("---")
-                                from shortcut_saver import (
+                                from app.utils.shortcut_saver import (
                                     convert_workflow_to_steps,
                                     render_save_shortcut_button,
                                 )
@@ -848,7 +837,7 @@ def render_custom_workflows_tab():
 
         # Import and display workflow templates
         try:
-            from workflow_templates import WORKFLOW_TEMPLATES, WorkflowTemplateManager
+            from app.utils.workflow_templates import WORKFLOW_TEMPLATES, WorkflowTemplateManager
 
             template_manager = WorkflowTemplateManager()
 
@@ -1182,7 +1171,7 @@ def render_custom_workflows_tab():
                                         ].items():
                                             if param_config["type"] == "file":
                                                 model_input[param_name] = previous_output
-                                                st.write(f"📥 Using output from previous step")
+                                                st.write("📥 Using output from previous step")
                                                 break
 
                                     # Handle seed = 0
@@ -1273,7 +1262,7 @@ def render_custom_workflows_tab():
                     1. Image Generation (Flux)
                     2. 3D Generation (Hunyuan 3D)
                     3. Video Generation (Kling v2.5)
-                    
+
                     *Use case: Product visualization*
                     """
                     )
@@ -1285,7 +1274,7 @@ def render_custom_workflows_tab():
                     1. Image Generation (SDXL)
                     2. Music Generation (MusicGen)
                     3. Video Generation (Pixverse)
-                    
+
                     *Use case: Social media content*
                     """
                     )
@@ -1298,7 +1287,7 @@ def render_custom_workflows_tab():
                     1. Image Generation (Imagen)
                     2. Speech Synthesis (Minimax)
                     3. Video Generation (Veo 3)
-                    
+
                     *Use case: Explainer videos*
                     """
                     )
@@ -1310,7 +1299,7 @@ def render_custom_workflows_tab():
                     1. Image Editing (Flux Editing)
                     2. Ads & Marketing (Ad Products)
                     3. Music Generation (Stable Audio)
-                    
+
                     *Use case: Product marketing*
                     """
                     )
@@ -1367,13 +1356,19 @@ def render_custom_workflows_tab():
 
         # Use enhanced converter
         try:
-            from enhanced_workflow_converter import EnhancedUniversalConverter, WorkflowPlatform
-            from enhanced_workflow_converter import analyze_workflow as enhanced_analyze
-            from enhanced_workflow_converter import convert_any_workflow, detect_workflow_platform
+            from app.utils.enhanced_workflow_converter import (
+                EnhancedUniversalConverter,
+                WorkflowPlatform,
+            )
+            from app.utils.enhanced_workflow_converter import analyze_workflow as enhanced_analyze
+            from app.utils.enhanced_workflow_converter import (
+                convert_any_workflow,
+                detect_workflow_platform,
+            )
 
             USE_ENHANCED = True
         except ImportError:
-            from workflow_converter import SUPPORTED_PLATFORMS, analyze_workflow, convert_workflow
+            from app.utils.workflow_converter import analyze_workflow, convert_workflow
 
             USE_ENHANCED = False
 
@@ -1451,7 +1446,7 @@ def render_custom_workflows_tab():
         - **Semantic understanding** of workflow intent
         - **Intelligent mapping** to equivalent capabilities
         - **Multi-level fallbacks** for unsupported features
-        
+
         📌 **Steps:**
         1. Export your workflow from any supported platform
         2. Upload the JSON/YAML file or paste content below
@@ -1604,7 +1599,7 @@ def render_custom_workflows_tab():
                                     "prompts": analysis.prompts,
                                 }
                             else:
-                                from workflow_converter import convert_workflow
+                                from app.utils.workflow_converter import convert_workflow
 
                                 converted, info = convert_workflow(workflow_content)
                             st.session_state.workflow_converted = converted
@@ -1708,7 +1703,10 @@ def render_custom_workflows_tab():
 
             with st.spinner("Analyzing required models..."):
                 try:
-                    from comfyui_model_manager import ComfyUIModelManager, analyze_comfyui_models
+                    from app.services.comfyui_model_manager import (
+                        ComfyUIModelManager,
+                        analyze_comfyui_models,
+                    )
 
                     workflow_raw = st.session_state.get("workflow_raw", {})
                     model_analysis = analyze_comfyui_models(workflow_raw)
@@ -1881,7 +1879,7 @@ def render_custom_workflows_tab():
                     ):
                         with st.spinner("Running workflow remotely..."):
                             try:
-                                from comfyui_model_manager import (
+                                from app.services.comfyui_model_manager import (
                                     ComfyUIExecutor,
                                     ComfyUIModelManager,
                                 )
@@ -1952,7 +1950,7 @@ def render_custom_workflows_tab():
 
                             with st.spinner("Running workflow on local ComfyUI..."):
                                 try:
-                                    from comfyui_model_manager import (
+                                    from app.services.comfyui_model_manager import (
                                         ComfyUIExecutor,
                                         ComfyUIModelManager,
                                     )
@@ -2341,7 +2339,7 @@ def render_custom_workflows_tab():
                                 ):
                                     try:
                                         with st.spinner(
-                                            f"🎬 Generating video... This may take 1-3 minutes"
+                                            "🎬 Generating video... This may take 1-3 minutes"
                                         ):
                                             replicate_token = (
                                                 get_api_key("REPLICATE_API_TOKEN", "Replicate")

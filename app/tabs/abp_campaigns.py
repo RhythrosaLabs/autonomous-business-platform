@@ -1,6 +1,6 @@
 import time
 
-from app.tabs.abp_imports_common import Path, datetime, json, os, requests, setup_logger, st
+from app.tabs.abp_imports_common import Path, datetime, os, setup_logger, st
 
 # Maintain backward compatibility alias
 dt = datetime
@@ -9,13 +9,7 @@ logger = setup_logger(__name__)
 from app.services.global_job_queue import JobType, get_global_job_queue
 from app.services.platform_helpers import _get_replicate_token
 from app.services.platform_integrations import tracked_replicate_run
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-    submit_batch_product_designs,
-)
+from app.services.tab_job_helpers import are_all_jobs_done, check_jobs_progress, collect_job_results
 
 # Import reliability utilities
 try:
@@ -240,12 +234,12 @@ Format: Just the 5 headlines, numbered."""
                             "❌ REPLICATE_API_TOKEN not found. Please set it in your environment or Settings."
                         )
                         st.stop()
-                    from api_service import ReplicateAPI
+                    from app.services.api_service import ReplicateAPI
 
                     st.session_state.replicate_api = ReplicateAPI(replicate_token)
 
                 # Create generator with fast_mode option
-                from campaign_generator_service import EnhancedCampaignGenerator
+                from app.services.campaign_generator_service import EnhancedCampaignGenerator
 
                 generator = EnhancedCampaignGenerator(
                     replicate_api=st.session_state.replicate_api, skip_enhancement=fast_mode

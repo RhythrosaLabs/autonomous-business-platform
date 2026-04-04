@@ -9,10 +9,10 @@ import os
 import random
 import re
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 from app.services.secure_config import get_api_key
-from app.utils.youtube_helper import YOUTUBE_CATEGORIES, get_youtube_service, upload_to_youtube
+from app.utils.youtube_helper import get_youtube_service, upload_to_youtube
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -103,7 +103,7 @@ class YouTubeUploadService:
             self.is_authenticated = False
             return False
 
-    def check_credentials(self) -> Dict[str, any]:
+    def check_credentials(self) -> dict[str, any]:
         """
         Check YouTube credentials status
 
@@ -161,7 +161,7 @@ class YouTubeUploadService:
         ad_tone: Optional[str] = None,
         product_category: Optional[str] = None,
         use_viral_title: bool = True,
-    ) -> Dict[str, any]:
+    ) -> dict[str, any]:
         """
         Generate optimized YouTube metadata for maximum virality and exposure using AI
 
@@ -377,10 +377,10 @@ DESCRIPTION: [your description here]"""
         self,
         video_path: str,
         product_name: str,
-        metadata: Optional[Dict] = None,
+        metadata: Optional[dict] = None,
         thumbnail_path: Optional[str] = None,
         **kwargs,
-    ) -> Optional[Dict]:
+    ) -> Optional[dict]:
         """
         Upload commercial video to YouTube
 
@@ -464,7 +464,7 @@ DESCRIPTION: [your description here]"""
             logger.error(f"❌ Thumbnail creation failed: {e}")
             return None
 
-    def get_upload_history(self, limit: int = 10) -> List[Dict]:
+    def get_upload_history(self, limit: int = 10) -> list[dict]:
         """
         Get recent video uploads from authenticated channel
 
@@ -532,7 +532,7 @@ def quick_upload(
     video_path: str,
     title: str,
     description: str = "",
-    tags: List[str] = None,
+    tags: list[str] = None,
     privacy: str = "unlisted",
     create_thumbnail: bool = True,
 ) -> Optional[str]:
@@ -582,14 +582,14 @@ Setup Instructions:
 5. Token saved to 'token.pickle' for future use
 
 Example usage:
-    from youtube_upload_service import YouTubeUploadService
-    
+    from app.services.youtube_upload_service import YouTubeUploadService
+
     uploader = YouTubeUploadService()
-    
+
     # Check credentials
     status = uploader.check_credentials()
     print(status)
-    
+
     # Upload video
     result = uploader.upload_commercial(
         video_path="commercial.mp4",
@@ -598,7 +598,7 @@ Example usage:
         target_audience="Fitness Enthusiasts",
         ad_tone="Exciting & Energetic"
     )
-    
+
     if result:
         print(f"Uploaded: {result['url']}")
 """

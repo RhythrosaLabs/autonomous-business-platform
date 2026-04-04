@@ -39,7 +39,6 @@ This is the core brain of Otto Mate.
 
 from app.tabs.abp_imports_common import (
     Any,
-    BytesIO,
     Callable,
     Dict,
     Enum,
@@ -48,7 +47,6 @@ from app.tabs.abp_imports_common import (
     Path,
     ThreadPoolExecutor,
     Tuple,
-    Union,
     asyncio,
     base64,
     dataclass,
@@ -56,23 +54,19 @@ from app.tabs.abp_imports_common import (
     field,
     hashlib,
     json,
-    logging,
-    lru_cache,
     os,
-    pickle,
     re,
     setup_logger,
     st,
-    tempfile,
     time,
     uuid,
 )
 
 logger = setup_logger(__name__)
 
+from app.services.secure_config import get_api_key
 from app.tabs.abp_imports_common import (
     Any,
-    BytesIO,
     Callable,
     Dict,
     Enum,
@@ -81,7 +75,6 @@ from app.tabs.abp_imports_common import (
     Path,
     ThreadPoolExecutor,
     Tuple,
-    Union,
     asyncio,
     base64,
     dataclass,
@@ -89,19 +82,13 @@ from app.tabs.abp_imports_common import (
     field,
     hashlib,
     json,
-    logging,
-    lru_cache,
     os,
-    pickle,
     re,
     setup_logger,
     st,
-    tempfile,
     time,
     uuid,
 )
-
-from app.services.secure_config import get_api_key
 
 logger = setup_logger(__name__)
 
@@ -172,7 +159,7 @@ class OttoKnowledgeBase_Reference:
         """Load memory from disk."""
         if self.memory_file.exists():
             try:
-                with open(self.memory_file, "r") as f:
+                with open(self.memory_file) as f:
                     return json.load(f)
             except Exception as e:
                 logger.warning(f"Failed to load memory: {e}")
@@ -323,7 +310,7 @@ Be specific and detailed."""
                 try:
                     content = file_data.decode("utf-8", errors="ignore")
                 except:
-                    content = f"[Binary file - cannot extract text]"
+                    content = "[Binary file - cannot extract text]"
 
             # Summarize if content is long
             summary = content[:500] if len(content) > 500 else content
@@ -530,7 +517,7 @@ class OttoAppAwareness:
 
         summary_parts = [
             f"📍 **Current Page:** {state.get('current_page', 'Main Dashboard')}",
-            f"🔗 **Integrations:** ",
+            "🔗 **Integrations:** ",
         ]
 
         integrations = state.get("integrations", {})
@@ -1000,7 +987,7 @@ class RequestCache:
         if key in self._cache:
             value, timestamp = self._cache[key]
             if time.time() - timestamp < self.ttl:
-                logger.info(f"🎯 Cache hit for request")
+                logger.info("🎯 Cache hit for request")
                 return value
             del self._cache[key]
         return None
@@ -1132,7 +1119,7 @@ class SlashCommandProcessor:
     def _show_help(self) -> Dict[str, Any]:
         """Generate help message showing all available commands organized by category."""
         # Use the new categorized structure
-        help_text = """## 🚀 Otto Slash Commands
+        help_text = r"""## 🚀 Otto Slash Commands
 
 Type a command followed by your prompt, e.g., `/image a sunset over mountains`
 
@@ -1328,7 +1315,7 @@ Return ONLY the JSON, no additional text."""
 
                 if brand_kit.get("voice"):
                     voice = brand_kit["voice"]
-                    response += f"\n### 🗣️ Brand Voice\n"
+                    response += "\n### 🗣️ Brand Voice\n"
                     response += f"**Tone:** {voice.get('tone', 'N/A')}\n"
                     response += f"**Style:** {voice.get('communication_style', 'N/A')}\n"
                     if voice.get("personality_traits"):
@@ -1986,7 +1973,7 @@ Branded: [2-3 branded hashtag ideas]"""
                 return {"success": True, "type": "shopify", "message": menu, "artifacts": []}
 
             # Import Shopify API
-            from shopify_service import ShopifyAPI
+            from app.services.shopify_service import ShopifyAPI
 
             api = ShopifyAPI(shop_url=shop_url, access_token=access_token)
 
@@ -2400,7 +2387,7 @@ Provide:
 
         try:
             # Import task queue engine
-            from app.services.task_queue_engine import MultiStepPlanner, TaskQueueManager
+            from app.services.task_queue_engine import MultiStepPlanner
 
             if action == "create":
                 # /task create marketing campaign for new product
@@ -3657,7 +3644,7 @@ Output ONLY the CSV data - no explanations."""
                     "media_type": "image",
                     "url": image_url,
                     "filepath": saved_path,
-                    "message": f"✅ Generated image",
+                    "message": "✅ Generated image",
                     "artifacts": [
                         {
                             "type": "image",
@@ -3690,7 +3677,7 @@ Output ONLY the CSV data - no explanations."""
                     "url": video_url,
                     "source_image": image_url,
                     "filepath": video_path,
-                    "message": f"✅ Generated video",
+                    "message": "✅ Generated video",
                     "artifacts": [
                         {"type": "video", "url": video_url, "filepath": video_path},
                         {"type": "image", "url": image_url, "filepath": image_path},
@@ -3729,7 +3716,7 @@ Output ONLY the CSV data - no explanations."""
                     "url": video_url,
                     "source_image": image_url,
                     "filepath": video_path,
-                    "message": f"✅ Generated video",
+                    "message": "✅ Generated video",
                     "artifacts": [
                         {"type": "video", "url": video_url, "filepath": video_path},
                         {"type": "image", "url": image_url, "filepath": image_path},
@@ -3754,7 +3741,7 @@ Output ONLY the CSV data - no explanations."""
                     "media_type": "audio",
                     "url": audio_url,
                     "filepath": audio_path,
-                    "message": f"✅ Generated music",
+                    "message": "✅ Generated music",
                     "artifacts": [
                         {
                             "type": "audio",
@@ -3780,7 +3767,7 @@ Output ONLY the CSV data - no explanations."""
                     "media_type": "audio",
                     "url": audio_url,
                     "filepath": audio_path,
-                    "message": f"✅ Generated speech audio",
+                    "message": "✅ Generated speech audio",
                     "artifacts": [
                         {"type": "audio", "url": audio_url, "filepath": audio_path, "text": prompt}
                     ],
@@ -3804,7 +3791,7 @@ Output ONLY the CSV data - no explanations."""
                     "media_type": "audio",
                     "url": audio_url,
                     "filepath": audio_path,
-                    "message": f"✅ Generated sound effect",
+                    "message": "✅ Generated sound effect",
                     "artifacts": [{"type": "audio", "url": audio_url, "filepath": audio_path}],
                 }
 
@@ -3840,7 +3827,7 @@ Output ONLY the CSV data - no explanations."""
                     "url": model_url or image_url,
                     "source_image": image_url,
                     "filepath": model_path,
-                    "message": f"✅ Generated 3D model",
+                    "message": "✅ Generated 3D model",
                     "artifacts": [
                         {"type": "3d", "url": model_url, "filepath": model_path},
                         {"type": "image", "url": image_url, "filepath": image_path},
@@ -3932,14 +3919,14 @@ Output ONLY the CSV data - no explanations."""
                 for x in ["video", "kling", "luma", "minimax-video", "sora", "wan", "ltx", "mochi"]
             ):
                 # Generate image first for video
-                st.info(f"🎨 Generating reference image for video...")
+                st.info("🎨 Generating reference image for video...")
                 image_url = self.replicate.generate_image(prompt=prompt, width=1280, height=720)
                 st.info(f"🎬 Generating video with {model_name}...")
 
                 # Use the standard video generation method which handles model-specific params
                 try:
                     result = self.replicate.generate_video(prompt=prompt, image_url=image_url)
-                except Exception as e:
+                except Exception:
                     # Fallback: try direct model call
                     result = self.replicate._run_model(model_id, {"prompt": prompt})
 
@@ -4479,7 +4466,7 @@ Be specific, actionable, and EFFICIENT."""
                 # Wait for all parallel steps
                 results = await asyncio.gather(*tasks, return_exceptions=True)
 
-                for step, result in zip(step_group, results):
+                for step, result in zip(step_group, results, strict=False):
                     completed_count += 1
                     if isinstance(result, Exception):
                         step.status = "failed"
@@ -4919,7 +4906,7 @@ Format with clear headers."""
                 f.write(response.content)
                 video_path = f.name
 
-            logger.info(f"📤 Uploading to YouTube...")
+            logger.info("📤 Uploading to YouTube...")
 
             # Get title from context
             title = context.get("understood_goal", "Otto Mate Creation")[:100]
@@ -5042,7 +5029,7 @@ Topic context: {context.get('understood_goal', step.description)}
                     )
 
                 # Create the blog post
-                logger.info(f"📤 Publishing blog to Shopify...")
+                logger.info("📤 Publishing blog to Shopify...")
 
                 result = self.shopify.create_blog_post(
                     title=title,
@@ -5208,12 +5195,12 @@ Topic context: {context.get('understood_goal', step.description)}
         failed = sum(1 for s in plan.steps if s.status == "failed")
 
         summary_parts = [
-            f"## 🎯 Task Complete",
-            f"",
+            "## 🎯 Task Complete",
+            "",
             f"**Request:** {plan.summary}",
             f"**Status:** {'✅ Success' if plan.status == 'completed' else '⚠️ Completed with issues'}",
             f"**Steps:** {completed}/{len(plan.steps)} completed",
-            f"",
+            "",
         ]
 
         # Add artifacts
@@ -5512,8 +5499,8 @@ def render_otto_chat(replicate_api, printify_api=None, shopify_api=None, youtube
                                 if video_id:
                                     st.markdown(
                                         f"""
-                                    <iframe width="100%" height="400" 
-                                        src="https://www.youtube.com/embed/{video_id}" 
+                                    <iframe width="100%" height="400"
+                                        src="https://www.youtube.com/embed/{video_id}"
                                         frameborder="0" allowfullscreen>
                                     </iframe>
                                     """,
@@ -5720,8 +5707,8 @@ def render_otto_chat(replicate_api, printify_api=None, shopify_api=None, youtube
                                     if video_id:
                                         st.markdown(
                                             f"""
-                                        <iframe width="100%" height="400" 
-                                            src="https://www.youtube.com/embed/{video_id}" 
+                                        <iframe width="100%" height="400"
+                                            src="https://www.youtube.com/embed/{video_id}"
                                             frameborder="0" allowfullscreen>
                                         </iframe>
                                         """,

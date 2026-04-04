@@ -1,7 +1,7 @@
-import asyncio
 import base64
 import logging
 import os
+import sys
 from datetime import datetime
 
 import streamlit as st
@@ -534,7 +534,10 @@ def render_playground_tab():
 
                 # Save chain as shortcut
                 st.markdown("---")
-                from shortcut_saver import convert_chain_to_steps, render_save_shortcut_button
+                from app.utils.shortcut_saver import (
+                    convert_chain_to_steps,
+                    render_save_shortcut_button,
+                )
 
                 chain_steps = convert_chain_to_steps(
                     [
@@ -1064,11 +1067,11 @@ def render_playground_tab():
                                         border-radius: 8px;
                                     }}
                                 </style>
-                                <model-viewer 
-                                    src="{model_url}" 
-                                    alt="Generated 3D Model" 
-                                    auto-rotate 
-                                    camera-controls 
+                                <model-viewer
+                                    src="{model_url}"
+                                    alt="Generated 3D Model"
+                                    auto-rotate
+                                    camera-controls
                                     shadow-intensity="1"
                                     exposure="1"
                                     shadow-softness="0.5"
@@ -1125,7 +1128,7 @@ def render_playground_tab():
     elif playground_mode == "🎵 Audio Studio":
         st.markdown("---")
         try:
-            from audio_editor import render_audio_editor_ui
+            from app.services.audio_editor import render_audio_editor_ui
 
             render_audio_editor_ui()
         except ImportError as e:
@@ -1135,7 +1138,7 @@ def render_playground_tab():
     elif playground_mode == "📄 Document Editor":
         st.markdown("---")
         try:
-            from document_editor import render_document_editor_ui
+            from app.services.document_editor import render_document_editor_ui
 
             render_document_editor_ui()
         except ImportError as e:
@@ -1145,7 +1148,7 @@ def render_playground_tab():
     elif playground_mode == "📊 Spreadsheet":
         st.markdown("---")
         try:
-            from spreadsheet_viewer import render_spreadsheet_viewer_ui
+            from app.utils.spreadsheet_viewer import render_spreadsheet_viewer_ui
 
             render_spreadsheet_viewer_ui()
         except ImportError as e:

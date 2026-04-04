@@ -1,24 +1,11 @@
-from app.tabs.abp_imports_common import Path, datetime, json, os, random, re, setup_logger, st, time
+from app.tabs.abp_imports_common import Path, datetime, json, os, setup_logger, st
 
 # Maintain backward compatibility alias
 dt = datetime
 logger = setup_logger(__name__)
 
-from app.services.ai_model_manager import ModelFallbackManager, ModelPriority
-from app.services.api_service import ReplicateAPI
-from app.services.platform_helpers import (
-    _ensure_replicate_client,
-    _get_printify_api,
-    _get_replicate_token,
-    _render_printify_product_config,
-    create_campaign_directory,
-    save_campaign_metadata,
-)
-from app.services.smart_dashboard_widget import ActivityFeed, SmartDashboard
-from app.tabs.abp_campaign_generator import run_campaign_generation
+from app.services.platform_helpers import _get_replicate_token, _render_printify_product_config
 from app.utils.cross_page_state import render_campaign_status_banner
-from app.utils.prompt_templates import PromptTemplateLibrary
-from app.utils.ray_integration_helpers import is_ray_enabled
 
 
 def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
@@ -123,13 +110,13 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
     st.markdown("### 🎨 Brand Template")
 
     # Load brand templates
-    brand_templates_file = Path(__file__).parent / "brand_templates.json"
+    brand_templates_file = Path(__file__).parent.parent.parent / "brand_templates.json"
     brand_templates = []
     active_brand_id = None
 
     if brand_templates_file.exists():
         try:
-            with open(brand_templates_file, "r") as f:
+            with open(brand_templates_file) as f:
                 brand_data = json.load(f)
                 brand_templates = brand_data.get("templates", [])
                 active_brand_id = brand_data.get("active_brand")
@@ -734,7 +721,7 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
 
             mailing_list_path = Path(__file__).parent / "mailing_list.json"
             if mailing_list_path.exists():
-                with open(mailing_list_path, "r") as f:
+                with open(mailing_list_path) as f:
                     mailing_data = json.load(f)
                 local_emails = [
                     s["email"]
@@ -748,7 +735,7 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
         # Also try Shopify if no local list
         if len(all_emails) <= 1:
             try:
-                from shopify_service import ShopifyAPI
+                from app.services.shopify_service import ShopifyAPI
 
                 shopify_svc = ShopifyAPI()
                 if shopify_svc.connected:
@@ -1247,7 +1234,7 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
         )
 
         if use_prompt_templates:
-            from app.utils.prompt_templates import PromptEnhancer, PromptTemplateLibrary
+            from app.utils.prompt_templates import PromptTemplateLibrary
 
             template_lib = PromptTemplateLibrary()
 
@@ -1845,7 +1832,7 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
                 st.markdown(
                     f"""
                 **Concept:** {campaign['concept']}
-            
+
                 **Generated:**
                 - Products: {campaign['products']}
                 - Blog Posts: {campaign['blogs']}

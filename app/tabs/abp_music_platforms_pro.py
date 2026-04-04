@@ -1,25 +1,21 @@
 """
 Professional Music Platforms Manager
 Handles multiple music distribution platforms with service-specific features
-Includes: Spotify, Apple Music, YouTube Music, Bandcamp, SoundCloud, Deezer, TikTok, 
+Includes: Spotify, Apple Music, YouTube Music, Bandcamp, SoundCloud, Deezer, TikTok,
 Amazon Music, Tidal, Beatport, Traxsource, Juno Download, etc.
 """
 
 from app.tabs.abp_imports_common import (
-    Any,
     Dict,
-    List,
     Optional,
     Path,
     asdict,
-    asyncio,
     dataclass,
     datetime,
     json,
     os,
     setup_logger,
     st,
-    timedelta,
 )
 
 logger = setup_logger(__name__)
@@ -697,7 +693,7 @@ def render_bandcamp_tab():
 
         if st.button("📧 Send Email"):
             if subject and message:
-                st.success(f"Email sent to 156 subscribers!")
+                st.success("Email sent to 156 subscribers!")
 
     with tabs[5]:
         st.subheader("Merchandise Integration")
@@ -1052,7 +1048,7 @@ def render_music_platforms_tab():
                     os.environ["SPOTIFY_CLIENT_SECRET"] = spotify_client_secret
 
                     # Also save to .env file
-                    env_file = Path("/Users/sheils/repos/printify/.env")
+                    env_file = Path(__file__).parent.parent.parent / ".env"
                     try:
                         # Read existing .env
                         env_vars = {}
@@ -1120,7 +1116,7 @@ def render_music_platforms_tab():
                     os.environ["APPLE_KEY_ID"] = apple_key_id
 
                     # Also save to .env file
-                    env_file = Path("/Users/sheils/repos/printify/.env")
+                    env_file = Path(__file__).parent.parent.parent / ".env"
                     try:
                         # Read existing .env
                         env_vars = {}
@@ -1173,7 +1169,7 @@ def render_music_platforms_tab():
                 if youtube_api_key:
                     os.environ["YOUTUBE_API_KEY"] = youtube_api_key
 
-                    env_file = Path("/Users/sheils/repos/printify/.env")
+                    env_file = Path(__file__).parent.parent.parent / ".env"
                     try:
                         env_vars = {}
                         if env_file.exists():
@@ -1260,7 +1256,7 @@ def render_music_platforms_tab():
                                 f"**👉 [Click here to authorize on {platform_info['name']}]({auth_url})**"
                             )
                             st.markdown(
-                                f"*This will open in a new window. Authorize the app, then return here.*"
+                                "*This will open in a new window. Authorize the app, then return here.*"
                             )
 
                     with col2:
@@ -1375,7 +1371,7 @@ def render_music_platforms_tab():
             if connected_items:
                 # Connection status grid
                 cols = st.columns(len(connected_items))
-                for col, (platform_key, platform_info, cred) in zip(cols, connected_items):
+                for col, (platform_key, platform_info, cred) in zip(cols, connected_items, strict=False):
                     with col:
                         st.markdown(
                             f"""
@@ -1457,7 +1453,7 @@ def render_music_platforms_tab():
                     st.markdown("## Platform Dashboards")
                     platform_tabs = st.tabs(connected_names)
 
-                    for tab, renderer in zip(platform_tabs, platform_renderers):
+                    for tab, renderer in zip(platform_tabs, platform_renderers, strict=False):
                         with tab:
                             try:
                                 renderer()

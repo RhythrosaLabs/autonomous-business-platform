@@ -1,4 +1,4 @@
-from app.tabs.abp_imports_common import Path, datetime, json, os, setup_logger, st, time
+from app.tabs.abp_imports_common import Path, datetime, os, setup_logger, st, time
 
 # Maintain backward compatibility alias
 dt = datetime
@@ -7,14 +7,11 @@ logger = setup_logger(__name__)
 from app.services.enhanced_features import GlobalSearchManager
 from app.services.platform_helpers import _get_replicate_token
 from app.services.platform_integrations import render_recovery_check
-from app.services.shopify_service import ShopifyAPI
 from app.services.tab_visibility_manager import (
     get_filtered_tabs,
-    get_visible_tabs,
     initialize_tab_visibility,
     render_tab_preferences,
 )
-from app.services.youtube_upload_service import YouTubeUploadService
 from app.utils.performance_optimizations import render_performance_settings
 
 # Import validation utilities
@@ -130,7 +127,7 @@ def render_sidebar(
             st.markdown("#### 🤖 AI Assistant")
 
             try:
-                from custom_assistants import PRESET_ASSISTANTS
+                from app.services.custom_assistants import PRESET_ASSISTANTS
 
                 # Initialize active assistant in session state
                 if "active_assistant" not in st.session_state:
@@ -504,24 +501,24 @@ def render_sidebar(
                 1. Go to [Google Cloud Console](https://console.cloud.google.com/)
                 2. Create a new project or select existing
                 3. Enable **YouTube Data API v3**
-        
+
                 #### Step 2: Create OAuth 2.0 Credentials
                 1. Go to **APIs & Services → Credentials**
                 2. Click **Create Credentials → OAuth client ID**
                 3. Choose **Desktop application**
                 4. Download the JSON file
-        
+
                 #### Step 3: Install Credentials
                 1. Rename downloaded file to `client_secret.json`
                 2. Place it in: `/Users/sheils/repos/printify/`
                 3. Click **Authenticate** button below
-        
+
                 #### Step 4: First-Time Authorization
                 1. Browser will open automatically
                 2. Sign in with your YouTube account
                 3. Grant permissions
                 4. Token will be saved for future use
-        
+
                 #### Important Notes:
                 - ✅ Free to use (within YouTube API quotas)
                 - ✅ Token persists across sessions
@@ -941,11 +938,13 @@ def render_sidebar(
 
                                     # Try to save to .env file
                                     try:
-                                        env_path = os.path.join(os.path.dirname(__file__), ".env")
+                                        env_path = os.path.join(
+                                            os.path.dirname(__file__), "..", "..", ".env"
+                                        )
                                         with open(env_path, "a") as f:
                                             f.write(f"\n{pod_id.upper()}_API_KEY={api_key}")
                                         st.success(f"✅ {pod_info['name']} connected and saved!")
-                                    except Exception as e:
+                                    except Exception:
                                         st.success(
                                             f"✅ {pod_info['name']} connected for this session!"
                                         )
@@ -1032,7 +1031,7 @@ def render_sidebar(
                                     st.info("After authorizing, paste the code below:")
 
                                 auth_code = st.text_input(
-                                    f"Authorization Code",
+                                    "Authorization Code",
                                     key=f"{market_id}_auth_code",
                                     type="password",
                                 )
@@ -1089,7 +1088,7 @@ def render_sidebar(
                             if test_caption:
                                 with st.spinner("Posting to Twitter..."):
                                     try:
-                                        from ai_twitter_poster import AITwitterPoster
+                                        from app.services.ai_twitter_poster import AITwitterPoster
 
                                         poster = AITwitterPoster(
                                             headless=False, browser_type="chrome"
@@ -1511,12 +1510,12 @@ def render_sidebar(
                 Campaign Export Report
                 Generated: {dt.now().strftime('%Y-%m-%d %H:%M:%S')}
                 =====================================
-        
+
                 Total Campaigns: {len(campaign_data.get('campaigns', []))}
                 Total Products: {len(campaign_data.get('generated_products', []))}
                 Total Blog Posts: {len(campaign_data.get('blog_posts', []))}
                 Total Social Posts: {len(campaign_data.get('social_posts', []))}
-        
+
                 ---
                 Exported by Otto Mate Business Platform
                 """
@@ -1542,7 +1541,7 @@ def render_sidebar(
                 # Try to get API usage data
                 try:
                     if API_USAGE_TRACKER_AVAILABLE:
-                        from api_usage_tracker import api_tracker
+                        from app.utils.api_usage_tracker import api_tracker
 
                         analytics_data["api_usage"] = {
                             "total_cost": api_tracker.get_total_cost(),
@@ -1566,6 +1565,9 @@ def render_sidebar(
 
                 with col_ana2:
                     # CSV for analytics
+                    import csv
+                    import io
+
                     ana_csv = io.StringIO()
                     ana_writer = csv.writer(ana_csv)
                     ana_writer.writerow(["Metric", "Value"])
@@ -1846,8 +1848,8 @@ def render_sidebar(
                                             results = []
                                             context = {"description": shortcut["description"]}
 
-                                            from api_service import ReplicateAPI
-                                            from otto_engine import get_slash_processor
+                                            from app.services.api_service import ReplicateAPI
+                                            from app.services.otto_engine import get_slash_processor
 
                                             # Get Replicate API token
                                             replicate_token = _get_replicate_token()
@@ -1935,7 +1937,7 @@ def render_sidebar(
 
                                                         if "twitter" in platform and image_path:
                                                             try:
-                                                                from ai_twitter_poster import (
+                                                                from app.services.ai_twitter_poster import (
                                                                     AITwitterPoster,
                                                                 )
 
@@ -1971,7 +1973,7 @@ def render_sidebar(
                                                                 )
                                                                 if success:
                                                                     st.success(
-                                                                        f"✅ Posted to Twitter!"
+                                                                        "✅ Posted to Twitter!"
                                                                     )
                                                                     results.append(
                                                                         {
@@ -1982,7 +1984,7 @@ def render_sidebar(
                                                                     )
                                                                 else:
                                                                     st.warning(
-                                                                        f"⚠️ Twitter post may have failed - check manually"
+                                                                        "⚠️ Twitter post may have failed - check manually"
                                                                     )
                                                                     results.append(
                                                                         {
@@ -2013,7 +2015,7 @@ def render_sidebar(
                                                             )
 
                                                     elif step["type"] == "ai":
-                                                        st.info(f"🤖 AI processing...")
+                                                        st.info("🤖 AI processing...")
                                                         results.append(
                                                             {
                                                                 "step": step_name,
@@ -2035,7 +2037,7 @@ def render_sidebar(
                                                     )
 
                                                 if shortcut.get("settings", {}).get("notify", True):
-                                                    st.success(f"🎉 Done!")
+                                                    st.success("🎉 Done!")
 
                                         except Exception as e:
                                             st.error(f"Error: {str(e)}")
@@ -2125,7 +2127,7 @@ def render_sidebar(
                                         st.session_state.magic_shortcuts = (
                                             sidebar_shortcuts_mgr.load_shortcuts()
                                         )
-                                    st.success(f"✅ Shortcut saved!")
+                                    st.success("✅ Shortcut saved!")
                                     st.rerun()
 
                         st.markdown("---")
@@ -2158,7 +2160,7 @@ def render_sidebar(
                         // Keyboard shortcut handler for Magic Buttons
                         (function() {{
                             const shortcuts = {kb_json};
-                            
+
                             // Track pressed modifier keys
                             let modifiers = {{
                                 ctrl: false,
@@ -2166,7 +2168,7 @@ def render_sidebar(
                                 shift: false,
                                 meta: false
                             }};
-                            
+
                             // Build shortcut string from current state
                             function getShortcutString(key) {{
                                 let parts = [];
@@ -2177,7 +2179,7 @@ def render_sidebar(
                                 parts.push(key.toLowerCase());
                                 return parts.join('+');
                             }}
-                            
+
                             // Update modifier state
                             function updateModifiers(event) {{
                                 modifiers.ctrl = event.ctrlKey;
@@ -2185,37 +2187,37 @@ def render_sidebar(
                                 modifiers.shift = event.shiftKey;
                                 modifiers.meta = event.metaKey;
                             }}
-                            
+
                             // Handle keydown
                             document.addEventListener('keydown', function(event) {{
                                 updateModifiers(event);
-                                
+
                                 // Get the key (normalize)
                                 let key = event.key.toLowerCase();
-                                
+
                                 // Build shortcut string
                                 let shortcutStr = getShortcutString(key);
-                                
+
                                 // Check if this matches any shortcut
                                 if (shortcuts[shortcutStr]) {{
                                     const shortcut = shortcuts[shortcutStr];
-                                    
+
                                     // Prevent default browser behavior
                                     event.preventDefault();
                                     event.stopPropagation();
-                                    
+
                                     // Show notification
                                     console.log('🎯 Triggering shortcut:', shortcut.name);
-                                    
+
                                     // Find and click the corresponding button
                                     const buttonId = 'sidebar_shortcut_' + shortcut.id;
                                     const buttons = document.querySelectorAll('button');
-                                    
+
                                     for (let btn of buttons) {{
                                         if (btn.textContent.includes(shortcut.icon) && btn.textContent.includes(shortcut.name)) {{
                                             console.log('✅ Found button, clicking...');
                                             btn.click();
-                                            
+
                                             // Visual feedback
                                             const notification = document.createElement('div');
                                             notification.style.position = 'fixed';
@@ -2232,24 +2234,24 @@ def render_sidebar(
                                             notification.style.fontSize = '14px';
                                             notification.innerHTML = '⚡ ' + shortcut.icon + ' ' + shortcut.name;
                                             document.body.appendChild(notification);
-                                            
+
                                             setTimeout(() => {{
                                                 notification.style.transition = 'opacity 0.3s';
                                                 notification.style.opacity = '0';
                                                 setTimeout(() => notification.remove(), 300);
                                             }}, 2000);
-                                            
+
                                             break;
                                         }}
                                     }}
                                 }}
                             }}, true);
-                            
+
                             // Reset modifiers on keyup
                             document.addEventListener('keyup', function(event) {{
                                 updateModifiers(event);
                             }});
-                            
+
                             // Show available shortcuts on Ctrl+Shift+?
                             document.addEventListener('keydown', function(event) {{
                                 if (event.ctrlKey && event.shiftKey && event.key === '?') {{
@@ -2257,7 +2259,7 @@ def render_sidebar(
                                     const shortcutList = Object.entries(shortcuts)
                                         .map(([key, val]) => `⌨️ ${{key.toUpperCase()}} → ${{val.icon}} ${{val.name}}`)
                                         .join('\\n');
-                                    
+
                                     const helpBox = document.createElement('div');
                                     helpBox.style.position = 'fixed';
                                     helpBox.style.top = '50%';
@@ -2275,7 +2277,7 @@ def render_sidebar(
                                     document.body.appendChild(helpBox);
                                 }}
                             }});
-                            
+
                             console.log('⚡ Keyboard shortcuts activated:', Object.keys(shortcuts).length, 'shortcuts loaded');
                         }})();
                         </script>
@@ -2427,7 +2429,7 @@ def render_sidebar(
             from background_task_manager import render_compact_progress_indicator
 
             render_compact_progress_indicator()
-        except Exception as e:
+        except Exception:
             pass  # Silently fail if not available
 
     return all_tabs

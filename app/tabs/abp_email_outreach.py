@@ -3,25 +3,16 @@ Email & Influencer Outreach Tab for Otto Platform
 Manage email campaigns, influencer contacts, and create AI-powered email content
 """
 
-import json
 import logging
-import re
-import time
 from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import streamlit as st
 
 from app.services.global_job_queue import JobType, get_global_job_queue
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-    submit_batch_product_designs,
-)
+from app.services.tab_job_helpers import are_all_jobs_done, check_jobs_progress, collect_job_results
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -56,7 +47,7 @@ class EmailTemplate:
     name: str
     subject: str
     html_content: str
-    variables: List[str]
+    variables: list[str]
     created_date: str
     brand_aligned: bool = True
 
@@ -67,11 +58,11 @@ class EmailCampaign:
 
     name: str
     subject: str
-    recipient_list: List[str]
+    recipient_list: list[str]
     template: str
     status: str  # draft, scheduled, sent, in_progress
     send_date: Optional[str] = None
-    results: Optional[Dict[str, Any]] = None
+    results: Optional[dict[str, Any]] = None
     created_date: str = ""
 
     def to_dict(self):
@@ -202,7 +193,7 @@ class InfluencerDatabase:
 
     def __init__(self):
         """Initialize database"""
-        self.contacts: List[InfluencerContact] = []
+        self.contacts: list[InfluencerContact] = []
 
     def add_contact(self, contact: InfluencerContact) -> bool:
         """Add influencer contact"""
@@ -212,15 +203,15 @@ class InfluencerDatabase:
         self.contacts.append(contact)
         return True
 
-    def get_contacts_by_niche(self, niche: str) -> List[InfluencerContact]:
+    def get_contacts_by_niche(self, niche: str) -> list[InfluencerContact]:
         """Get contacts by niche"""
         return [c for c in self.contacts if niche.lower() in c.niche.lower()]
 
-    def get_contacts_by_platform(self, platform: str) -> List[InfluencerContact]:
+    def get_contacts_by_platform(self, platform: str) -> list[InfluencerContact]:
         """Get contacts by platform"""
         return [c for c in self.contacts if c.platform.lower() == platform.lower()]
 
-    def search_contacts(self, query: str) -> List[InfluencerContact]:
+    def search_contacts(self, query: str) -> list[InfluencerContact]:
         """Search contacts"""
         query_lower = query.lower()
         return [
@@ -617,7 +608,7 @@ def render_email_outreach_tab(
             with st.expander("🎨 Brand Styling (Optional)", expanded=False):
                 st.caption("Apply consistent brand colors and fonts to your email")
                 try:
-                    from brand_templates import BRAND_TEMPLATES
+                    from app.utils.brand_templates import PRESET_TEMPLATES as BRAND_TEMPLATES
 
                     brand_template = st.selectbox(
                         "Select Brand Template",
@@ -654,7 +645,6 @@ def render_email_outreach_tab(
                 else:
                     try:
                         # Import required services
-                        from email_marketing_service import EmailMarketingService
 
                         from app.services.platform_helpers import _ensure_replicate_client
 
@@ -867,14 +857,14 @@ Keep it concise but compelling. Use engaging language that converts."""
         <tr>
             <td align="center" style="padding: 40px 20px;">
                 <table width="600" cellpadding="0" cellspacing="0" style="background-color: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    
+
                     <!-- Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, {primary_color} 0%, {secondary_color} 100%); padding: 40px 30px; border-radius: 8px 8px 0 0; text-align: center;">
                             <h1 style="margin: 0; color: white; font-size: 32px; font-weight: bold;">{camp_name}</h1>
                         </td>
                     </tr>
-                    
+
                     <!-- Hero Image -->"""
 
                         if generated_images:
@@ -887,7 +877,7 @@ Keep it concise but compelling. Use engaging language that converts."""
                     </tr>"""
 
                         html_email += f"""
-                    
+
                     <!-- Body Content -->
                     <tr>
                         <td style="padding: 40px 30px;">
@@ -896,7 +886,7 @@ Keep it concise but compelling. Use engaging language that converts."""
                             </div>
                         </td>
                     </tr>
-                    
+
                     <!-- CTA Button -->
                     <tr>
                         <td style="padding: 0 30px 40px 30px; text-align: center;">
@@ -905,7 +895,7 @@ Keep it concise but compelling. Use engaging language that converts."""
                             </a>
                         </td>
                     </tr>
-                    
+
                     <!-- Footer -->
                     <tr>
                         <td style="background-color: #f8f8f8; padding: 30px; border-radius: 0 0 8px 8px; text-align: center; color: #666666; font-size: 14px;">
@@ -913,7 +903,7 @@ Keep it concise but compelling. Use engaging language that converts."""
                             <p style="margin: 0;"><a href="#" style="color: {primary_color}; text-decoration: none;">Unsubscribe</a></p>
                         </td>
                     </tr>
-                    
+
                 </table>
             </td>
         </tr>

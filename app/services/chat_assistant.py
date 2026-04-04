@@ -30,8 +30,6 @@ from app.tabs.abp_imports_common import (
     List,
     Optional,
     Path,
-    ThreadPoolExecutor,
-    Tuple,
     asyncio,
     datetime,
     json,
@@ -39,7 +37,6 @@ from app.tabs.abp_imports_common import (
     os,
     setup_logger,
     st,
-    uuid,
 )
 
 logger = setup_logger(__name__)
@@ -230,14 +227,14 @@ class ChatAssistant:
 
             self.browser_use_available = bool(self.anthropic_key)
             if self.browser_use_available:
-                logger.info(f"✅ Browser-Use available: True (Anthropic key found)")
+                logger.info("✅ Browser-Use available: True (Anthropic key found)")
             else:
-                logger.warning(f"⚠️ Browser-Use disabled: ANTHROPIC_API_KEY not found in .env")
+                logger.warning("⚠️ Browser-Use disabled: ANTHROPIC_API_KEY not found in .env")
         except ImportError as e:
             self.browser_use_available = False
             logger.warning(f"⚠️ Browser-Use not available: {e}")
-            logger.warning(f"💡 Install: pip install browser-use langchain-anthropic playwright")
-            logger.warning(f"💡 Then run: playwright install")
+            logger.warning("💡 Install: pip install browser-use langchain-anthropic playwright")
+            logger.warning("💡 Then run: playwright install")
 
     def _get_default_otto_prompt(self, credential_context: str, knowledge_base: str) -> str:
         """Get the default Otto system prompt."""
@@ -561,7 +558,6 @@ If this task requires logging in to any service, check if credentials are availa
                     from app.services.otto_engine import (
                         AI_MODELS,
                         SLASH_COMMANDS,
-                        SlashCommandProcessor,
                         get_slash_processor,
                     )
 
@@ -575,7 +571,7 @@ If this task requires logging in to any service, check if credentials are availa
                     if command in SLASH_COMMANDS or command in AI_MODELS:
                         # Special handling for chain commands with progress
                         if command == "chain":
-                            st.info(f"🔗 Starting chain execution...")
+                            st.info("🔗 Starting chain execution...")
 
                             # Create progress container
                             progress_container = st.container()
@@ -916,7 +912,7 @@ If this task requires logging in to any service, check if credentials are availa
                     )
 
                     if result.success:
-                        response = f"✅ **Browser task completed!**\n\n"
+                        response = "✅ **Browser task completed!**\n\n"
                         response += f"**Steps taken:** {result.steps_taken}\n"
                         response += f"**Duration:** {result.duration_seconds:.1f}s\n\n"
                         response += f"**Result:** {result.result_text}"
@@ -928,7 +924,7 @@ If this task requires logging in to any service, check if credentials are availa
 
                         return response
                     else:
-                        return f"❌ **Browser task failed**\n\nErrors:\n" + "\n".join(result.errors)
+                        return "❌ **Browser task failed**\n\nErrors:\n" + "\n".join(result.errors)
                 else:
                     # Fall back to legacy browser-use
                     return await self.execute_browser_task(user_message)
@@ -944,7 +940,7 @@ If this task requires logging in to any service, check if credentials are availa
                     "chat_history": [m.get("content", "") for m in chat_history[-5:]],
                 }
 
-                st.info(f"🚀 **Executing your request...**")
+                st.info("🚀 **Executing your request...**")
                 results = await orchestrator.orchestrate(user_message, context)
 
                 if results.get("final_summary"):
@@ -984,7 +980,7 @@ If this task requires logging in to any service, check if credentials are availa
 
             if active_assistant_id and active_assistant_id != "otto_default":
                 try:
-                    from custom_assistants import PRESET_ASSISTANTS
+                    from app.services.custom_assistants import PRESET_ASSISTANTS
 
                     if active_assistant_id in PRESET_ASSISTANTS:
                         preset = PRESET_ASSISTANTS[active_assistant_id]
@@ -1267,7 +1263,7 @@ End to end automation for a neon cat poster campaign
         metadata_path = campaign_path / "campaign_metadata.json"
         if metadata_path.exists():
             try:
-                with open(metadata_path, "r") as f:
+                with open(metadata_path) as f:
                     metadata = json.load(f)
                 analysis.append(f"\n**Created:** {metadata.get('timestamp', 'Unknown')}")
                 analysis.append(f"**Concept:** {metadata.get('concept', 'Unknown')}")
@@ -1364,7 +1360,7 @@ End to end automation for a neon cat poster campaign
 
     def handle_browser_screenshot(self, args: str) -> str:
         """Handle /screenshot command using browser-use."""
-        task = f"Take a screenshot of the current page"
+        task = "Take a screenshot of the current page"
         if args:
             task += f" focusing on {args}"
         return asyncio.run(self.execute_browser_task(task))
@@ -1515,7 +1511,7 @@ def _initialize_apis():
         token = os.getenv("SHOPIFY_ACCESS_TOKEN") or st.session_state.get("shopify_token")
         store = os.getenv("SHOPIFY_STORE_NAME") or st.session_state.get("shopify_store")
         if token and store:
-            from shopify_service import ShopifyService
+            from app.services.shopify_service import ShopifyService
 
             apis["shopify"] = ShopifyService(store, token)
     except:
@@ -1801,7 +1797,7 @@ def render_chat_interface(key_suffix: str = "sidebar"):
                                     image_url = match.group(1)
                                     try:
                                         st.image(image_url, use_container_width=True)
-                                    except Exception as e:
+                                    except Exception:
                                         st.markdown(f"🖼️ [View Image]({image_url})")
                             elif part.strip():
                                 st.markdown(part)

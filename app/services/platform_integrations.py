@@ -11,7 +11,7 @@ Usage in autonomous_business_platform.py:
 -----------------------------------------
 
 1. Add this import near the top:
-   
+
    from app.services.platform_integrations import (
        init_all_integrations,
        tracked_replicate_run,
@@ -19,27 +19,27 @@ Usage in autonomous_business_platform.py:
    )
 
 2. After initialize_session_state(), call:
-   
+
    integrations = init_all_integrations()
 
 3. Replace replicate calls:
-   
+
    # Before:
    output = client.run("model/name", input={...})
-   
+
    # After:
    output = tracked_replicate_run(client, "model/name", input_params)
 
 4. In the sidebar section, add:
-   
+
    render_integrations_sidebar()
 
 """
 
-import os
 import time
+from collections.abc import Callable
 from functools import wraps
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Optional
 
 import streamlit as st
 
@@ -47,7 +47,7 @@ from app.services.secure_config import get_api_key
 
 # Import our new modules
 try:
-    from api_usage_tracker import APIUsageTracker, get_tracker, render_usage_dashboard
+    from app.utils.api_usage_tracker import APIUsageTracker, get_tracker, render_usage_dashboard
 
     API_TRACKER_AVAILABLE = True
 except ImportError:
@@ -107,7 +107,7 @@ except ImportError:
 # =============================================================================
 
 
-def init_all_integrations() -> Dict[str, Any]:
+def init_all_integrations() -> dict[str, Any]:
     """
     Initialize all integration modules
 
@@ -228,7 +228,7 @@ def get_rate_limiter() -> ReplicateRateLimiter:
 def tracked_replicate_run(
     client: Any,
     model: str,
-    input_params: Dict[str, Any],
+    input_params: dict[str, Any],
     operation_name: Optional[str] = None,
     apply_rate_limit: bool = True,
 ) -> Any:
@@ -285,7 +285,7 @@ def tracked_replicate_run(
         if "429" in error_str or "throttled" in error_str.lower():
             if apply_rate_limit:
                 rate_limiter.mark_rate_limited()
-                st.warning(f"⚠️ Rate limited by Replicate. Waiting before retry...")
+                st.warning("⚠️ Rate limited by Replicate. Waiting before retry...")
 
         # Track failed call too
         if tracker:
@@ -578,8 +578,8 @@ output = client.run("stability-ai/sdxl:...", input=model_input)
 
 # After:
 output = tracked_replicate_run(
-    client, 
-    "stability-ai/sdxl:...", 
+    client,
+    "stability-ai/sdxl:...",
     model_input,
     operation_name="Generate product image"
 )

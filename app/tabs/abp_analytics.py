@@ -1,6 +1,5 @@
 import logging
 import os
-from datetime import datetime
 
 import streamlit as st
 
@@ -36,7 +35,7 @@ def render_analytics_tab():
             # Try to initialize from credentials
             if os.getenv("SHOPIFY_SHOP_URL") and os.getenv("SHOPIFY_ACCESS_TOKEN"):
                 try:
-                    from shopify_service import ShopifyAPI
+                    from app.services.shopify_service import ShopifyAPI
 
                     st.session_state.shopify_api = ShopifyAPI()
                     shopify_connected = st.session_state.shopify_api.connected
@@ -77,10 +76,10 @@ def render_analytics_tab():
             # Try to initialize from token.pickle
             if os.path.exists("token.pickle"):
                 try:
-                    from youtube_upload_service import YouTubeUploadService
+                    from app.services.youtube_upload_service import YouTubeUploadService
 
                     st.session_state.youtube_service = YouTubeUploadService()
-                    youtube_connected = st.session_state.youtube_service.authenticated
+                    youtube_connected = st.session_state.youtube_service.is_authenticated
                 except Exception as e:
                     logger.error(f"Failed to initialize YouTube: {e}")
                     youtube_connected = False
@@ -605,7 +604,7 @@ def render_analytics_tab():
         else:
             try:
                 with st.spinner("Loading YouTube analytics..."):
-                    from youtube_upload_service import YouTubeUploadService
+                    from app.services.youtube_upload_service import YouTubeUploadService
 
                     yt = st.session_state.youtube_service
 

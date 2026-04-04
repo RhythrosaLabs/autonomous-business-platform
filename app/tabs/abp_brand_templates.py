@@ -303,7 +303,11 @@ Be specific with hex codes and font suggestions."""
 
     # Import brand templates module
     try:
-        from brand_templates import PRESET_TEMPLATES, get_active_template, render_template_library
+        from app.utils.brand_templates import (
+            PRESET_TEMPLATES,
+            get_active_template,
+            render_template_library,
+        )
 
         # Show active template at top
         active_template = get_active_template()

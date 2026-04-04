@@ -5,12 +5,11 @@ Caching, lazy loading, and optimization utilities.
 """
 
 import functools
-import hashlib
 import logging
 import os
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Dict, Optional
 
 import streamlit as st
 
@@ -32,7 +31,7 @@ def get_replicate_client(api_token: str):
 def get_youtube_service():
     """Cache YouTube service initialization."""
     try:
-        from youtube_upload_service import YouTubeUploadService
+        from app.services.youtube_upload_service import YouTubeUploadService
 
         service = YouTubeUploadService()
         return service
@@ -70,7 +69,7 @@ def get_replicate_api(api_token: str):
 def get_shopify_api(shop_url: str, access_token: str):
     """Cache Shopify API client."""
     try:
-        from shopify_service import ShopifyService
+        from app.services.shopify_service import ShopifyService
 
         return ShopifyService(shop_url=shop_url, access_token=access_token)
     except Exception as e:
@@ -194,7 +193,7 @@ def fragment_render(func: Callable) -> Callable:
 class PerformanceMonitor:
     """Track and report performance metrics."""
 
-    _timings: Dict[str, list] = {}
+    _timings: dict[str, list] = {}
 
     @classmethod
     def start_timer(cls, operation: str) -> float:
@@ -222,7 +221,7 @@ class PerformanceMonitor:
         return sum(timings) / len(timings) if timings else 0
 
     @classmethod
-    def get_stats(cls) -> Dict:
+    def get_stats(cls) -> dict:
         """Get all timing stats."""
         return {
             op: {

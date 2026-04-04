@@ -4,12 +4,11 @@ OTTO SUPER ENGINE - Part 2: Execution Engine
 Execution engine that runs tools and displays results in real-time.
 """
 
-import asyncio
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -30,9 +29,9 @@ class ExecutionResult:
     error: Optional[str] = None
     duration_seconds: float = 0.0
     cost_estimate: str = "$0.00"
-    artifacts: List[Dict] = field(default_factory=list)
+    artifacts: list[dict] = field(default_factory=list)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "tool_id": self.tool_id,
             "success": self.success,
@@ -81,7 +80,7 @@ class ExecutionEngine:
             self.ray_manager = None
 
     async def execute_tool(
-        self, tool_id: str, parameters: Dict, progress_callback=None
+        self, tool_id: str, parameters: dict, progress_callback=None
     ) -> ExecutionResult:
         """
         Execute a single tool with given parameters.
@@ -366,7 +365,7 @@ class ExecutionEngine:
 
             # Try to use the campaign generator service
             try:
-                from campaign_generator_service import CampaignGeneratorService
+                from app.services.campaign_generator_service import CampaignGeneratorService
 
                 generator = CampaignGeneratorService()
 
@@ -842,11 +841,11 @@ class ContextTracker:
         """Get a context value."""
         return self.context.get(key, default)
 
-    def get_all(self) -> Dict:
+    def get_all(self) -> dict:
         """Get all context."""
         return self.context.copy()
 
-    def track_generation(self, output_type: str, url: str, metadata: Dict = None):
+    def track_generation(self, output_type: str, url: str, metadata: dict = None):
         """Track a generated asset."""
         if output_type == "image":
             self.context["last_generated_image"] = url

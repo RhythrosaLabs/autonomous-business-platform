@@ -1,4 +1,4 @@
-from app.tabs.abp_imports_common import Path, asyncio, datetime, json, os, re, setup_logger, st
+from app.tabs.abp_imports_common import Path, datetime, json, os, re, setup_logger, st
 
 # Maintain backward compatibility alias
 dt = datetime
@@ -16,17 +16,8 @@ from app.services.platform_helpers import (
 )
 from app.services.platform_integrations import tracked_replicate_run
 from app.services.shopify_service import ShopifyAPI
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-    submit_blog_generation_job,
-    submit_social_content_job,
-)
-from app.utils.brand_templates import PRESET_TEMPLATES as BRAND_TEMPLATES
+from app.services.tab_job_helpers import are_all_jobs_done, check_jobs_progress, collect_job_results
 from app.utils.cross_page_state import restore_page_to_session
-from app.utils.ray_integration_helpers import is_ray_enabled, ray_generate_image_sync
 
 
 def render_content_generator_tab():
@@ -50,7 +41,7 @@ def render_content_generator_tab():
         try:
             # Try the proper import location first
             try:
-                from brand_templates import BRAND_TEMPLATES, BrandTemplateManager
+                from app.utils.brand_templates import BRAND_TEMPLATES, BrandTemplateManager
             except ImportError:
                 # Fallback to legacy location
                 from brand_brain import BRAND_TEMPLATES
@@ -75,7 +66,7 @@ def render_content_generator_tab():
                             unsafe_allow_html=True,
                         )
                         st.caption(template.get("description", "")[:50] + "...")
-                        if st.button(f"Use", key=f"brand_template_{template_id}"):
+                        if st.button("Use", key=f"brand_template_{template_id}"):
                             st.session_state["selected_brand_template"] = template_id
                             selected_template = template_id
                             st.success(f"✅ {template['name']} template applied!")
@@ -88,7 +79,7 @@ def render_content_generator_tab():
                         )
             else:
                 st.info("No brand templates configured. Create one in the 🎨 Brand Templates tab!")
-        except ImportError as e:
+        except ImportError:
             st.info(
                 "💡 Create brand templates in the **🎨 Brand Templates** tab for consistent styling!"
             )
@@ -323,7 +314,7 @@ def render_content_generator_tab():
                                         )
 
                                         if article:
-                                            st.success(f"✅ Blog post published to Shopify!")
+                                            st.success("✅ Blog post published to Shopify!")
                                             article_url = article.get(
                                                 "url",
                                                 f"https://{shopify_shop_url}/blogs/news/{slug}",
@@ -390,7 +381,7 @@ def render_content_generator_tab():
                                 hooks_prompt = """Generate 5 viral social media hook formulas that work in 2024:
 
 1. A curiosity gap hook
-2. A controversial/hot take hook  
+2. A controversial/hot take hook
 3. A "secret" or insider knowledge hook
 4. A relatable pain point hook
 5. A transformation/before-after hook
@@ -502,7 +493,6 @@ Format: Just the hook templates with [BLANK] for customization. Under 15 words e
 
                     # Generate captions in parallel
                     with st.spinner(f"Generating {num_variations} captions in parallel..."):
-                        import time
 
                         queue = get_global_job_queue()
                         caption_job_ids = []
@@ -763,7 +753,7 @@ Format: Just the hook templates with [BLANK] for customization. Under 15 words e
             try:
                 mailing_list_path = Path(__file__).parent / "mailing_list.json"
                 if mailing_list_path.exists():
-                    with open(mailing_list_path, "r") as f:
+                    with open(mailing_list_path) as f:
                         mailing_data = json.load(f)
                     local_emails = [
                         s["email"]

@@ -8,17 +8,12 @@ except ImportError:
 
 from app.tabs.abp_imports_common import (
     Path,
-    ThreadPoolExecutor,
-    base64,
     datetime,
-    json,
     logging,
     os,
-    random,
     re,
     requests,
     setup_logger,
-    shutil,
     st,
     time,
 )
@@ -38,28 +33,11 @@ except ImportError:
 
 import re
 
-import moviepy.editor as mpe  # Don't use * import - it shadows 'time' module
-
-from app.services.ai_model_manager import ModelFallbackManager
-from app.services.api_service import ReplicateAPI
-from app.services.blog_generator import generate_product_blog
-
 # Import helpers
 from app.services.campaign_generator_service import EnhancedCampaignGenerator
-from app.services.digital_products_service import DigitalProductGenerator, DigitalProductsService
-from app.services.printify_mockup_service import PrintifyMockupService
-from app.services.shopify_service import ShopifyAPI
 
 # VideoMaker is not a class - videomaker.py is a standalone streamlit app
-from app.services.social_media_automation import SocialMediaAutomation
-from app.utils.prompt_templates import PromptTemplateLibrary
-from app.utils.ray_campaign_operations import (
-    ray_generate_campaign_videos_parallel,
-    ray_generate_product_images_parallel,
-    ray_generate_single_product_image,
-    show_ray_performance_info,
-)
-from app.utils.ray_campaign_wrapper import RayCampaignWrapper, show_ray_status
+from app.utils.ray_campaign_operations import show_ray_performance_info
 from app.utils.unified_storage import auto_save_generated_content
 
 
@@ -81,12 +59,10 @@ def strip_markdown(text: str) -> str:
 
 from app.services.platform_helpers import (
     _build_default_printify_config,
-    _extract_article_html,
     _get_printify_api,
     _get_replicate_token,
     _resolve_campaign_printify_config,
     _send_design_to_printify,
-    _slugify,
     create_campaign_directory,
     save_campaign_metadata,
 )
@@ -527,7 +503,7 @@ def run_campaign_generation(
                 current_extra += 1
                 with st.spinner(f"📈 Trend Scanning ({current_extra}/{enabled_count})..."):
                     trend_prompt = f"""Analyze current market trends for: {product_context}
-                        
+
 Target audience: {target_audience}
 
 Provide:
@@ -548,7 +524,7 @@ Keep it concise and actionable. Focus on the PRODUCT, not just the design concep
                     # Save to campaign directory
                     if campaign_enabled:
                         save_text_file(trend_result, str(campaign_dir / "trend_analysis.txt"))
-                    st.success(f"✅ Trend scanning complete")
+                    st.success("✅ Trend scanning complete")
 
             # 2. SEO & Keyword Research
             if extra_ai_steps.get("seo_research"):
@@ -576,7 +552,7 @@ Format as actionable recommendations for product titles, descriptions, and blog 
 
                     if campaign_enabled:
                         save_text_file(seo_result, str(campaign_dir / "seo_research.txt"))
-                    st.success(f"✅ SEO research complete")
+                    st.success("✅ SEO research complete")
 
             # 3. Demand Prediction
             if extra_ai_steps.get("demand_prediction"):
@@ -605,7 +581,7 @@ Focus on the actual PRODUCT being sold, not just the design concept."""
 
                     if campaign_enabled:
                         save_text_file(demand_result, str(campaign_dir / "demand_prediction.txt"))
-                    st.success(f"✅ Demand prediction complete")
+                    st.success("✅ Demand prediction complete")
 
             # 4. A/B Testing Suggestions
             if extra_ai_steps.get("ab_testing"):
@@ -634,7 +610,7 @@ Focus on selling the PRODUCT, not just the design. Include expected impact and p
 
                     if campaign_enabled:
                         save_text_file(ab_result, str(campaign_dir / "ab_testing_strategy.txt"))
-                    st.success(f"✅ A/B testing plan complete")
+                    st.success("✅ A/B testing plan complete")
 
             # 5. Seasonality Analysis
             if extra_ai_steps.get("seasonality"):
@@ -665,7 +641,7 @@ Focus on when people BUY this type of product, not just when the design theme is
                         save_text_file(
                             season_result, str(campaign_dir / "seasonality_analysis.txt")
                         )
-                    st.success(f"✅ Seasonality analysis complete")
+                    st.success("✅ Seasonality analysis complete")
 
             # 6. Bundle Generation Ideas
             if extra_ai_steps.get("bundle_generation"):
@@ -694,7 +670,7 @@ Focus on bundling actual PRODUCTS together, not just designs."""
 
                     if campaign_enabled:
                         save_text_file(bundle_result, str(campaign_dir / "bundle_ideas.txt"))
-                    st.success(f"✅ Bundle generation complete")
+                    st.success("✅ Bundle generation complete")
 
             # 7. Influencer Outreach List - REAL CONTACTS
             if extra_ai_steps.get("influencer_outreach"):
@@ -889,7 +865,7 @@ Make it sound human and passionate - like a small team that really cares."""
 
                     if campaign_enabled:
                         save_text_file(pr_result, str(campaign_dir / "pr_press_kit.txt"))
-                    st.success(f"✅ PR & press kit complete")
+                    st.success("✅ PR & press kit complete")
 
             # 9. Analytics & Cohort Setup
             if extra_ai_steps.get("analytics_cohort"):
@@ -921,7 +897,7 @@ Include specific metrics and measurement methodologies."""
 
                     if campaign_enabled:
                         save_text_file(analytics_result, str(campaign_dir / "analytics_setup.txt"))
-                    st.success(f"✅ Analytics setup complete")
+                    st.success("✅ Analytics setup complete")
 
             # Store extra results for later use
             results["extra_ai_research"] = extra_results
@@ -1382,7 +1358,7 @@ Include specific metrics and measurement methodologies."""
                                                                                     == "twitter"
                                                                                 ):
                                                                                     if st.button(
-                                                                                        f"🐦 Post to Twitter",
+                                                                                        "🐦 Post to Twitter",
                                                                                         key=f"post_twitter_{i+1}",
                                                                                     ):
                                                                                         tweet_caption = f"{concept_input} - Product {i+1} now available! #newproduct"
@@ -1531,9 +1507,7 @@ Include specific metrics and measurement methodologies."""
                                                                     # Create commercial using the new reliable method
                                                                     # Enforce product-fidelity by passing explicit product features and brand template
                                                                     product_features = (
-                                                                        product_data.get(
-                                                                            "features"
-                                                                        )
+                                                                        product_data.get("features")
                                                                         or product_data.get(
                                                                             "attributes"
                                                                         )
@@ -1590,7 +1564,7 @@ Include specific metrics and measurement methodologies."""
 
                                                             if video_outputs:
                                                                 st.success(
-                                                                    f"🎉 Professional commercial created featuring ACTUAL Printify mockups!"
+                                                                    "🎉 Professional commercial created featuring ACTUAL Printify mockups!"
                                                                 )
                                                                 st.info(
                                                                     "✨ The commercial shows your real product with professional effects, voiceover, and music"
@@ -1664,7 +1638,6 @@ Include specific metrics and measurement methodologies."""
 
                 if shopify_shop_url and shopify_access_token:
                     try:
-                        import base64
 
                         from app.services.shopify_service import ShopifyAPI
 
@@ -1721,7 +1694,7 @@ Include specific metrics and measurement methodologies."""
                                     )
 
                                     if article:
-                                        st.success(f"✅ Blog published to Shopify!")
+                                        st.success("✅ Blog published to Shopify!")
                                         article_url = article.get(
                                             "url", f"https://{shopify_shop_url}/blogs/news/{slug}"
                                         )
@@ -1914,7 +1887,7 @@ Include specific metrics and measurement methodologies."""
             # Show preview
             if video_images:
                 st.markdown("---")
-                st.markdown(f"### 🎬 Video clips:")
+                st.markdown("### 🎬 Video clips:")
                 cols = st.columns(min(len(video_images), 3))
                 for idx, img_path in enumerate(video_images[:3]):
                     with cols[idx]:
@@ -2239,7 +2212,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
 
                 narrated_paths = []
                 for seg_idx, (video_path, script_segment) in enumerate(
-                    zip(temp_video_paths, script_segments)
+                    zip(temp_video_paths, script_segments, strict=False)
                 ):
                     try:
                         st.info(f"🎙️ Processing segment {seg_idx + 1}/{len(script_segments)}...")
@@ -2291,7 +2264,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                             text = re.sub(r"\s+", " ", text).strip()
 
                             # Ensure proper ending
-                            if text and not text[-1] in ".!?":
+                            if text and text[-1] not in ".!?":
                                 text += "."
 
                             return text
@@ -2379,7 +2352,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                                         for chunk in resp.iter_content(1024 * 32):
                                             f.write(chunk)
                                     voiceover_success = True
-                                    st.success(f"✅ Speech generated via Replicate API")
+                                    st.success("✅ Speech generated via Replicate API")
                                     break
 
                             except Exception as e:
@@ -2397,7 +2370,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                                 tts = gTTS(text=cleaned_narration, lang="en", slow=False)
                                 tts.save(str(segment_voice_path))
                                 voiceover_success = True
-                                st.success(f"✅ Speech generated via gTTS fallback")
+                                st.success("✅ Speech generated via gTTS fallback")
                             except Exception as gtts_error:
                                 st.error(f"❌ gTTS fallback failed: {gtts_error}")
                                 # Skip narration for this segment - use original video
@@ -2459,7 +2432,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                         result = subprocess.run(ffmpeg_combine_cmd, capture_output=True)
 
                         if result.returncode != 0:
-                            st.warning(f"⚠️ ffmpeg failed, using MoviePy fallback")
+                            st.warning("⚠️ ffmpeg failed, using MoviePy fallback")
                             # Fallback to MoviePy
                             video_clip = VideoFileClip(str(video_path))
                             narration_clip = AudioFileClip(str(segment_voice_path))
@@ -2487,7 +2460,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                         narrated_paths.append(video_path)
 
                 temp_video_paths = narrated_paths
-                st.success(f"✅ All segments narrated!")
+                st.success("✅ All segments narrated!")
 
             # 6. Concatenate final commercial with CROSSFADE transitions
             st.info("🎬 Step 5: Assembling final commercial with smooth transitions...")
@@ -2607,7 +2580,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
             if auto_publish_youtube:
                 st.info("📺 Uploading to YouTube...")
                 try:
-                    from youtube_upload_service import YouTubeUploadService
+                    from app.services.youtube_upload_service import YouTubeUploadService
 
                     yt_service = YouTubeUploadService()
 
@@ -2630,7 +2603,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
 
                         if result and result.get("video_id"):
                             video_id = result["video_id"]
-                            st.success(f"✅ Uploaded to YouTube!")
+                            st.success("✅ Uploaded to YouTube!")
                             st.markdown(f"🎬 **Watch:** https://youtube.com/watch?v={video_id}")
                             results["youtube_video_id"] = video_id
                         else:
@@ -2658,7 +2631,6 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
         with st.spinner("Creating social media assets..."):
             try:
                 from campaign_helpers import generate_content
-                from social_media_ad_service import SocialMediaAdService, download_and_save_ads
 
                 platforms = ["instagram", "facebook", "twitter"]
                 social_prompt = (
@@ -3293,7 +3265,7 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
 
         with st.spinner("Generating and sending marketing emails..."):
             try:
-                from email_marketing_service import EmailMarketingService
+                from app.services.email_marketing_service import EmailMarketingService
 
                 email_service = EmailMarketingService()
 
