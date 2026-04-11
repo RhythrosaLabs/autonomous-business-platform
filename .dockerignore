@@ -1,0 +1,48 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.eggs
+dist
+build
+
+# Virtual environments
+venv
+.venv
+env
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Large data / output directories
+library/
+outputs/
+runs/
+temp_files/
+temp_uploads/
+old docs/
+otto_knowledge/
+file_library/
+products/
+task_artifacts/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Docs
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
