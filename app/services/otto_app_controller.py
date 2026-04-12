@@ -370,7 +370,7 @@ class OttoAppController:
                 "total_orders": len(orders),
                 "total_revenue": sum(float(o.get("total_price", 0)) for o in orders),
             }
-        except:
+        except Exception:
             return {"error": "Failed to fetch"}
 
     async def _get_social_analytics(self, period: str) -> dict:

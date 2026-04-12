@@ -1,5 +1,3 @@
-import json
-import os
 from datetime import datetime as dt
 from pathlib import Path
 
@@ -16,12 +14,7 @@ from app.services.platform_helpers import (
     _slugify,
 )
 from app.services.platform_integrations import tracked_replicate_run
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_product_designs,
-)
+from app.services.tab_job_helpers import are_all_jobs_done, check_jobs_progress, collect_job_results
 from app.utils.cross_page_state import restore_page_to_session
 
 # Style and color prompts for Product Studio
@@ -83,6 +76,10 @@ def render_product_studio_tab():
     )
 
     st.markdown("### 🎨 AI Design Studio")
+
+    if "product_studio_results" not in st.session_state:
+        st.session_state.product_studio_results = []
+
     st.markdown(
         "Generate print-ready artwork designs. These designs can then be sent to Printify to print on products."
     )
@@ -448,6 +445,7 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                     "base_prompt": base_prompt,
                 }
                 st.session_state.product_studio_results.insert(0, run_info)
+                st.session_state.setdefault("generated_assets", {})
                 asset_bucket = st.session_state.generated_assets.setdefault("product_designs", [])
                 asset_bucket.extend(var["image_path"] for var in variations)
 
@@ -473,7 +471,7 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                         # Download button
                         with open(variation["image_path"], "rb") as img_file:
                             st.download_button(
-                                f"⬇️ Download PNG",
+                                "⬇️ Download PNG",
                                 data=img_file.read(),
                                 file_name=Path(variation["image_path"]).name,
                                 mime="image/png",
@@ -485,7 +483,7 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                             "Use the Printify selection above to create a ready-to-sell product."
                         )
                         if st.button(
-                            f"🚀 Create Printify Product",
+                            "🚀 Create Printify Product",
                             key=f"printify_publish_{timestamp}_{idx}",
                             use_container_width=True,
                             disabled=not printify_api_client,
@@ -540,15 +538,15 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                             if product.get("design_path")
                         }
 
-                        for idx, variation in enumerate(variations, start=1):
+                        for auto_idx, variation in enumerate(variations, start=1):
                             if variation["image_path"] in published_designs:
-                                st.info(f"Variation {idx} already published to Printify.")
+                                st.info(f"Variation {auto_idx} already published to Printify.")
                                 continue
 
                             status_placeholder = st.empty()
                             try:
-                                variation_label = f"{(base_prompt or design_prompt or 'Design')[:40]} - Variation {idx}"
-                                with st.spinner(f"Publishing variation {idx} to Printify..."):
+                                variation_label = f"{(base_prompt or design_prompt or 'Design')[:40]} - Variation {auto_idx}"
+                                with st.spinner(f"Publishing variation {auto_idx} to Printify..."):
                                     result = _send_design_to_printify(
                                         variation["image_path"],
                                         variation["prompt"],
@@ -557,16 +555,16 @@ Be specific and visual. Format: Just the design concept in 20 words or less."""
                                     )
                                 product_id = result.get("product_id") or "draft product"
                                 status_placeholder.success(
-                                    f"Variation {idx}: Published product {product_id} ({len(auto_config.get('variant_ids', []))} variant(s))"
+                                    f"Variation {auto_idx}: Published product {product_id} ({len(auto_config.get('variant_ids', []))} variant(s))"
                                 )
                                 published_designs.add(variation["image_path"])
                             except Exception as auto_error:
-                                status_placeholder.error(f"Variation {idx}: {auto_error}")
+                                status_placeholder.error(f"Variation {auto_idx}: {auto_error}")
 
-                    st.info(f"📁 All files saved to: `{session_dir}`")
-                    st.toast(f"Generated {len(variations)} design(s).")
-                else:
-                    st.warning("No designs were saved. Check the error above and try again.")
+                st.info(f"📁 All files saved to: `{session_dir}`")
+                st.toast(f"Generated {len(variations)} design(s).")
+            else:
+                st.warning("No designs were saved. Check the error above and try again.")
 
     if len(st.session_state.product_studio_results) > 1:
         with st.expander("Previous Design Studio runs", expanded=False):

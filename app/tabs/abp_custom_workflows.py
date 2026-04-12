@@ -739,7 +739,7 @@ def render_custom_workflows_tab():
 
                                 workflow_steps = convert_workflow_to_steps(
                                     {
-                                        "name": workflow["name"],
+                                        "name": workflow.get("name", "Custom Workflow"),
                                         "steps": [
                                             {
                                                 "name": step.get("name", ""),
@@ -752,11 +752,11 @@ def render_custom_workflows_tab():
                                     }
                                 )
                                 render_save_shortcut_button(
-                                    pipeline_name=workflow["name"],
+                                    pipeline_name=workflow.get("name", "Custom Workflow"),
                                     pipeline_description=f"Workflow with {len(workflow_steps)} steps",
                                     steps=workflow_steps,
                                     icon="🔄",
-                                    button_key=f"save_workflow_{workflow['name']}",
+                                    button_key=f"save_workflow_{workflow.get('name', 'custom')}",
                                     expanded=True,
                                 )
                             else:
@@ -989,6 +989,11 @@ def render_custom_workflows_tab():
                     models_dict = IMAGE_MODELS
 
                 # Model selection
+                if not models_dict:
+                    st.warning(
+                        f"No models available for {step['type']}. Check playground_models module."
+                    )
+                    continue
                 selected_model = st.selectbox(
                     "Model",
                     list(models_dict.keys()),
@@ -1498,7 +1503,7 @@ def render_custom_workflows_tab():
                                 import yaml
 
                                 workflow_content = yaml.safe_load(content)
-                            except:
+                            except Exception:
                                 st.error("Could not parse file as JSON or YAML")
                     except Exception as e:
                         st.error(f"Error reading file: {e}")
@@ -1510,7 +1515,7 @@ def render_custom_workflows_tab():
                             import yaml
 
                             workflow_content = yaml.safe_load(workflow_text)
-                        except:
+                        except Exception:
                             st.error("Could not parse content as JSON or YAML")
                 else:
                     st.warning("Please upload a file or paste workflow content")
@@ -1565,21 +1570,21 @@ def render_custom_workflows_tab():
                             content = workflow_file.read().decode("utf-8")
                             try:
                                 workflow_content = json.loads(content)
-                            except:
+                            except Exception:
                                 import yaml
 
                                 workflow_content = yaml.safe_load(content)
-                        except:
+                        except Exception:
                             pass
                     elif workflow_text:
                         try:
                             workflow_content = json.loads(workflow_text)
-                        except:
+                        except Exception:
                             try:
                                 import yaml
 
                                 workflow_content = yaml.safe_load(workflow_text)
-                            except:
+                            except Exception:
                                 pass
 
                 if not workflow_content:

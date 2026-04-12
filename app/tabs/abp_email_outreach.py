@@ -12,7 +12,6 @@ from typing import Any, Optional
 import streamlit as st
 
 from app.services.global_job_queue import JobType, get_global_job_queue
-from app.services.tab_job_helpers import are_all_jobs_done, check_jobs_progress, collect_job_results
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -625,9 +624,40 @@ def render_email_outreach_tab(
                         st.success(f"✅ Using {template_data['name']} brand styling")
                 except ImportError:
                     brand_template = "None"
+                    BRAND_TEMPLATES = {}
                     st.info("Brand templates not available")
 
             st.divider()
+
+            # Check for in-progress image generation jobs (persists across reruns)
+            if "email_image_jobs" in st.session_state and st.session_state.email_image_jobs:
+                from app.services.tab_job_helpers import (
+                    are_all_jobs_done,
+                    check_jobs_progress,
+                    collect_job_results,
+                )
+
+                image_job_ids = st.session_state.email_image_jobs
+                job_progress = check_jobs_progress(image_job_ids)
+                num_images = len(image_job_ids)
+
+                st.markdown("#### 🎨 Image Generation Progress")
+                col1, col2, col3 = st.columns(3)
+                col1.metric("⏳ Running", job_progress["running"])
+                col2.metric("✅ Done", job_progress["completed"])
+                col3.metric("❌ Failed", job_progress["failed"])
+
+                if are_all_jobs_done(image_job_ids):
+                    image_results = collect_job_results(image_job_ids, timeout=60)
+                    generated_images = [img for img in image_results if img is not None]
+                    del st.session_state.email_image_jobs
+                    ctx = st.session_state.pop("email_campaign_context", None)
+                    st.success(f"✅ Generated {len(generated_images)}/{num_images} hero images!")
+                    if ctx:
+                        st.info(f"Images saved to: {ctx.get('images_dir', 'campaign directory')}")
+                else:
+                    if st.button("🔄 Refresh Image Progress", key="refresh_email_images"):
+                        st.rerun()
 
             # Generate Button
             generate_campaign = st.button(

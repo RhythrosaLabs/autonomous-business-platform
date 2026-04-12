@@ -1,26 +1,12 @@
 from app.services.secure_config import get_api_key
-from app.tabs.abp_imports_common import (
-    Path,
-    asyncio,
-    datetime,
-    json,
-    os,
-    requests,
-    setup_logger,
-    st,
-)
+from app.tabs.abp_imports_common import datetime, os, requests, setup_logger, st
 
 # Maintain backward compatibility alias
 dt = datetime
 logger = setup_logger(__name__)
 
 from app.services.global_job_queue import JobType, get_global_job_queue
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-)
+from app.services.tab_job_helpers import are_all_jobs_done, check_jobs_progress, collect_job_results
 from app.tabs.abp_utils import cached_scan_files, cached_scan_products
 
 # Import optional dependencies
@@ -137,7 +123,7 @@ def render_file_grid(files, key_prefix, cols_count=4):
                             if file_info["type"] in [".png", ".jpg", ".jpeg", ".gif", ".webp"]:
                                 try:
                                     st.image(str(file_info["path"]), use_container_width=True)
-                                except:
+                                except Exception:
                                     st.markdown("🖼️ *Preview unavailable*")
                             elif file_info["type"] in [".mp4", ".mov", ".avi"]:
                                 st.video(str(file_info["path"]))
@@ -215,12 +201,11 @@ def render_file_grid(files, key_prefix, cols_count=4):
 
                                             from app.services.platform_helpers import (
                                                 _ensure_replicate_client,
-                                                is_streamlit_cloud,
                                             )
 
                                             replicate_api, _ = _ensure_replicate_client()
 
-                                            with st.spinner(f"Generating video..."):
+                                            with st.spinner("Generating video..."):
                                                 image_path = str(file_info["path"])
                                                 prompt = (
                                                     video_prompt
@@ -363,7 +348,7 @@ def render_file_library_tab():
                     # Find all metadata JSON files
                     for meta_file in folder_path.glob("*_metadata.json"):
                         try:
-                            with open(meta_file, "r") as f:
+                            with open(meta_file) as f:
                                 metadata = json.load(f)
 
                                 # Get actual file path
@@ -378,7 +363,7 @@ def render_file_library_tab():
                                             "folder": folder_name,
                                         }
                                     )
-                        except Exception as e:
+                        except Exception:
                             continue
 
             # Apply filters
@@ -602,6 +587,8 @@ def render_file_library_tab():
         cached_results = cached_scan_files(
             str(campaigns_dir), str(knowledge_dir), ft, include_knowledge
         )
+        if not cached_results:
+            cached_results = []
         # Convert path strings back to Path objects for compatibility
         for f in cached_results:
             f["path"] = Path(f["path"])
@@ -737,6 +724,8 @@ def render_file_library_tab():
             if st.session_state.get("prod_designs_loaded", False):
                 with st.spinner("Scanning products..."):
                     product_files = cached_scan_products(str(products_dir), str(campaigns_dir))
+                    if not product_files:
+                        product_files = []
                     # Convert paths
                     for p in product_files:
                         p["path"] = Path(p["path"])
@@ -870,7 +859,6 @@ def render_file_library_tab():
                             f"🎨 Generating {variations} {product_type} variations in parallel..."
                         ):
                             try:
-                                import time
 
                                 from app.services.api_service import ReplicateAPI
 
@@ -1042,10 +1030,10 @@ def render_file_library_tab():
             brand_templates = []
             if templates_file.exists():
                 try:
-                    with open(templates_file, "r") as f:
+                    with open(templates_file) as f:
                         data = json.load(f)
                         brand_templates = data.get("templates", [])
-                except:
+                except Exception:
                     pass
 
             if brand_templates:
@@ -1097,7 +1085,7 @@ def render_file_library_tab():
                                 st.session_state.current_main_tab = 15  # Go to Brand Templates tab
                                 st.rerun()
                             if st.button("📋 Copy", key=f"copy_brand_{idx}"):
-                                st.session_state[f"copied_brand"] = template
+                                st.session_state["copied_brand"] = template
                                 st.success("Copied!")
 
                         st.markdown(f"**Voice:** {template.get('voice', 'Not set')}")
@@ -1177,7 +1165,7 @@ def render_file_library_tab():
                         st.markdown(f"### {kit['icon']} {kit['name']}")
                         st.caption(f"{kit['size']} • {kit['desc']}")
                         if st.button(
-                            f"🎨 Create", key=f"create_social_{idx}", use_container_width=True
+                            "🎨 Create", key=f"create_social_{idx}", use_container_width=True
                         ):
                             st.session_state["social_template_size"] = kit["size"]
                             st.session_state["social_template_name"] = kit["name"]
@@ -1232,7 +1220,7 @@ def render_file_library_tab():
                 with st.expander(f"{vt['icon']} {vt['name']} ({vt['duration']})"):
                     st.markdown(f"**Style:** {vt['style']}")
                     st.markdown(f"**Duration:** {vt['duration']}")
-                    if st.button(f"🎬 Use Template", key=f"use_video_template_{idx}"):
+                    if st.button("🎬 Use Template", key=f"use_video_template_{idx}"):
                         st.session_state["video_template"] = vt
                         st.session_state.current_main_tab = 7  # Video Producer
                         st.rerun()
@@ -1278,7 +1266,7 @@ def render_file_library_tab():
             for idx, wf in enumerate(workflow_templates):
                 with st.expander(f"{wf['icon']} {wf['name']} ({wf['steps']} steps)"):
                     st.markdown(f"**Flow:** {wf['desc']}")
-                    if st.button(f"🔧 Load Workflow", key=f"load_workflow_{idx}"):
+                    if st.button("🔧 Load Workflow", key=f"load_workflow_{idx}"):
                         st.session_state["loaded_workflow_template"] = wf
                         st.session_state.current_main_tab = 9  # Workflows
                         st.rerun()
@@ -1358,7 +1346,7 @@ def render_file_library_tab():
                             try:
                                 created = datetime.fromisoformat(conv.get("created_at", ""))
                                 date_str = created.strftime("%b %d, %Y at %H:%M")
-                            except:
+                            except Exception:
                                 date_str = "Unknown date"
 
                             st.markdown(
@@ -1425,7 +1413,7 @@ def render_file_library_tab():
                 1. Chat with Otto in the sidebar or Chat tab
                 2. Click 💾 **Save** in the Chat History panel
                 3. Or conversations auto-save when you start a new chat
-                
+
                 All your conversations will appear here!
                 """
                 )
@@ -1453,7 +1441,7 @@ def render_file_library_tab():
                     try:
                         import json
 
-                        with open(contact_file, "r") as f:
+                        with open(contact_file) as f:
                             contact_data = json.load(f)
 
                         campaign_name = contact_data.get("campaign", "Unknown")[:60]
@@ -1485,7 +1473,7 @@ def render_file_library_tab():
 
                                 # Copy all emails button
                                 if st.button(
-                                    f"📋 Copy All Emails", key=f"copy_emails_{contact_file.stem}"
+                                    "📋 Copy All Emails", key=f"copy_emails_{contact_file.stem}"
                                 ):
                                     st.code("\\n".join(emails))
                                     st.info("✅ Select and copy the emails above")
@@ -1721,12 +1709,12 @@ def render_file_library_tab():
                         # Show text preview for readable files
                         if file_info["type"] in [".txt", ".md", ".csv"]:
                             try:
-                                with open(file_info["path"], "r") as f:
+                                with open(file_info["path"]) as f:
                                     content = f.read(500)
                                     st.text(
                                         content[:500] + "..." if len(content) > 500 else content
                                     )
-                            except (UnicodeDecodeError, IOError):
+                            except (OSError, UnicodeDecodeError):
                                 st.caption("Binary file")
 
                         with open(file_info["path"], "rb") as f:
@@ -1850,7 +1838,7 @@ def render_file_library_tab():
                             st.caption(f"... and {len(files_only) - 5} more files")
 
                         # Bulk download button
-                        if st.button(f"📦 Download Campaign ZIP", key=f"zip_{campaign.name}"):
+                        if st.button("📦 Download Campaign ZIP", key=f"zip_{campaign.name}"):
                             import io
                             import zipfile
 

@@ -165,10 +165,11 @@ def render_analytics_tab():
 
             # Job 1: Get Shopify data
             if shopify_connected and st.session_state.get("shopify_api"):
+                _shopify_api = st.session_state.shopify_api
 
-                def fetch_shopify():
+                def fetch_shopify(api=_shopify_api):
                     try:
-                        return st.session_state.shopify_api.get_comprehensive_analytics()
+                        return api.get_comprehensive_analytics()
                     except Exception as e:
                         logger.error(f"Shopify error: {e}")
                         return {"error": str(e)}
@@ -187,10 +188,10 @@ def render_analytics_tab():
 
             # Job 2: Get Printify data
             if printify_connected and st.session_state.get("printify_api"):
+                _printify_api = st.session_state.printify_api
 
-                def fetch_printify():
+                def fetch_printify(api=_printify_api):
                     try:
-                        api = st.session_state.printify_api
                         shops = api.get_shops()
                         if shops:
                             shop_id = str(shops[0].get("id"))
@@ -219,10 +220,10 @@ def render_analytics_tab():
 
             # Job 3: Get YouTube data
             if youtube_connected and st.session_state.get("youtube_service"):
+                _youtube_svc = st.session_state.youtube_service
 
-                def fetch_youtube():
+                def fetch_youtube(yt=_youtube_svc):
                     try:
-                        yt = st.session_state.youtube_service
                         upload_history = yt.get_upload_history(limit=50)
                         if upload_history:
                             total_views = sum(v.get("view_count", 0) for v in upload_history)

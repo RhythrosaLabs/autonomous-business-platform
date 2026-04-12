@@ -7,10 +7,8 @@ View, edit, and analyze CSV/Excel spreadsheets with AI insights.
 import io
 import json
 import logging
-import os
-from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -134,7 +132,7 @@ class SpreadsheetViewer:
 
     # ===== Data Operations =====
 
-    def get_summary(self) -> Dict:
+    def get_summary(self) -> dict:
         """Get summary statistics of the data."""
         if self.current_df is None:
             return {}
@@ -152,7 +150,7 @@ class SpreadsheetViewer:
             "text_columns": list(df.select_dtypes(include=["object"]).columns),
         }
 
-    def get_statistics(self) -> Dict:
+    def get_statistics(self) -> dict:
         """Get detailed statistics for numeric columns."""
         if self.current_df is None:
             return {}
@@ -216,7 +214,7 @@ class SpreadsheetViewer:
 
         return self.current_df.sort_values(by=column, ascending=ascending)
 
-    def add_column(self, name: str, values: List = None, formula: str = None):
+    def add_column(self, name: str, values: list = None, formula: str = None):
         """Add a new column."""
         if self.current_df is None:
             raise ValueError("No data loaded")
@@ -250,7 +248,7 @@ class SpreadsheetViewer:
 
         self.current_df.at[row, column] = value
 
-    def delete_rows(self, indices: List[int]):
+    def delete_rows(self, indices: list[int]):
         """Delete rows by index."""
         if self.current_df is None:
             raise ValueError("No data loaded")
@@ -308,7 +306,7 @@ Provide a clear, insightful answer based on the data.
             logger.error(f"AI analysis failed: {e}")
             raise
 
-    def generate_insights(self) -> List[str]:
+    def generate_insights(self) -> list[str]:
         """Generate automatic insights about the data."""
         if self.current_df is None:
             return []
@@ -376,7 +374,7 @@ def render_spreadsheet_viewer_ui():
             from app.services.api_service import ReplicateAPI
 
             api = ReplicateAPI(api_token=token)
-    except:
+    except Exception:
         pass
 
     viewer = SpreadsheetViewer(api_service=api)
@@ -484,7 +482,7 @@ def render_spreadsheet_viewer_ui():
                                 if filter_val and "." in filter_val
                                 else int(filter_val) if filter_val else filter_val
                             )
-                        except:
+                        except Exception:
                             pass
 
                         filtered = viewer.filter_data(filter_col, filter_op, filter_val)
@@ -606,7 +604,7 @@ def render_spreadsheet_viewer_ui():
                 "Quantity": np.random.randint(1, 50, 100),
                 "Rating": np.random.uniform(3.0, 5.0, 100).round(1),
             }
-            data["Revenue"] = [p * q for p, q in zip(data["Price"], data["Quantity"])]
+            data["Revenue"] = [p * q for p, q in zip(data["Price"], data["Quantity"], strict=False)]
 
             viewer.current_df = pd.DataFrame(data)
             st.success("Example data loaded!")

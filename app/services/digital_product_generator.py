@@ -7,13 +7,10 @@ Not just cover art, but the entire product with all content.
 from app.services.secure_config import get_api_key
 from app.tabs.abp_imports_common import (
     Any,
-    BytesIO,
     Dict,
     List,
     Optional,
     Path,
-    base64,
-    datetime,
     json,
     logging,
     os,
@@ -180,7 +177,7 @@ class AIContentGenerator:
                         with open(output_path, "wb") as f:
                             f.write(response.content)
                         return output_path
-            except:
+            except Exception:
                 pass
 
             # Fallback to gTTS
@@ -253,7 +250,7 @@ class EBookGenerator:
         if not title:
             title_prompt = f"""Create a compelling, marketable book title for a {genre} book about: {topic}
             Target audience: {target_audience}
-            
+
             Respond with ONLY the title, nothing else."""
 
             title = self.ai.generate_text(title_prompt, max_tokens=50)
@@ -266,7 +263,7 @@ class EBookGenerator:
 
         # Generate book outline
         outline_prompt = f"""Create a detailed chapter outline for a {genre} book titled "{title}" about {topic}.
-        
+
 Target audience: {target_audience}
 Number of chapters: {num_chapters}
 
@@ -328,8 +325,8 @@ Write the full chapter content now:"""
             if include_images:
                 update_progress(f"🎨 Generating illustration for Chapter {i+1}...")
 
-                image_prompt = f"""Book illustration for chapter titled "{chapter_info['title']}" 
-                from a {genre} book about {topic}. 
+                image_prompt = f"""Book illustration for chapter titled "{chapter_info['title']}"
+                from a {genre} book about {topic}.
                 Professional book illustration, detailed, evocative"""
 
                 image_url = self.ai.generate_image(image_prompt)
@@ -347,8 +344,8 @@ Write the full chapter content now:"""
 
         # Generate cover
         update_progress("🎨 Generating book cover...")
-        cover_prompt = f"""Professional book cover design for "{title}", 
-        a {genre} book about {topic}. 
+        cover_prompt = f"""Professional book cover design for "{title}",
+        a {genre} book about {topic}.
         Eye-catching, marketable book cover, professional typography space for title,
         bestseller quality design"""
 
@@ -475,7 +472,7 @@ Write the full chapter content now:"""
                 cover_img = Image(cover_path, width=5 * inch, height=7 * inch)
                 story.append(cover_img)
                 story.append(PageBreak())
-            except:
+            except Exception:
                 pass
 
         # Title page
@@ -507,7 +504,7 @@ Write the full chapter content now:"""
                     img = Image(chapter["image"], width=4 * inch, height=3 * inch)
                     story.append(img)
                     story.append(Spacer(1, 0.2 * inch))
-                except:
+                except Exception:
                     pass
 
             # Chapter content - split into paragraphs
@@ -521,7 +518,7 @@ Write the full chapter content now:"""
                     para = para.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
                     try:
                         story.append(Paragraph(para, body_style))
-                    except:
+                    except Exception:
                         # If paragraph fails, try simpler text
                         story.append(Paragraph(para[:500], body_style))
 
@@ -645,10 +642,10 @@ class ColoringBookGenerator:
         # Generate page descriptions for variety
         page_ideas_prompt = f"""Generate {num_pages} unique coloring page ideas for a {difficulty} level coloring book about "{theme}".
         Style: {style}
-        
+
         For each page, provide a brief, specific description (one line each).
         Make each page unique and interesting.
-        
+
         Format: Just list the descriptions, one per line, numbered 1-{num_pages}."""
 
         page_ideas = self.ai.generate_text(page_ideas_prompt, max_tokens=1000)
@@ -671,7 +668,7 @@ class ColoringBookGenerator:
 
             # Generate coloring page image
             image_prompt = f"""Coloring book page, {page_desc}, {theme}, {style_prompt}, {diff_prompt},
-            black and white line art, no shading, no gray tones, no color, 
+            black and white line art, no shading, no gray tones, no color,
             clean outlines only, white background, printable coloring page,
             professional coloring book illustration"""
 
@@ -745,7 +742,7 @@ class ColoringBookGenerator:
                 img = Image(cover_path, width=7 * inch, height=9 * inch)
                 story.append(img)
                 story.append(PageBreak())
-            except:
+            except Exception:
                 pass
 
         # Coloring pages
@@ -755,7 +752,7 @@ class ColoringBookGenerator:
                     img = Image(page_path, width=7.5 * inch, height=9.5 * inch)
                     story.append(img)
                     story.append(PageBreak())
-                except:
+                except Exception:
                     pass
 
         try:
@@ -1177,7 +1174,7 @@ Lessons covered:
 
 Include:
 1. Key Concepts Review (5 fill-in-the-blank questions)
-2. Practical Exercises (3-5 hands-on activities)  
+2. Practical Exercises (3-5 hands-on activities)
 3. Reflection Questions (3 thought-provoking questions)
 4. Action Items / Next Steps (5 actionable items)
 
@@ -1255,7 +1252,7 @@ Write the complete worksheet content now:"""
                         try:
                             story.append(Paragraph(para, styles["Normal"]))
                             story.append(Spacer(1, 0.1 * inch))
-                        except:
+                        except Exception:
                             pass
 
                 story.append(PageBreak())
@@ -1446,7 +1443,7 @@ Continue for all {num_pages} pages. Make it engaging with good pacing."""
                 img = Image(cover_path, width=7.5 * inch, height=10 * inch)
                 story.append(img)
                 story.append(PageBreak())
-            except:
+            except Exception:
                 pass
 
         # Pages
@@ -1456,7 +1453,7 @@ Continue for all {num_pages} pages. Make it engaging with good pacing."""
                     img = Image(page_path, width=7.5 * inch, height=10 * inch)
                     story.append(img)
                     story.append(PageBreak())
-                except:
+                except Exception:
                     pass
 
         try:
@@ -1587,7 +1584,7 @@ Make the names creative and genre-appropriate."""
         promo_styles = ["instagram square", "banner wide", "story vertical"]
         sizes = ["1080x1080", "1200x628", "1080x1920"]
 
-        for style, size in zip(promo_styles[:2], sizes[:2]):  # Just 2 promos
+        for style, size in zip(promo_styles[:2], sizes[:2], strict=False):  # Just 2 promos
             promo_prompt = f"""Promotional image for "{pack_name}" sample pack,
             {genre} music production,
             {style} format,

@@ -21,13 +21,27 @@ def render_task_queue_tab(
         except ImportError:
             st.error("Enhanced Task Queue module not found.")
     else:
-        # Fallback to original todo list
-        # Assuming render_autonomous_todo is available via import or passed in
-        # But render_autonomous_todo is defined in autonomous_business_platform.py
-        # We should probably import it or move it.
-        # For now, let's assume the caller handles the fallback or we import it if possible.
-        # Actually, render_autonomous_todo is a wrapper for chat_assistant.
+        # Fallback: simple task list UI when enhanced task queue is not available
+        st.markdown("### 📋 Task Queue")
+        st.info("The enhanced task queue engine is not available. Showing basic task list.")
 
-        from app.services.chat_assistant import get_chat_assistant
+        if "task_list" not in st.session_state:
+            st.session_state.task_list = []
 
-        get_chat_assistant()["render_autonomous_todo"]()
+        new_task = st.text_input("Add a new task:", key="new_task_input")
+        if st.button("➕ Add Task") and new_task:
+            st.session_state.task_list.append({"name": new_task, "done": False})
+            st.rerun()
+
+        for i, task in enumerate(st.session_state.task_list):
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                done = st.checkbox(task["name"], value=task["done"], key=f"task_{i}")
+                st.session_state.task_list[i]["done"] = done
+            with col2:
+                if st.button("🗑️", key=f"del_task_{i}"):
+                    st.session_state.task_list.pop(i)
+                    st.rerun()
+
+        if not st.session_state.task_list:
+            st.caption("No tasks yet. Add one above!")

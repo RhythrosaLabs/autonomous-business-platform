@@ -7,7 +7,7 @@ The supercharged Otto that combines all components into one hyperintelligent ass
 import asyncio
 import logging
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import streamlit as st
 
@@ -21,7 +21,6 @@ from .otto_super_engine import (
     IntentParser,
     MemoryManager,
     ParsedIntent,
-    Tool,
     ToolCategory,
     ToolRegistry,
 )
@@ -76,7 +75,7 @@ class OttoSuper:
                 from ray_integration_helpers import is_ray_enabled
 
                 self.enable_ray = is_ray_enabled()
-            except:
+            except Exception:
                 self.enable_ray = False
         else:
             self.enable_ray = enable_ray
@@ -120,7 +119,7 @@ class OttoSuper:
         else:
             logger.info("✅ Otto Super ready with FULL platform access!")
 
-    def get_system_status(self) -> Dict[str, bool]:
+    def get_system_status(self) -> dict[str, bool]:
         """Get status of all integrated systems."""
         return {
             "replicate": bool(self.replicate),
@@ -133,7 +132,7 @@ class OttoSuper:
 
     async def process_message(
         self, user_message: str, session: Optional[ChatSession] = None, progress_callback=None
-    ) -> tuple[str, List[ExecutionResult]]:
+    ) -> tuple[str, list[ExecutionResult]]:
         """
         Process a user message end-to-end:
         1. Parse intent
@@ -306,7 +305,7 @@ class OttoSuper:
             return error_msg, []
 
     async def _generate_conversational_response(
-        self, message: str, recent_messages: List[ChatMessage], context: Dict
+        self, message: str, recent_messages: list[ChatMessage], context: dict
     ) -> str:
         """Generate a conversational response (no actions)."""
 
@@ -353,8 +352,8 @@ Be helpful, friendly, and concise. If the user asks you to DO something, explain
             return f"I understand your question, but I encountered an error: {e}"
 
     async def _handle_app_control(
-        self, intent_type: str, message: str, context: Dict
-    ) -> Dict[str, Any]:
+        self, intent_type: str, message: str, context: dict
+    ) -> dict[str, Any]:
         """Handle app-wide control operations (full platform access)."""
 
         try:
@@ -495,7 +494,7 @@ Be helpful, friendly, and concise. If the user asks you to DO something, explain
         match = re.search(r"\$?(\d+\.?\d*)", message)
         return float(match.group(1)) if match else 24.99
 
-    def _extract_platforms(self, message: str) -> List[str]:
+    def _extract_platforms(self, message: str) -> list[str]:
         """Extract platform list from message."""
         msg_lower = message.lower()
         all_platforms = ["pinterest", "tiktok", "instagram", "twitter", "facebook"]
@@ -525,8 +524,8 @@ Be helpful, friendly, and concise. If the user asks you to DO something, explain
         return "daily"
 
     async def _handle_extended_intent(
-        self, extended_intent: Dict[str, Any], message: str, context: Dict
-    ) -> Dict[str, Any]:
+        self, extended_intent: dict[str, Any], message: str, context: dict
+    ) -> dict[str, Any]:
         """Handle extended Otto functionality (task queue, documents, workflows)."""
         action = extended_intent.get("action")
 
@@ -624,7 +623,7 @@ Be helpful, friendly, and concise. If the user asks you to DO something, explain
             logger.error(f"Extended intent error: {e}", exc_info=True)
             return {"success": False, "response": f"❌ Error: {str(e)}"}
 
-    def _build_response(self, intent: ParsedIntent, results: List[ExecutionResult]) -> str:
+    def _build_response(self, intent: ParsedIntent, results: list[ExecutionResult]) -> str:
         """Build a response message from intent and results."""
 
         successful = [r for r in results if r.success]
@@ -681,7 +680,7 @@ Be helpful, friendly, and concise. If the user asks you to DO something, explain
 
         return "\n".join(response_parts)
 
-    def get_tool_catalog(self) -> Dict[str, List[Dict]]:
+    def get_tool_catalog(self) -> dict[str, list[dict]]:
         """Get a categorized catalog of all available tools."""
         catalog = {}
 
@@ -831,7 +830,7 @@ def render_otto_super_ui(replicate_api, printify_api=None, shopify_api=None, you
                                     image_url = match.group(1)
                                     try:
                                         st.image(image_url, use_container_width=True)
-                                    except:
+                                    except Exception:
                                         st.markdown(part)
                             elif part.strip():
                                 st.markdown(part)

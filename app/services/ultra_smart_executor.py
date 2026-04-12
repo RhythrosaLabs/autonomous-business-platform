@@ -12,21 +12,16 @@ A hyper-intelligent workflow execution engine that:
 8. Real-time adaptation to available resources
 """
 
-import hashlib
-import json
 import logging
 import os
 import re
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple
-
-import requests
-
-from app.services.platform_integrations import tracked_replicate_run
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -63,20 +58,20 @@ class StepResult:
     output_type: OutputType = None
     output_url: str = None
     output_path: str = None
-    metadata: Dict = field(default_factory=dict)
+    metadata: dict = field(default_factory=dict)
     message: str = ""
     workaround_used: str = None
     adaptation_notes: str = None
     execution_time: float = 0
     model_used: str = None
-    fallbacks_tried: List[str] = field(default_factory=list)
+    fallbacks_tried: list[str] = field(default_factory=list)
 
 
 @dataclass
 class WorkflowContext:
     """Rich context with intelligent retrieval"""
 
-    outputs: List[StepResult] = field(default_factory=list)
+    outputs: list[StepResult] = field(default_factory=list)
 
     # Current state by type
     current_image: str = None
@@ -87,14 +82,14 @@ class WorkflowContext:
     current_mask: str = None
 
     # All outputs by type (history)
-    all_images: List[str] = field(default_factory=list)
-    all_videos: List[str] = field(default_factory=list)
-    all_texts: List[str] = field(default_factory=list)
+    all_images: list[str] = field(default_factory=list)
+    all_videos: list[str] = field(default_factory=list)
+    all_texts: list[str] = field(default_factory=list)
 
     # Extracted data
-    prompts: List[str] = field(default_factory=list)
-    styles: List[str] = field(default_factory=list)
-    models_used: List[str] = field(default_factory=list)
+    prompts: list[str] = field(default_factory=list)
+    styles: list[str] = field(default_factory=list)
+    models_used: list[str] = field(default_factory=list)
 
     # Original workflow info
     workflow_name: str = ""
@@ -102,7 +97,7 @@ class WorkflowContext:
     start_time: datetime = None
 
     # Variables and expressions
-    variables: Dict[str, Any] = field(default_factory=dict)
+    variables: dict[str, Any] = field(default_factory=dict)
 
     def get_best_match(self, required_type: OutputType, hint: str = None) -> Optional[str]:
         """Get the best matching output for a requirement"""
@@ -419,7 +414,7 @@ class UltraSmartExecutor:
         self.error_recovery_strategies = self._build_recovery_strategies()
         self.execution_log = []
 
-    def _build_recovery_strategies(self) -> Dict[str, List[Callable]]:
+    def _build_recovery_strategies(self) -> dict[str, list[Callable]]:
         """Build multi-level recovery strategies for each capability"""
         return {
             "image_generation": [
@@ -456,7 +451,7 @@ class UltraSmartExecutor:
             ],
         }
 
-    def execute_workflow(self, workflow: Dict, progress_callback=None) -> List[StepResult]:
+    def execute_workflow(self, workflow: dict, progress_callback=None) -> list[StepResult]:
         """Execute workflow with full intelligence"""
         self.context = WorkflowContext()
         self.context.workflow_name = workflow.get("name", "Unnamed")
@@ -522,7 +517,7 @@ class UltraSmartExecutor:
 
         return results
 
-    def _extract_workflow_context(self, workflow: Dict):
+    def _extract_workflow_context(self, workflow: dict):
         """Extract prompts, variables, and context from workflow"""
         # Extract prompts from steps
         for step in workflow.get("steps", []):
@@ -539,7 +534,7 @@ class UltraSmartExecutor:
         if "variables" in workflow:
             self.context.variables = workflow["variables"]
 
-    def _analyze_step_intent(self, step: Dict) -> Tuple[str, OutputType]:
+    def _analyze_step_intent(self, step: dict) -> tuple[str, OutputType]:
         """Semantically analyze what the step is trying to do"""
         step_type = step.get("type", "").lower()
         step_name = step.get("name", "").lower()
@@ -580,7 +575,7 @@ class UltraSmartExecutor:
         # Default to image generation (most common)
         return "image_generation", OutputType.IMAGE
 
-    def _enrich_config(self, step: Dict, capability: str) -> Dict:
+    def _enrich_config(self, step: dict, capability: str) -> dict:
         """Enrich step config with context-aware defaults"""
         config = step.get("config", {}).copy()
 
@@ -625,7 +620,7 @@ class UltraSmartExecutor:
         self,
         step_id: int,
         step_type: str,
-        config: Dict,
+        config: dict,
         capability: str,
         expected_output: OutputType,
     ) -> StepResult:
@@ -687,7 +682,7 @@ class UltraSmartExecutor:
             fallbacks_tried=tried_models,
         )
 
-    def _find_suitable_models(self, required_caps: List[str]) -> List[str]:
+    def _find_suitable_models(self, required_caps: list[str]) -> list[str]:
         """Find models that have at least one required capability"""
         suitable = []
         for model_key, model_info in MODEL_REGISTRY.items():
@@ -701,7 +696,7 @@ class UltraSmartExecutor:
         step_id: int,
         step_type: str,
         model_key: str,
-        config: Dict,
+        config: dict,
         expected_output: OutputType,
     ) -> StepResult:
         """Run a specific model with parameter mapping"""
@@ -763,13 +758,13 @@ class UltraSmartExecutor:
     # ==================== RECOVERY STRATEGIES ====================
 
     def _try_alternative_model(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Try alternative models (already covered in main flow)"""
         return None
 
     def _try_simplified_prompt(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Simplify prompt and retry"""
         if "prompt" not in config:
@@ -791,11 +786,11 @@ class UltraSmartExecutor:
                 result.status = StepStatus.WORKAROUND
                 result.workaround_used = "Used simplified prompt"
             return result
-        except:
+        except Exception:
             return None
 
     def _try_different_size(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Try with different image size"""
         modified = config.copy()
@@ -808,11 +803,11 @@ class UltraSmartExecutor:
                 result.status = StepStatus.WORKAROUND
                 result.workaround_used = "Used smaller image size (512x512)"
             return result
-        except:
+        except Exception:
             return None
 
     def _generate_placeholder(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Generate a placeholder image"""
         # Use placeholder service
@@ -835,7 +830,7 @@ class UltraSmartExecutor:
         )
 
     def _try_as_img2img(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Convert edit request to img2img"""
         if not config.get("image"):
@@ -849,17 +844,17 @@ class UltraSmartExecutor:
                 result.status = StepStatus.WORKAROUND
                 result.workaround_used = "Used img2img approach"
             return result
-        except:
+        except Exception:
             return None
 
     def _try_as_style_transfer(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Try as style transfer instead of direct edit"""
         return None  # Would need style transfer model
 
     def _passthrough_original(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Pass through original image unchanged"""
         original = config.get("image") or self.context.get_best_match(OutputType.IMAGE)
@@ -877,7 +872,7 @@ class UltraSmartExecutor:
         return None
 
     def _try_basic_resize(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Try basic resize instead of AI upscaling"""
         original = config.get("image") or self.context.get_best_match(OutputType.IMAGE)
@@ -896,7 +891,7 @@ class UltraSmartExecutor:
         return None
 
     def _try_animated_gif(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Create animated GIF from static image"""
         image = config.get("image") or self.context.get_best_match(OutputType.IMAGE)
@@ -915,7 +910,7 @@ class UltraSmartExecutor:
         return None
 
     def _create_slideshow(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Create slideshow from available images"""
         if self.context.all_images:
@@ -932,19 +927,19 @@ class UltraSmartExecutor:
         return None
 
     def _try_manual_mask(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Try basic masking approach"""
         return self._passthrough_original(step_id, step_type, config, expected_output, error)
 
     def _try_alternative_path(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Try alternative save path"""
         return self._try_temp_directory(step_id, step_type, config, expected_output, error)
 
     def _try_temp_directory(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Save to temp directory"""
         import tempfile
@@ -979,7 +974,7 @@ class UltraSmartExecutor:
         return None
 
     def _return_url(
-        self, step_id: int, step_type: str, config: Dict, expected_output: OutputType, error: str
+        self, step_id: int, step_type: str, config: dict, expected_output: OutputType, error: str
     ) -> StepResult:
         """Return URL instead of saving locally"""
         source = self.context.get_best_match(OutputType.IMAGE) or self.context.get_best_match(
@@ -1000,7 +995,7 @@ class UltraSmartExecutor:
 
     # ==================== SPECIAL HANDLERS ====================
 
-    def handle_comfyui_workflow(self, comfy_workflow: Dict) -> List[StepResult]:
+    def handle_comfyui_workflow(self, comfy_workflow: dict) -> list[StepResult]:
         """
         Special handler for ComfyUI workflows.
         Understands ComfyUI node semantics and executes equivalent operations.
@@ -1020,7 +1015,7 @@ class UltraSmartExecutor:
 
 
 # Convenience function
-def execute_workflow_ultra(workflow: Dict, progress_callback=None) -> List[StepResult]:
+def execute_workflow_ultra(workflow: dict, progress_callback=None) -> list[StepResult]:
     """
     Execute workflow with ultra-smart executor.
     """
@@ -1028,7 +1023,7 @@ def execute_workflow_ultra(workflow: Dict, progress_callback=None) -> List[StepR
     return executor.execute_workflow(workflow, progress_callback)
 
 
-def get_execution_summary(results: List[StepResult]) -> Dict:
+def get_execution_summary(results: list[StepResult]) -> dict:
     """Get a summary of execution results"""
     total = len(results)
     success = sum(1 for r in results if r.status == StepStatus.SUCCESS)

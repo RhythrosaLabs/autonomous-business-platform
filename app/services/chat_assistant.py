@@ -1267,7 +1267,7 @@ End to end automation for a neon cat poster campaign
                     metadata = json.load(f)
                 analysis.append(f"\n**Created:** {metadata.get('timestamp', 'Unknown')}")
                 analysis.append(f"**Concept:** {metadata.get('concept', 'Unknown')}")
-            except:
+            except Exception:
                 pass
 
         return "\n".join(analysis)
@@ -1504,7 +1504,7 @@ def _initialize_apis():
             from app.services.api_service import PrintifyAPI
 
             apis["printify"] = PrintifyAPI(token)
-    except:
+    except Exception:
         pass
 
     try:
@@ -1514,13 +1514,13 @@ def _initialize_apis():
             from app.services.shopify_service import ShopifyService
 
             apis["shopify"] = ShopifyService(store, token)
-    except:
+    except Exception:
         pass
 
     try:
         if st.session_state.get("youtube_credentials"):
             apis["youtube"] = True
-    except:
+    except Exception:
         pass
 
     return apis

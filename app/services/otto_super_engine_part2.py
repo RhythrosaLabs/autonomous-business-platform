@@ -534,7 +534,7 @@ class ExecutionEngine:
 
             try:
                 os.unlink(video_path)
-            except:
+            except Exception:
                 pass
 
             if result:

@@ -285,19 +285,27 @@ def render_calendar_tab():
                             new_title = st.text_input(
                                 "Title", value=item.get("title", ""), key=f"edit_title_{idx}"
                             )
+                            _time_str = item.get("time", "09:00")
+                            try:
+                                _default_time = datetime_module.datetime.strptime(
+                                    _time_str, "%H:%M"
+                                ).time()
+                            except (ValueError, TypeError):
+                                _default_time = datetime_module.time(9, 0)
                             new_time = st.time_input(
                                 "Time",
-                                value=datetime_module.datetime.strptime(
-                                    item.get("time", "09:00"), "%H:%M"
-                                ).time(),
+                                value=_default_time,
                                 key=f"edit_time_{idx}",
+                            )
+                            _valid_types = ["post", "image", "video", "workflow"]
+                            _item_type = item.get("type", "post")
+                            _type_index = (
+                                _valid_types.index(_item_type) if _item_type in _valid_types else 0
                             )
                             new_type = st.selectbox(
                                 "Type",
-                                ["post", "image", "video", "workflow"],
-                                index=["post", "image", "video", "workflow"].index(
-                                    item.get("type", "post")
-                                ),
+                                _valid_types,
+                                index=_type_index,
                                 key=f"edit_type_{idx}",
                             )
                             new_desc = st.text_area(

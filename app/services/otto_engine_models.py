@@ -10,38 +10,28 @@ Classes:
 - TaskType, TaskStep, TaskPlan: Task workflow structures
 """
 
+from app.services.secure_config import get_api_key
 from app.tabs.abp_imports_common import (
     Any,
     BytesIO,
-    Callable,
     Dict,
     Enum,
     List,
     Optional,
     Path,
-    ThreadPoolExecutor,
     Tuple,
-    Union,
-    asyncio,
     base64,
     dataclass,
     datetime,
     field,
     hashlib,
     json,
-    logging,
-    lru_cache,
     os,
-    pickle,
-    re,
     setup_logger,
     st,
-    tempfile,
     time,
     uuid,
 )
-
-from app.services.secure_config import get_api_key
 
 logger = setup_logger(__name__)
 
@@ -75,7 +65,7 @@ class OttoKnowledgeBase:
         """Load memory from disk."""
         if self.memory_file.exists():
             try:
-                with open(self.memory_file, "r") as f:
+                with open(self.memory_file) as f:
                     return json.load(f)
             except Exception as e:
                 logger.warning(f"Failed to load memory: {e}")
@@ -207,7 +197,7 @@ Be specific and detailed."""
                 try:
                     parsed = json.loads(content)
                     content = json.dumps(parsed, indent=2)
-                except:
+                except Exception:
                     pass
 
             elif file_ext in ["csv"]:
@@ -219,8 +209,8 @@ Be specific and detailed."""
             else:
                 try:
                     content = file_data.decode("utf-8", errors="ignore")
-                except:
-                    content = f"[Binary file - cannot extract text]"
+                except Exception:
+                    content = "[Binary file - cannot extract text]"
 
             # Summarize if content is long
             summary = content[:500] if len(content) > 500 else content
@@ -418,7 +408,7 @@ class OttoAppAwareness:
 
         summary_parts = [
             f"📍 **Current Page:** {state.get('current_page', 'Main Dashboard')}",
-            f"🔗 **Integrations:** ",
+            "🔗 **Integrations:** ",
         ]
 
         integrations = state.get("integrations", {})
@@ -517,7 +507,7 @@ class RequestCache:
         if key in self._cache:
             value, timestamp = self._cache[key]
             if time.time() - timestamp < self.ttl:
-                logger.info(f"🎯 Cache hit for request")
+                logger.info("🎯 Cache hit for request")
                 return value
             del self._cache[key]
         return None

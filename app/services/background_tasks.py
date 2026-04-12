@@ -440,7 +440,7 @@ class BackgroundTaskManager:
                             task.completed_at = datetime.now().isoformat()
                             cleaned += 1
                             logger.warning(f"Cleaned up stuck task {task.id}")
-                    except:
+                    except Exception:
                         pass
         if cleaned > 0:
             self._save_state()
@@ -600,7 +600,7 @@ def get_task_manager() -> BackgroundTaskManager:
     if HAS_STREAMLIT:
         try:
             return _get_cached_task_manager()
-        except:
+        except Exception:
             pass
     return BackgroundTaskManager()
 

@@ -4,15 +4,13 @@ Enhanced Video Editor
 Advanced video editing tools with AI-powered features.
 """
 
-import io
 import json
 import logging
-import os
 import subprocess
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +31,7 @@ def check_ffmpeg() -> bool:
     try:
         subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -76,7 +74,7 @@ class VideoEditor:
         self.output_dir = output_dir or Path(tempfile.gettempdir()) / "video_editor"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _run_ffmpeg(self, args: List[str], timeout: int = 300) -> Tuple[bool, str]:
+    def _run_ffmpeg(self, args: list[str], timeout: int = 300) -> tuple[bool, str]:
         """Run FFmpeg command."""
         if not FFMPEG_AVAILABLE:
             raise RuntimeError("FFmpeg not installed")
@@ -96,7 +94,7 @@ class VideoEditor:
         except Exception as e:
             return False, str(e)
 
-    def get_video_info(self, video_path: str) -> Dict:
+    def get_video_info(self, video_path: str) -> dict:
         """Get video metadata using FFprobe."""
         try:
             cmd = [
@@ -153,7 +151,7 @@ class VideoEditor:
 
         return output_path
 
-    def concatenate(self, video_paths: List[str], output_path: str = None) -> str:
+    def concatenate(self, video_paths: list[str], output_path: str = None) -> str:
         """Concatenate multiple videos."""
         output_path = output_path or str(
             self.output_dir / f"concat_{datetime.now().strftime('%H%M%S')}.mp4"
@@ -268,7 +266,7 @@ class VideoEditor:
                     "-i",
                     audio_path,
                     "-filter_complex",
-                    f"[0:a][1:a]amix=inputs=2:duration=first[a]",
+                    "[0:a][1:a]amix=inputs=2:duration=first[a]",
                     "-map",
                     "0:v",
                     "-map",
@@ -319,7 +317,7 @@ class VideoEditor:
 
     def extract_frames(
         self, video_path: str, fps: float = 1, output_pattern: str = None
-    ) -> List[str]:
+    ) -> list[str]:
         """Extract frames from video."""
         output_pattern = output_pattern or str(self.output_dir / "frame_%04d.png")
 

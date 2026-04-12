@@ -6,8 +6,7 @@ product_promo_video.py, and autonomous_business_platform.py.
 """
 
 import logging
-import os
-from typing import Any, Dict, List, Optional
+from typing import Optional
 
 import replicate
 import requests
@@ -80,7 +79,12 @@ def generate_script_with_llama(
 
         output = replicate.run(model, input=input_params)
 
-        full_text = "".join(output).strip()
+        if isinstance(output, str):
+            full_text = output.strip()
+        elif output is not None:
+            full_text = "".join(output).strip()
+        else:
+            raise ValueError("Replicate returned no output")
         logger.info(f"✅ Generated {len(full_text)} characters")
 
         return full_text
@@ -92,7 +96,7 @@ def generate_script_with_llama(
 
 def parse_script_segments(
     script_text: str, expected_count: int = 3, fallback_text: str = "Generated content"
-) -> List[str]:
+) -> list[str]:
     """
     Parse numbered segments from generated script.
 
@@ -129,12 +133,12 @@ def parse_script_segments(
 
 
 def generate_voiceover_audio(
-    text_segments: List[str],
+    text_segments: list[str],
     voice_style: str = "Professional",
     model: str = "minimax/speech-02-hd",
     speed: float = 1.0,
     output_dir: Optional[str] = None,
-) -> List[str]:
+) -> list[str]:
     """
     Generate professional voiceover audio for text segments using Minimax Speech.
 

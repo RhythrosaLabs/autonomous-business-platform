@@ -668,7 +668,11 @@ def render_video_producer_tab():
                             model_input["first_frame_image"] = open(str(product_image_path), "rb")
                     elif use_pixverse5:
                         model_name = "pixverse/pixverse-v5"
-                        model_input = {"prompt": video_prompt, "duration": 5, "resolution": "720p"}
+                        model_input = {
+                            "prompt": video_prompt,
+                            "duration": video_duration,
+                            "resolution": "720p",
+                        }
                         if product_image_path and product_image_path.exists():
                             st.info(
                                 f"🖼️ Using product image for segment {i+1} (Pixverse v5 image-to-video)"
@@ -676,7 +680,11 @@ def render_video_producer_tab():
                             model_input["first_frame_image"] = open(str(product_image_path), "rb")
                     elif use_pixverse45:
                         model_name = "pixverse/pixverse-v4.5"
-                        model_input = {"prompt": video_prompt, "duration": 5, "resolution": "720p"}
+                        model_input = {
+                            "prompt": video_prompt,
+                            "duration": video_duration,
+                            "resolution": "720p",
+                        }
                         if product_image_path and product_image_path.exists():
                             st.info(
                                 f"🖼️ Using product image for segment {i+1} (Pixverse v4.5 image-to-video)"
@@ -707,10 +715,10 @@ def render_video_producer_tab():
                         st.info(f"🖼️ Using product image for segment {i+1} (Hailuo image-only)")
                         # Hailuo API requires BOTH prompt AND first_frame_image
                         model_input = {
-                            "prompt": video_prompt,  # Motion description
+                            "prompt": video_prompt,
                             "first_frame_image": open(str(product_image_path), "rb"),
-                            "duration": 6,
-                            "resolution": "768p",
+                            "duration": video_duration,
+                            "resolution": video_resolution,
                         }
                     elif use_wan:
                         model_name = "wan-video/wan-2.5-t2v-fast"
@@ -1045,6 +1053,8 @@ def render_video_producer_tab():
                         if include_music and music_path and music_path.exists():
                             try:
                                 music_clip = AudioFileClip(str(music_path))
+                                if music_clip.duration <= 0:
+                                    raise ValueError("Music clip has zero duration")
                                 # Loop music if video is longer
                                 if music_clip.duration < final_clip.duration:
                                     loops_needed = (

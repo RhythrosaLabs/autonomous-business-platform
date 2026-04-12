@@ -1,18 +1,8 @@
-from app.tabs.abp_imports_common import Path, datetime, json, os, setup_logger, st
+from app.tabs.abp_imports_common import datetime, setup_logger, st
 
 # Maintain backward compatibility alias
 dt = datetime
 logger = setup_logger(__name__)
-
-from app.services.global_job_queue import JobType, get_global_job_queue
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    submit_batch_operation,
-    submit_digital_product_job,
-)
-from app.utils.ray_integration_helpers import is_ray_enabled, ray_generate_image_sync
 
 
 def render_digital_products_tab():
@@ -40,7 +30,7 @@ def render_digital_products_tab():
     # Initialize service
     try:
         service = DigitalProductsService()
-    except:
+    except Exception:
         service = None
 
     dp_tabs = st.tabs(["🎨 AI Generate", "📤 Upload", "📦 My Products", "📊 Stats"])
@@ -216,15 +206,26 @@ def render_digital_products_tab():
                     if "digital_products" not in st.session_state:
                         st.session_state.digital_products = []
 
+                    # Save the uploaded file to disk
+                    import uuid
+                    from pathlib import Path as _Path
+
+                    upload_dir = _Path("library/documents")
+                    upload_dir.mkdir(parents=True, exist_ok=True)
+                    safe_name = f"{uuid.uuid4().hex[:8]}_{uploaded_file.name}"
+                    save_path = upload_dir / safe_name
+                    save_path.write_bytes(uploaded_file.getvalue())
+
                     # Create product entry
                     new_product = {
-                        "id": len(st.session_state.digital_products) + 1,
+                        "id": uuid.uuid4().hex[:8],
                         "title": upload_title,
                         "description": upload_desc,
                         "price": upload_price,
                         "filename": uploaded_file.name,
                         "file_size": uploaded_file.size,
                         "file_type": uploaded_file.type,
+                        "result": {"file_path": str(save_path)},
                         "created_at": dt.now().isoformat(),
                     }
                     st.session_state.digital_products.append(new_product)
@@ -251,7 +252,7 @@ def render_digital_products_tab():
                     try:
                         import json
 
-                        with open(product_file, "r") as f:
+                        with open(product_file) as f:
                             metadata = json.load(f)
                             # Add to session if not already there
                             if not any(
@@ -259,9 +260,9 @@ def render_digital_products_tab():
                                 for p in st.session_state.digital_products
                             ):
                                 st.session_state.digital_products.append(metadata)
-                    except:
+                    except Exception:
                         pass
-        except:
+        except Exception:
             pass
 
         if st.session_state.digital_products:
@@ -359,12 +360,17 @@ def render_digital_products_tab():
                         if product.get("result") and isinstance(product.get("result"), dict):
                             file_path = product["result"].get("file_path")
                             if file_path and Path(file_path).exists():
+                                import mimetypes
+
+                                mime_type = (
+                                    mimetypes.guess_type(file_path)[0] or "application/octet-stream"
+                                )
                                 with open(file_path, "rb") as f:
                                     st.download_button(
                                         "📥 Download",
                                         f.read(),
                                         file_name=Path(file_path).name,
-                                        mime="application/pdf",
+                                        mime=mime_type,
                                         key=f"download_dp_{idx}",
                                     )
 
@@ -429,7 +435,7 @@ def render_digital_products_tab():
                                 if file_path:
                                     try:
                                         Path(file_path).unlink(missing_ok=True)
-                                    except:
+                                    except Exception:
                                         pass
                             st.success("Product deleted!")
                             st.rerun()

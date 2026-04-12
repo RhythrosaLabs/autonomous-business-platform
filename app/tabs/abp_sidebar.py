@@ -1548,7 +1548,7 @@ def render_sidebar(
                             "today_cost": api_tracker.get_today_cost(),
                             "call_count": len(api_tracker.usage_log),
                         }
-                except:
+                except Exception:
                     pass
 
                 col_ana1, col_ana2 = st.columns(2)
@@ -1852,7 +1852,10 @@ def render_sidebar(
                                             from app.services.otto_engine import get_slash_processor
 
                                             # Get Replicate API token
-                                            replicate_token = _get_replicate_token()
+                                            try:
+                                                replicate_token = _get_replicate_token()
+                                            except ValueError:
+                                                replicate_token = None
                                             if not replicate_token:
                                                 st.error("❌ Replicate API token not configured.")
                                             else:

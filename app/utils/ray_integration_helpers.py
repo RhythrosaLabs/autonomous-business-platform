@@ -7,7 +7,8 @@ These helpers make it easy to add Ray support to any operation.
 
 import asyncio
 import logging
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from collections.abc import Callable
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -32,9 +33,9 @@ def is_ray_enabled() -> bool:
                 from abp_config import AppConfig
 
                 return AppConfig.ENABLE_RAY_DISTRIBUTED
-            except:
+            except Exception:
                 return True  # Default to enabled if config unavailable
-    except:
+    except Exception:
         pass
 
     # Fallback to cached value or True (enabled by default)
@@ -96,10 +97,10 @@ async def ray_execute_if_enabled(
 
 async def ray_batch_execute_if_enabled(
     func: Callable,
-    items: List[Tuple[tuple, dict]],
+    items: list[tuple[tuple, dict]],
     task_type: str = "batch",
     max_concurrent: int = 4,
-) -> List[Any]:
+) -> list[Any]:
     """
     Execute batch of tasks with Ray if enabled.
 
@@ -188,8 +189,8 @@ async def ray_generate_text(replicate_api, prompt: str, max_tokens: int = 500, *
 
 
 async def ray_batch_generate_images(
-    replicate_api, prompts: List[str], model: Optional[str] = None, **kwargs
-) -> List[Any]:
+    replicate_api, prompts: list[str], model: Optional[str] = None, **kwargs
+) -> list[Any]:
     """Batch generate images with Ray distribution."""
 
     async def _generate_one(prompt: str):
@@ -209,11 +210,11 @@ async def ray_batch_generate_images(
 
 async def ray_batch_generate_videos(
     replicate_api,
-    image_urls: List[str],
-    prompts: Optional[List[str]] = None,
+    image_urls: list[str],
+    prompts: Optional[list[str]] = None,
     model: Optional[str] = None,
     **kwargs,
-) -> List[Any]:
+) -> list[Any]:
     """Batch generate videos with Ray distribution."""
 
     async def _generate_one(image_url: str, prompt: Optional[str] = None):
@@ -228,7 +229,7 @@ async def ray_batch_generate_videos(
             return replicate_api.generate_video(image_url, prompt, **kwargs)
 
     if prompts:
-        items = [((url, prompt), {}) for url, prompt in zip(image_urls, prompts)]
+        items = [((url, prompt), {}) for url, prompt in zip(image_urls, prompts, strict=False)]
     else:
         items = [((url,), {}) for url in image_urls]
 

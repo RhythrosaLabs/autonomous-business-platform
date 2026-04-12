@@ -112,6 +112,16 @@ def run_campaign_generation(
     auto_use_luma=False,
     auto_use_sora=False,
     auto_use_kling=False,
+    auto_use_luma2=False,
+    auto_use_veo3=False,
+    auto_use_veo3_fast=False,
+    auto_use_veo31_fast=False,
+    auto_use_veo2=False,
+    auto_use_pixverse5=False,
+    auto_use_pixverse45=False,
+    auto_use_leonardo=False,
+    auto_use_wan=False,
+    auto_use_seedance=False,
 ):
     """
     Runs the full autonomous campaign generation process.
@@ -1943,7 +1953,7 @@ Include specific metrics and measurement methodologies."""
                     store_name = st.session_state["shopify_store_name"]
                 elif "printify_shop_name" in st.session_state:
                     store_name = st.session_state["printify_shop_name"]
-            except:
+            except Exception:
                 pass
 
             # Simple, chill sales pitch for the ACTUAL PRODUCT
@@ -2568,12 +2578,12 @@ CRITICAL: Line 2 must be VERY SHORT (5-8 words only). Keep it SHORT. Natural. Li
                 for clip in clips:
                     try:
                         clip.close()
-                    except:
+                    except Exception:
                         pass
                 try:
                     if "final_clip" in locals():
                         final_clip.close()
-                except:
+                except Exception:
                     pass
 
             # 7. Auto-upload to YouTube

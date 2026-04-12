@@ -12,7 +12,6 @@ from app.tabs.abp_imports_common import (
     datetime,
     json,
     logging,
-    os,
     setup_logger,
     st,
     uuid,
@@ -131,7 +130,7 @@ class ChatHistoryManager:
             if not file_path.exists():
                 return {"success": False, "error": "Conversation not found"}
 
-            with open(file_path, "r") as f:
+            with open(file_path) as f:
                 conversation = json.load(f)
 
             return {"success": True, "conversation": conversation}
@@ -156,7 +155,7 @@ class ChatHistoryManager:
 
             for file_path in self.conversations_path.glob("*.json"):
                 try:
-                    with open(file_path, "r") as f:
+                    with open(file_path) as f:
                         data = json.load(f)
                         conversations.append(
                             {
@@ -168,7 +167,7 @@ class ChatHistoryManager:
                                 "summary": data.get("summary", "")[:100],
                             }
                         )
-                except:
+                except Exception:
                     continue
 
             # Sort by updated_at descending
@@ -219,7 +218,7 @@ class ChatHistoryManager:
 
             for file_path in self.conversations_path.glob("*.json"):
                 try:
-                    with open(file_path, "r") as f:
+                    with open(file_path) as f:
                         data = json.load(f)
 
                         # Search in title and messages
@@ -238,7 +237,7 @@ class ChatHistoryManager:
                                     "summary": data.get("summary", "")[:100],
                                 }
                             )
-                except:
+                except Exception:
                     continue
 
             return results
@@ -297,7 +296,7 @@ def render_chat_history_sidebar(key_suffix: str = "main"):
                     try:
                         created = datetime.fromisoformat(conv.get("created_at", ""))
                         date_str = created.strftime("%b %d, %H:%M")
-                    except:
+                    except Exception:
                         date_str = "Unknown"
 
                     title = conv.get("title", "Untitled")[:35]

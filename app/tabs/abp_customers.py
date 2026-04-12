@@ -21,7 +21,7 @@ def render_customers_tab():
             try:
                 with open(MAILING_LIST_FILE) as f:
                     return json.load(f)
-            except:
+            except Exception:
                 return {"subscribers": [], "last_sync": None}
         return {"subscribers": [], "last_sync": None}
 
@@ -53,7 +53,7 @@ def render_customers_tab():
             shopify_svc = ShopifyAPI()
             if shopify_svc.connected:
                 shopify_count = shopify_svc.get_customer_count()
-        except:
+        except Exception:
             pass
 
         with col1:

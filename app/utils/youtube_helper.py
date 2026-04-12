@@ -124,8 +124,8 @@ def get_youtube_service(client_secrets_file=None, token_file=None):
             # Delete corrupted token file
             try:
                 token_file.unlink()
-                print(f"🗑️ Deleted corrupted token file")
-            except:
+                print("🗑️ Deleted corrupted token file")
+            except Exception:
                 pass
 
     # If no valid credentials or needs new auth for scopes, initiate OAuth flow
@@ -279,7 +279,7 @@ def upload_to_youtube_legacy(
                     print(f"💤 Retrying in {delay:.1f} seconds...")
                     time.sleep(delay)
                 else:
-                    print(f"❌ Max retries reached. Upload failed.")
+                    print("❌ Max retries reached. Upload failed.")
                     return None
             else:
                 # Non-retryable errors (auth, quota, invalid request)
@@ -294,7 +294,7 @@ def upload_to_youtube_legacy(
                 print(f"💤 Retrying in {delay:.1f} seconds...")
                 time.sleep(delay)
             else:
-                print(f"❌ Max retries reached due to network issues.")
+                print("❌ Max retries reached due to network issues.")
                 return None
 
         except Exception as e:
@@ -423,7 +423,7 @@ Setup:
 
 Example usage:
     from youtube_helper import get_youtube_service, upload_to_youtube
-    
+
     youtube = get_youtube_service()
     result = upload_to_youtube(
         youtube_service=youtube,

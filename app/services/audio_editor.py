@@ -4,7 +4,6 @@ Audio Editor
 Produce, generate, and modify audio files including TTS and text-to-music.
 """
 
-import io
 import json
 import logging
 import os
@@ -12,7 +11,7 @@ import subprocess
 import tempfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional
 
 from app.services.platform_integrations import tracked_replicate_run
 
@@ -24,7 +23,7 @@ def check_ffmpeg() -> bool:
     try:
         subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
         return True
-    except:
+    except Exception:
         return False
 
 
@@ -87,7 +86,7 @@ class AudioEditor:
         self.output_dir = output_dir or Path(tempfile.gettempdir()) / "audio_editor"
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-    def _run_ffmpeg(self, args: List[str], timeout: int = 120) -> Tuple[bool, str]:
+    def _run_ffmpeg(self, args: list[str], timeout: int = 120) -> tuple[bool, str]:
         """Run FFmpeg command."""
         if not FFMPEG_AVAILABLE:
             raise RuntimeError("FFmpeg not installed")
@@ -104,7 +103,7 @@ class AudioEditor:
         except Exception as e:
             return False, str(e)
 
-    def get_audio_info(self, audio_path: str) -> Dict:
+    def get_audio_info(self, audio_path: str) -> dict:
         """Get audio metadata."""
         try:
             cmd = [
@@ -154,7 +153,7 @@ class AudioEditor:
 
         return output_path
 
-    def concatenate(self, audio_paths: List[str], output_path: str = None) -> str:
+    def concatenate(self, audio_paths: list[str], output_path: str = None) -> str:
         """Concatenate multiple audio files."""
         output_path = output_path or str(
             self.output_dir / f"concat_{datetime.now().strftime('%H%M%S')}.mp3"
@@ -244,7 +243,7 @@ class AudioEditor:
         return output_path
 
     def mix_audio(
-        self, audio_paths: List[str], volumes: List[float] = None, output_path: str = None
+        self, audio_paths: list[str], volumes: list[float] = None, output_path: str = None
     ) -> str:
         """Mix multiple audio tracks together."""
         output_path = output_path or str(

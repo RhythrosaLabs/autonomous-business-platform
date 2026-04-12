@@ -296,7 +296,7 @@ Be specific and detailed."""
                 try:
                     parsed = json.loads(content)
                     content = json.dumps(parsed, indent=2)
-                except:
+                except Exception:
                     pass
 
             elif file_ext in ["csv"]:
@@ -309,7 +309,7 @@ Be specific and detailed."""
                 # Try to read as text
                 try:
                     content = file_data.decode("utf-8", errors="ignore")
-                except:
+                except Exception:
                     content = "[Binary file - cannot extract text]"
 
             # Summarize if content is long
@@ -1843,6 +1843,11 @@ Branded: [2-3 branded hashtag ideas]"""
                     }
 
                 shops = api.get_shops()
+                if not shops:
+                    return {
+                        "success": False,
+                        "error": "No Printify shops found. Configure your shop first.",
+                    }
                 shop_id = str(shops[0]["id"])
 
                 st.info("🚀 Publishing product...")
@@ -1864,6 +1869,11 @@ Branded: [2-3 branded hashtag ideas]"""
                     return {"success": False, "error": "No product ID provided"}
 
                 shops = api.get_shops()
+                if not shops:
+                    return {
+                        "success": False,
+                        "error": "No Printify shops found. Configure your shop first.",
+                    }
                 shop_id = str(shops[0]["id"])
 
                 mockups = api.get_all_product_mockups(shop_id, str(product_id))
@@ -2657,7 +2667,7 @@ Types can be: generate_image, generate_video, post_social, send_email, create_pr
                     # Extract JSON from response
                     json_match = response[response.find("{") : response.rfind("}") + 1]
                     workflow = json.loads(json_match)
-                except:
+                except Exception:
                     # Create basic workflow
                     workflow = {
                         "name": prompt[:50],
@@ -3031,7 +3041,7 @@ Use `/run {workflow_id}` to execute the pipeline.""",
                             )
                             if result.get("success"):
                                 results.append({"model": model, "result": result})
-                        except:
+                        except Exception:
                             pass
 
                     return {

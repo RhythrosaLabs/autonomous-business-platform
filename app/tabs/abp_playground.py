@@ -127,7 +127,7 @@ def render_playground_tab():
                     try:
                         replicate_token = _get_replicate_token()
                         if replicate_token:
-                            api = ReplicateAPI(api_token=replicate_token)
+                            api = ReplicateAPI(api_token=replicate_token, flux_model=img_model)
                             result = api.generate_image(prompt=img_prompt)
                             st.image(result, caption="Generated Image", use_container_width=True)
 
@@ -257,7 +257,12 @@ def render_playground_tab():
                             )
 
                             result_url = output[0] if isinstance(output, list) else str(output)
-                            st.image(result_url, caption="Edited Image", use_container_width=True)
+                            if not output:
+                                st.error("❌ Image edit returned no result.")
+                            else:
+                                st.image(
+                                    result_url, caption="Edited Image", use_container_width=True
+                                )
 
                             st.session_state.playground_results.append(
                                 {
@@ -1260,15 +1265,20 @@ def render_playground_tab():
                             with st.spinner("🤖 Generating code..."):
                                 prompt = f"Write Python code that: {code_task}\n\nProvide clean, commented code with proper error handling."
                                 response = replicate_api.generate_text(prompt, max_tokens=800)
-                                st.code(response, language="python")
-
-                                if st.button("📋 Copy to Editor"):
-                                    st.session_state.code_playground_input = response
-                                    st.rerun()
+                                st.session_state["_generated_code_result"] = response
                         except Exception as e:
                             st.error(f"Code generation failed: {e}")
                     else:
                         st.error("Replicate API token not configured")
+
+            if st.session_state.get("_generated_code_result"):
+                st.code(st.session_state["_generated_code_result"], language="python")
+                if st.button("📋 Copy to Editor"):
+                    st.session_state.code_playground_input = st.session_state[
+                        "_generated_code_result"
+                    ]
+                    del st.session_state["_generated_code_result"]
+                    st.rerun()
 
         with code_tabs[2]:
             st.markdown("#### 📚 Code Snippets Library")
@@ -1349,31 +1359,35 @@ def render_playground_tab():
                             with st.spinner("🤖 Generating HTML/CSS..."):
                                 prompt = f"Create HTML and CSS for: {web_task}\n\nProvide complete, modern, responsive HTML with embedded CSS. Use best practices."
                                 response = replicate_api.generate_text(prompt, max_tokens=1200)
-
-                                col1, col2 = st.columns(2)
-                                with col1:
-                                    st.code(response, language="html")
-                                with col2:
-                                    if st.button("📋 Load to Editor"):
-                                        # Try to split HTML and CSS
-                                        if "<style>" in response:
-                                            parts = response.split("<style>")
-                                            if len(parts) > 1:
-                                                css_part = parts[1].split("</style>")[0]
-                                                html_part = (
-                                                    parts[0] + parts[1].split("</style>")[1]
-                                                    if "</style>" in parts[1]
-                                                    else ""
-                                                )
-                                                st.session_state.html_playground_input = html_part
-                                                st.session_state.css_playground_input = css_part
-                                        else:
-                                            st.session_state.html_playground_input = response
-                                        st.rerun()
+                                st.session_state["_generated_html_result"] = response
                         except Exception as e:
                             st.error(f"HTML generation failed: {e}")
                     else:
                         st.error("Replicate API token not configured")
+
+            if st.session_state.get("_generated_html_result"):
+                response = st.session_state["_generated_html_result"]
+                col1, col2 = st.columns(2)
+                with col1:
+                    st.code(response, language="html")
+                with col2:
+                    if st.button("📋 Load to Editor"):
+                        # Try to split HTML and CSS
+                        if "<style>" in response:
+                            parts = response.split("<style>")
+                            if len(parts) > 1:
+                                css_part = parts[1].split("</style>")[0]
+                                html_part = (
+                                    parts[0] + parts[1].split("</style>")[1]
+                                    if "</style>" in parts[1]
+                                    else ""
+                                )
+                                st.session_state.html_playground_input = html_part
+                                st.session_state.css_playground_input = css_part
+                        else:
+                            st.session_state.html_playground_input = response
+                        del st.session_state["_generated_html_result"]
+                        st.rerun()
 
     else:
         st.info(f"🚧 {playground_mode} mode coming soon!")

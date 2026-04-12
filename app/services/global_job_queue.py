@@ -15,10 +15,11 @@ Architecture:
 import asyncio
 import logging
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +120,7 @@ class Job:
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     progress: float = 0.0
-    metadata: Dict = field(default_factory=dict)
+    metadata: dict = field(default_factory=dict)
 
     def duration(self) -> Optional[float]:
         """Get job duration in seconds."""
@@ -127,7 +128,7 @@ class Job:
             return (self.completed_at - self.started_at).total_seconds()
         return None
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         """Convert to dictionary for serialization."""
         return {
             "id": self.id,
@@ -168,7 +169,7 @@ class GlobalJobQueue:
             max_concurrent_jobs: Maximum jobs running simultaneously
         """
         self.max_concurrent_jobs = max_concurrent_jobs
-        self.jobs: Dict[str, Job] = {}
+        self.jobs: dict[str, Job] = {}
         self.ray_available = HAS_RAY
         self._running_futures = {}
 
@@ -200,7 +201,7 @@ class GlobalJobQueue:
         args: tuple = (),
         kwargs: dict = None,
         priority: int = 5,
-        metadata: Dict = None,
+        metadata: dict = None,
     ) -> str:
         """
         Submit a job to the global queue.
@@ -400,7 +401,7 @@ class GlobalJobQueue:
 
     def get_all_jobs(
         self, tab_name: Optional[str] = None, status: Optional[JobStatus] = None
-    ) -> List[Job]:
+    ) -> list[Job]:
         """
         Get all jobs, optionally filtered.
 
@@ -438,7 +439,7 @@ class GlobalJobQueue:
             try:
                 ray.cancel(self._running_futures[job_id])
                 del self._running_futures[job_id]
-            except:
+            except Exception:
                 pass
 
         job.status = JobStatus.CANCELLED
@@ -461,7 +462,7 @@ class GlobalJobQueue:
 
         logger.info(f"🧹 Cleared {len(to_remove)} completed jobs")
 
-    def get_queue_stats(self) -> Dict:
+    def get_queue_stats(self) -> dict:
         """Get queue statistics."""
         queued = sum(1 for j in self.jobs.values() if j.status == JobStatus.QUEUED)
         running = sum(1 for j in self.jobs.values() if j.status == JobStatus.RUNNING)

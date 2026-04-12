@@ -12,13 +12,10 @@ Integrates with:
 NO HALLUCINATIONS - Uses real data sources and validation.
 """
 
-import asyncio
 import logging
 import re
 from dataclasses import dataclass, field
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import requests
 
@@ -40,9 +37,9 @@ class Contact:
     confidence: float = 0.0  # 0-1 confidence this is real
     verified: bool = False
     source: str = ""  # Where we found this contact
-    metadata: Dict = field(default_factory=dict)
+    metadata: dict = field(default_factory=dict)
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return {
             "name": self.name,
             "role": self.role,
@@ -69,7 +66,7 @@ class OutreachPlan:
     strategy: str
     day: Optional[str] = None  # For week plans
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         result = {
             "contact_name": self.contact_name,
             "best_time": self.best_time,
@@ -103,10 +100,10 @@ class ContactFinderService:
         product_type: str,
         target_market: str,
         location: str = "United States",
-        contact_types: List[str] = None,
+        contact_types: list[str] = None,
         result_count: int = 10,
         remote: bool = True,
-    ) -> List[Contact]:
+    ) -> list[Contact]:
         """
         Find real contacts based on product and target market.
 
@@ -178,7 +175,7 @@ class ContactFinderService:
 
     async def _analyze_target_market(
         self, product_name: str, product_type: str, target_market: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze target market to identify key decision makers and channels."""
 
         if not self.replicate:
@@ -226,7 +223,7 @@ Format as JSON:
             logger.error(f"Market analysis error: {e}")
             return self._get_default_market_analysis(product_type)
 
-    def _get_default_market_analysis(self, product_type: str) -> Dict:
+    def _get_default_market_analysis(self, product_type: str) -> dict:
         """Default market analysis based on product type."""
 
         if product_type == "poster":
@@ -294,8 +291,8 @@ Format as JSON:
             }
 
     def _generate_search_queries(
-        self, product_type: str, market_analysis: Dict, contact_types: List[str] = None
-    ) -> List[Dict[str, str]]:
+        self, product_type: str, market_analysis: dict, contact_types: list[str] = None
+    ) -> list[dict[str, str]]:
         """Generate search queries for finding contacts."""
 
         queries = []
@@ -310,8 +307,8 @@ Format as JSON:
         return queries[:15]  # Limit to 15 queries
 
     async def _search_contacts(
-        self, query: Dict[str, str], location: str, remote: bool
-    ) -> List[Contact]:
+        self, query: dict[str, str], location: str, remote: bool
+    ) -> list[Contact]:
         """Search for contacts using multiple sources."""
 
         contacts = []
@@ -335,8 +332,8 @@ Format as JSON:
         return contacts
 
     async def _search_linkedin(
-        self, query: Dict[str, str], location: str, remote: bool
-    ) -> List[Contact]:
+        self, query: dict[str, str], location: str, remote: bool
+    ) -> list[Contact]:
         """Search for contacts using FREE methods only (AI web search)."""
 
         role = query.get("role", "")
@@ -371,7 +368,7 @@ Format as JSON:
             channel_type="linkedin_search",
             contact_type=role,
             rationale=f"Use this LinkedIn search to find real {role.lower()} contacts in {org}. Click the link to see actual professionals.",
-            outreach_approach=f"1. Click the LinkedIn search link\n2. Browse profiles and find relevant contacts\n3. Send personalized connection requests",
+            outreach_approach="1. Click the LinkedIn search link\n2. Browse profiles and find relevant contacts\n3. Send personalized connection requests",
             confidence=0.5,
             verified=False,
             source="LinkedIn Search (manual lookup)",
@@ -380,7 +377,7 @@ Format as JSON:
 
         return contacts
 
-    async def _search_web_for_real_contacts(self, role: str, org: str) -> List[Contact]:
+    async def _search_web_for_real_contacts(self, role: str, org: str) -> list[Contact]:
         """Use web search to find real contacts."""
         contacts = []
 
@@ -451,7 +448,7 @@ Only return the JSON array, no other text."""
                         channel=channel,
                         channel_type=channel_type,
                         contact_type=role,
-                        rationale=f"Found via web search - verify before outreach.",
+                        rationale="Found via web search - verify before outreach.",
                         outreach_approach=f"Research {company_name} first, then personalize your approach.",
                         confidence=0.50,  # Lower confidence for AI-generated
                         verified=False,
@@ -464,7 +461,7 @@ Only return the JSON array, no other text."""
 
         return contacts
 
-    async def _search_twitter(self, query: Dict[str, str]) -> List[Contact]:
+    async def _search_twitter(self, query: dict[str, str]) -> list[Contact]:
         """Search Twitter/X for relevant contacts."""
 
         role = query.get("role", "")
@@ -494,7 +491,7 @@ Only return the JSON array, no other text."""
             channel_type="twitter",
             contact_type="Social Media Influencer",
             rationale=f"Active creator in {org.lower()} space with engaged audience. Posts regularly about relevant topics.",
-            outreach_approach=f"Send DM with genuine appreciation for their content. Propose collaboration that aligns with their existing style.",
+            outreach_approach="Send DM with genuine appreciation for their content. Propose collaboration that aligns with their existing style.",
             confidence=0.65,
             verified=False,
             source="Twitter/X search",
@@ -503,7 +500,7 @@ Only return the JSON array, no other text."""
 
         return contacts
 
-    async def _search_instagram(self, query: Dict[str, str]) -> List[Contact]:
+    async def _search_instagram(self, query: dict[str, str]) -> list[Contact]:
         """Search Instagram for influencers and creators."""
 
         role = query.get("role", "")
@@ -534,7 +531,7 @@ Only return the JSON array, no other text."""
             channel_type="instagram",
             contact_type="Social Media Influencer",
             rationale=f"Visual content creator specializing in {org.lower()}. Strong engagement rate and aesthetic alignment with target market.",
-            outreach_approach=f"Comment on recent posts to build rapport first. Then DM with collaboration proposal including clear visual examples.",
+            outreach_approach="Comment on recent posts to build rapport first. Then DM with collaboration proposal including clear visual examples.",
             confidence=0.70,
             verified=False,
             source="Instagram search",
@@ -543,7 +540,7 @@ Only return the JSON array, no other text."""
 
         return contacts
 
-    async def _search_directories(self, query: Dict[str, str], location: str) -> List[Contact]:
+    async def _search_directories(self, query: dict[str, str], location: str) -> list[Contact]:
         """Search public business directories and generate realistic contacts."""
 
         role = query.get("role", "")
@@ -578,7 +575,7 @@ Only return the JSON array, no other text."""
             channel_type="email",
             contact_type=role,
             rationale=f"Established {org.lower()} with proven track record. Decision maker for partnerships and collaborations.",
-            outreach_approach=f"Send professional email with clear value proposition. Include portfolio/samples and specific collaboration ideas.",
+            outreach_approach="Send professional email with clear value proposition. Include portfolio/samples and specific collaboration ideas.",
             confidence=0.60,
             verified=False,
             source="Business directory",
@@ -587,7 +584,7 @@ Only return the JSON array, no other text."""
 
         return contacts
 
-    async def _verify_contacts(self, contacts: List[Contact]) -> List[Contact]:
+    async def _verify_contacts(self, contacts: list[Contact]) -> list[Contact]:
         """Verify contact information is real and active."""
 
         verified = []
@@ -657,7 +654,7 @@ Only return the JSON array, no other text."""
             # Basic check - would need LinkedIn auth for full verification
             response = requests.head(url, timeout=5, allow_redirects=True)
             return response.status_code == 200
-        except:
+        except Exception:
             return False
 
     async def _verify_website(self, url: str) -> bool:
@@ -668,12 +665,12 @@ Only return the JSON array, no other text."""
                 url = f"https://{url}"
             response = requests.head(url, timeout=5, allow_redirects=True)
             return response.status_code == 200
-        except:
+        except Exception:
             return False
 
     def _rank_contacts(
-        self, contacts: List[Contact], product_type: str, target_market: str
-    ) -> List[Contact]:
+        self, contacts: list[Contact], product_type: str, target_market: str
+    ) -> list[Contact]:
         """Rank contacts by relevance and confidence."""
 
         # Score each contact
@@ -707,7 +704,7 @@ Only return the JSON array, no other text."""
         # Sort by score
         return sorted(contacts, key=lambda c: c.metadata.get("score", 0), reverse=True)
 
-    async def generate_day_plan(self, contacts: List[Contact]) -> List[OutreachPlan]:
+    async def generate_day_plan(self, contacts: list[Contact]) -> list[OutreachPlan]:
         """Generate optimal daily outreach schedule."""
 
         plans = []
@@ -733,7 +730,7 @@ Only return the JSON array, no other text."""
 
         return plans
 
-    async def generate_week_plan(self, contacts: List[Contact]) -> List[OutreachPlan]:
+    async def generate_week_plan(self, contacts: list[Contact]) -> list[OutreachPlan]:
         """Generate week-long outreach schedule."""
 
         plans = []

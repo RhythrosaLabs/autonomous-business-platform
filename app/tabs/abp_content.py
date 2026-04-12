@@ -655,7 +655,8 @@ Format: Just the hook templates with [BLANK] for customization. Under 15 words e
                         with st.expander("✨ Enhance with AI Analysis", expanded=False):
                             if st.button("🔍 Analyze & Improve Captions", key="enhance_social"):
                                 with st.spinner("Analyzing and enhancing captions..."):
-                                    enhanced_generator = EnhancedCampaignGenerator(replicate_api)
+                                    _replicate_api, _ = _ensure_replicate_client()
+                                    enhanced_generator = EnhancedCampaignGenerator(_replicate_api)
                                     analyzed_caption = enhanced_generator.enhance_content(
                                         all_captions[0], f"{platform} Social Media Post"
                                     )

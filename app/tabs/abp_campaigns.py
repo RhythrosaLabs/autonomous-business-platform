@@ -203,9 +203,122 @@ Format: Just the 5 headlines, numbered."""
             st.markdown("##### 💡 Headline Ideas")
             st.markdown(st.session_state["headline_ideas"])
 
+    # Check for in-progress campaign jobs (works across reruns)
+    if st.session_state.get("campaign_generation_jobs"):
+        st.markdown("---")
+        st.markdown("### ⚡ Campaign Generation In Progress")
+
+        progress_bar = st.progress(0, text="Checking job progress...")
+        status_text = st.empty()
+
+        job_ids = st.session_state.campaign_generation_jobs
+        progress = check_jobs_progress(job_ids)
+
+        status_text.text(f"⚡ Parallel Generation: {progress['completed']}/{len(job_ids)} complete")
+        completion_pct = int((progress["completed"] / len(job_ids)) * 90)
+        progress_bar.progress(completion_pct, text=f"Running {progress['running']} jobs...")
+
+        if are_all_jobs_done(job_ids):
+            # Collect results safely
+            results = collect_job_results(job_ids)
+            concept = ""
+            plan = ""
+            budget_bytes = b""
+            schedule_bytes = b""
+
+            if len(results) > 0 and results[0]:
+                concept = results[0][0] if isinstance(results[0], tuple) else str(results[0])
+            if len(results) > 1 and results[1]:
+                plan = results[1][0] if isinstance(results[1], tuple) else str(results[1])
+            if len(results) > 2 and results[2]:
+                budget_bytes = results[2] if isinstance(results[2], bytes) else b""
+            if len(results) > 3 and results[3]:
+                schedule_bytes = results[3] if isinstance(results[3], bytes) else b""
+
+            # Retrieve stored campaign info
+            campaign_info = st.session_state.get("campaign_generation_info", {})
+            campaign_dir = Path(campaign_info.get("campaign_dir", "campaigns/unknown"))
+            campaign_dir.mkdir(parents=True, exist_ok=True)
+            campaign_name = campaign_info.get("campaign_name", "campaign")
+            product_desc = campaign_info.get("product_description", "")
+
+            # Save spreadsheets
+            if budget_bytes:
+                budget_path = campaign_dir / "budget_spreadsheet.xlsx"
+                with open(budget_path, "wb") as f:
+                    f.write(budget_bytes)
+            if schedule_bytes:
+                schedule_path = campaign_dir / "social_media_schedule.xlsx"
+                with open(schedule_path, "wb") as f:
+                    f.write(schedule_bytes)
+
+            # Clear jobs
+            st.session_state.campaign_generation_jobs = []
+
+            status_text.text("Step 7/7: Compiling Master Document and ZIP Archive...")
+            progress_bar.progress(95, text="Step 7/7: Compiling Master Document and ZIP Archive...")
+
+            # Create generator to compile final docs
+            try:
+                from app.services.campaign_generator_service import EnhancedCampaignGenerator
+
+                generator = EnhancedCampaignGenerator(
+                    replicate_api=st.session_state.get("replicate_api"),
+                    skip_enhancement=True,
+                )
+                # Store the results into the generator's file_storage
+                generator.file_storage["campaign_concept"] = concept
+                generator.file_storage["marketing_plan"] = plan
+
+                master_doc = generator.create_master_document()
+                zip_buffer = generator.create_campaign_zip(campaign_dir)
+
+                progress_bar.progress(100, text="✅ Campaign Generation Complete!")
+                st.success("🎉 Your new marketing campaign is ready!")
+
+                st.subheader("Campaign Summary")
+                st.text_area("Campaign Concept", value=concept, height=150, disabled=True)
+                if plan:
+                    st.text_area(
+                        "Marketing Plan Snippet",
+                        value=plan[:500] + "...",
+                        height=150,
+                        disabled=True,
+                    )
+
+                campaign_summary = {
+                    "concept": product_desc[:50],
+                    "timestamp": dt.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    "path": str(campaign_dir),
+                    "status": "Completed",
+                }
+                if "campaign_history" not in st.session_state:
+                    st.session_state.campaign_history = []
+                st.session_state.campaign_history.append(campaign_summary)
+
+                st.download_button(
+                    label="📦 Download Complete Campaign ZIP",
+                    data=zip_buffer,
+                    file_name=f"{campaign_name}.zip",
+                    mime="application/zip",
+                    use_container_width=True,
+                )
+                st.balloons()
+            except Exception as e:
+                st.error(f"Error compiling campaign: {e}")
+                progress_bar.progress(100, text="⚠️ Completed with errors")
+        else:
+            if st.button("🔄 Refresh Progress", key="refresh_campaign_progress"):
+                st.rerun()
+            st.info("💡 You can switch tabs while generation runs in the background.")
+
     if submitted:
         if not all([product_description, target_audience, budget, selected_platforms]):
             st.error("Please fill out all fields before generating the campaign.")
+        elif st.session_state.get("campaign_generation_jobs"):
+            st.warning(
+                "A campaign is already being generated. Wait for it to complete or check progress above."
+            )
         else:
             st.info(
                 "🔥 Your request has been submitted! The autonomous agent is now crafting your campaign..."
@@ -250,188 +363,105 @@ Format: Just the 5 headlines, numbered."""
                         "⚡ Fast Mode enabled - skipping enhancement steps for faster generation"
                     )
 
-                # Initialize session state for campaign jobs
-                if "campaign_generation_jobs" not in st.session_state:
-                    st.session_state.campaign_generation_jobs = []
+                # Submit all jobs in parallel
+                status_text.text("🚀 Submitting 6 parallel generation jobs...")
+                progress_bar.progress(5, text="🚀 Submitting parallel jobs...")
 
-                # Check if jobs are already running
-                if st.session_state.campaign_generation_jobs:
-                    job_ids = st.session_state.campaign_generation_jobs
-                    progress = check_jobs_progress(job_ids)
+                queue = get_global_job_queue()
+                job_ids = []
 
-                    status_text.text(
-                        f"⚡ Parallel Generation: {progress['completed']}/{len(job_ids)} complete"
+                # Job 1: Campaign Concept
+                job_ids.append(
+                    queue.submit_job(
+                        job_type=JobType.TEXT_GENERATION,
+                        tab_name="Campaigns",
+                        description="Campaign Concept",
+                        function=generator.generate_campaign_concept,
+                        args=(
+                            product_description,
+                            target_audience,
+                            str(budget),
+                            selected_platforms,
+                        ),
+                        priority=7,
                     )
-                    completion_pct = int((progress["completed"] / len(job_ids)) * 90)
-                    progress_bar.progress(
-                        completion_pct, text=f"Running {progress['running']} jobs..."
-                    )
-
-                    if are_all_jobs_done(job_ids):
-                        # Collect results
-                        results = collect_job_results(job_ids)
-                        concept, analyzed_concept = results[0] if results[0] else ("", "")
-                        plan, analyzed_plan = results[1] if results[1] else ("", "")
-                        budget_bytes = results[2] if results[2] else b""
-                        schedule_bytes = results[3] if results[3] else b""
-                        resources, analyzed_resources = results[4] if results[4] else ("", "")
-                        recap, analyzed_recap = results[5] if results[5] else ("", "")
-
-                        # Save spreadsheets
-                        if budget_bytes:
-                            budget_path = campaign_dir / "budget_spreadsheet.xlsx"
-                            with open(budget_path, "wb") as f:
-                                f.write(budget_bytes)
-                        if schedule_bytes:
-                            schedule_path = campaign_dir / "social_media_schedule.xlsx"
-                            with open(schedule_path, "wb") as f:
-                                f.write(schedule_bytes)
-
-                        # Clear jobs
-                        st.session_state.campaign_generation_jobs = []
-
-                        status_text.text("Step 7/7: Compiling Master Document and ZIP Archive...")
-                        progress_bar.progress(
-                            95, text="Step 7/7: Compiling Master Document and ZIP Archive..."
-                        )
-                    else:
-                        # Still running, show refresh button
-                        if st.button("🔄 Refresh Progress", key="refresh_campaign_progress"):
-                            st.rerun()
-                        st.stop()
-                else:
-                    # Submit all jobs in parallel
-                    status_text.text("🚀 Submitting 6 parallel generation jobs...")
-                    progress_bar.progress(5, text="🚀 Submitting parallel jobs...")
-
-                    queue = get_global_job_queue()
-                    job_ids = []
-
-                    # Job 1: Campaign Concept
-                    job_ids.append(
-                        queue.submit_job(
-                            job_type=JobType.TEXT_GENERATION,
-                            tab_name="Campaigns",
-                            description="Campaign Concept",
-                            function=generator.generate_campaign_concept,
-                            args=(
-                                product_description,
-                                target_audience,
-                                str(budget),
-                                selected_platforms,
-                            ),
-                            priority=7,
-                        )
-                    )
-
-                    # Job 2: Marketing Plan
-                    job_ids.append(
-                        queue.submit_job(
-                            job_type=JobType.TEXT_GENERATION,
-                            tab_name="Campaigns",
-                            description="Marketing Plan",
-                            function=generator.generate_marketing_plan,
-                            args=(product_description, str(budget), selected_platforms),
-                            priority=7,
-                        )
-                    )
-
-                    # Job 3: Budget Spreadsheet
-                    job_ids.append(
-                        queue.submit_job(
-                            job_type=JobType.CAMPAIGN_GENERATION,
-                            tab_name="Campaigns",
-                            description="Budget Spreadsheet",
-                            function=generator.generate_budget_spreadsheet,
-                            args=(budget,),
-                            priority=6,
-                        )
-                    )
-
-                    # Job 4: Social Media Schedule
-                    job_ids.append(
-                        queue.submit_job(
-                            job_type=JobType.CAMPAIGN_GENERATION,
-                            tab_name="Campaigns",
-                            description="Social Media Schedule",
-                            function=lambda: generator.generate_social_media_schedule(
-                                "", selected_platforms
-                            ),
-                            priority=6,
-                        )
-                    )
-
-                    # Job 5: Resources & Tips
-                    job_ids.append(
-                        queue.submit_job(
-                            job_type=JobType.TEXT_GENERATION,
-                            tab_name="Campaigns",
-                            description="Resources & Tips",
-                            function=generator.generate_resources_and_tips,
-                            args=(product_description, target_audience),
-                            priority=6,
-                        )
-                    )
-
-                    # Job 6: Campaign Recap
-                    job_ids.append(
-                        queue.submit_job(
-                            job_type=JobType.TEXT_GENERATION,
-                            tab_name="Campaigns",
-                            description="Campaign Recap",
-                            function=generator.generate_campaign_recap,
-                            args=(product_description, str(budget), selected_platforms),
-                            priority=6,
-                        )
-                    )
-
-                    st.session_state.campaign_generation_jobs = job_ids
-                    st.success(
-                        f"✅ Submitted {len(job_ids)} parallel jobs! They'll complete ~7x faster."
-                    )
-                    st.info("💡 You can switch tabs while generation runs in the background.")
-                    time.sleep(1)  # Brief pause to let jobs start
-                    st.rerun()
-
-                # If we got here, jobs completed - continue with final steps
-                status_text.text("Step 7/7: Compiling Master Document and ZIP Archive...")
-                progress_bar.progress(
-                    95, text="Step 7/7: Compiling Master Document and ZIP Archive..."
-                )
-                master_doc = generator.create_master_document()
-                zip_buffer = generator.create_campaign_zip(campaign_dir)
-
-                progress_bar.progress(100, text="✅ Campaign Generation Complete!")
-                st.success("🎉 Your new marketing campaign is ready!")
-
-                # Display results
-                st.subheader("Campaign Summary")
-                st.text_area("Campaign Concept", value=concept, height=150, disabled=True)
-                st.text_area(
-                    "Marketing Plan Snippet", value=plan[:500] + "...", height=150, disabled=True
                 )
 
-                # Add to campaign history
-                campaign_summary = {
-                    "concept": product_description[:50],
-                    "timestamp": dt.now().strftime("%Y-%m-%d %H:%M:%S"),
-                    "path": str(campaign_dir),
-                    "zip_path": str(campaign_dir / "complete_campaign.zip"),
-                    "status": "Completed",
+                # Job 2: Marketing Plan
+                job_ids.append(
+                    queue.submit_job(
+                        job_type=JobType.TEXT_GENERATION,
+                        tab_name="Campaigns",
+                        description="Marketing Plan",
+                        function=generator.generate_marketing_plan,
+                        args=(product_description, str(budget), selected_platforms),
+                        priority=7,
+                    )
+                )
+
+                # Job 3: Budget Spreadsheet
+                job_ids.append(
+                    queue.submit_job(
+                        job_type=JobType.CAMPAIGN_GENERATION,
+                        tab_name="Campaigns",
+                        description="Budget Spreadsheet",
+                        function=generator.generate_budget_spreadsheet,
+                        args=(budget,),
+                        priority=6,
+                    )
+                )
+
+                # Job 4: Social Media Schedule
+                job_ids.append(
+                    queue.submit_job(
+                        job_type=JobType.CAMPAIGN_GENERATION,
+                        tab_name="Campaigns",
+                        description="Social Media Schedule",
+                        function=lambda: generator.generate_social_media_schedule(
+                            "", selected_platforms
+                        ),
+                        priority=6,
+                    )
+                )
+
+                # Job 5: Resources & Tips
+                job_ids.append(
+                    queue.submit_job(
+                        job_type=JobType.TEXT_GENERATION,
+                        tab_name="Campaigns",
+                        description="Resources & Tips",
+                        function=generator.generate_resources_and_tips,
+                        args=(product_description, target_audience),
+                        priority=6,
+                    )
+                )
+
+                # Job 6: Campaign Recap
+                job_ids.append(
+                    queue.submit_job(
+                        job_type=JobType.TEXT_GENERATION,
+                        tab_name="Campaigns",
+                        description="Campaign Recap",
+                        function=generator.generate_campaign_recap,
+                        args=(product_description, str(budget), selected_platforms),
+                        priority=6,
+                    )
+                )
+
+                # Store job IDs and campaign info for cross-rerun access
+                st.session_state.campaign_generation_jobs = job_ids
+                st.session_state.campaign_generation_info = {
+                    "campaign_dir": str(campaign_dir),
+                    "campaign_name": campaign_name,
+                    "product_description": product_description,
                 }
-                st.session_state.campaign_history.append(campaign_summary)
-
-                # Provide download link for the ZIP file
-                st.download_button(
-                    label="📦 Download Complete Campaign ZIP",
-                    data=zip_buffer,
-                    file_name=f"{campaign_name}.zip",
-                    mime="application/zip",
-                    use_container_width=True,
+                st.success(
+                    f"✅ Submitted {len(job_ids)} parallel jobs! They'll complete ~7x faster."
                 )
-
-                st.balloons()
+                st.info("💡 You can switch tabs while generation runs in the background.")
+                time.sleep(1)
+                st.rerun()
 
             except Exception as e:
                 st.error(f"An error occurred during campaign generation: {e}")
-                st.exception(e)  # Show full traceback for debugging
+                st.exception(e)

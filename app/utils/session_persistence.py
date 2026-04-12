@@ -21,10 +21,10 @@ import logging
 import os
 import threading
 import time
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -35,16 +35,16 @@ class SessionSnapshot:
 
     id: str
     timestamp: str
-    data: Dict
+    data: dict
     description: str = ""
     auto_saved: bool = True
     size_bytes: int = 0
 
-    def to_dict(self) -> Dict:
+    def to_dict(self) -> dict:
         return asdict(self)
 
     @classmethod
-    def from_dict(cls, data: Dict) -> "SessionSnapshot":
+    def from_dict(cls, data: dict) -> "SessionSnapshot":
         return cls(**data)
 
 
@@ -106,7 +106,7 @@ class SessionPersistence:
         self._lock = threading.Lock()
 
         # Session history
-        self.snapshots: List[SessionSnapshot] = []
+        self.snapshots: list[SessionSnapshot] = []
         self.max_snapshots = 20
 
         # Load existing session
@@ -125,7 +125,7 @@ class SessionPersistence:
         try:
             index_file = self._get_index_file()
             if index_file.exists():
-                with open(index_file, "r") as f:
+                with open(index_file) as f:
                     data = json.load(f)
                     self.snapshots = [
                         SessionSnapshot.from_dict(s) for s in data.get("snapshots", [])
@@ -162,7 +162,7 @@ class SessionPersistence:
         # Check whitelist
         return key in self.PERSIST_KEYS or any(pk in key for pk in self.PERSIST_KEYS)
 
-    def _compute_hash(self, data: Dict) -> str:
+    def _compute_hash(self, data: dict) -> str:
         """Compute a hash of the data for change detection"""
         return hashlib.md5(json.dumps(data, sort_keys=True, default=str).encode()).hexdigest()[:16]
 
@@ -188,10 +188,10 @@ class SessionPersistence:
         # Last resort: string conversion
         try:
             return str(value)
-        except:
+        except Exception:
             return None
 
-    def extract_persistable_state(self, session_state: Dict) -> Dict:
+    def extract_persistable_state(self, session_state: dict) -> dict:
         """Extract state that should be persisted"""
         persistable = {}
 
@@ -206,7 +206,7 @@ class SessionPersistence:
 
         return persistable
 
-    def should_auto_save(self, session_state: Dict) -> bool:
+    def should_auto_save(self, session_state: dict) -> bool:
         """Check if we should auto-save now"""
         now = time.time()
 
@@ -224,7 +224,7 @@ class SessionPersistence:
         return True
 
     def save_session(
-        self, session_state: Dict, description: str = "", force: bool = False
+        self, session_state: dict, description: str = "", force: bool = False
     ) -> Optional[SessionSnapshot]:
         """
         Save the current session state.
@@ -283,7 +283,7 @@ class SessionPersistence:
         try:
             session_file = self._get_session_file()
             if session_file.exists():
-                with open(session_file, "r") as f:
+                with open(session_file) as f:
                     data = json.load(f)
                     return SessionSnapshot.from_dict(data)
         except Exception as e:
@@ -319,7 +319,7 @@ class SessionPersistence:
         logger.info(f"Restored {restored_count} session keys")
         return restored_count
 
-    def get_recovery_info(self) -> Optional[Dict]:
+    def get_recovery_info(self) -> Optional[dict]:
         """Get info about recoverable session"""
         snapshot = self.load_session()
 
@@ -359,7 +359,7 @@ class SessionPersistence:
             days = seconds // 86400
             return f"{days} day{'s' if days != 1 else ''} ago"
 
-    def get_snapshot_history(self, limit: int = 10) -> List[Dict]:
+    def get_snapshot_history(self, limit: int = 10) -> list[dict]:
         """Get recent snapshot history"""
         history = []
 
@@ -384,12 +384,12 @@ class SessionPersistence:
                 # Load full data from file if needed
                 snapshot_file = self.storage_path / f"snapshot_{snapshot_id}.json"
                 if snapshot_file.exists():
-                    with open(snapshot_file, "r") as f:
+                    with open(snapshot_file) as f:
                         return SessionSnapshot.from_dict(json.load(f))
                 return snapshot
         return None
 
-    def create_named_snapshot(self, session_state: Dict, name: str) -> SessionSnapshot:
+    def create_named_snapshot(self, session_state: dict, name: str) -> SessionSnapshot:
         """Create a named snapshot (like a save point)"""
         return self.save_session(session_state, description=name, force=True)
 
@@ -425,7 +425,7 @@ def auto_save_session(session_state: Any) -> bool:
     return snapshot is not None
 
 
-def check_session_recovery(session_state: Any) -> Optional[Dict]:
+def check_session_recovery(session_state: Any) -> Optional[dict]:
     """
     Check if there's a session to recover.
     Call this on app startup.
@@ -457,7 +457,7 @@ def render_recovery_prompt():
             st.info(
                 f"""
             💾 **Unsaved work found** from {recovery_info['age_display']}
-            
+
             Found {recovery_info['key_count']} items including: {', '.join(recovery_info['keys'][:5])}{'...' if len(recovery_info['keys']) > 5 else ''}
             """
             )

@@ -7,7 +7,7 @@ Auto-updates with real-time stats, insights, and actionable recommendations
 
 import logging
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import streamlit as st
 
@@ -18,7 +18,7 @@ class SmartDashboard:
     """Intelligent dashboard with contextual metrics and insights"""
 
     @staticmethod
-    def get_dashboard_metrics() -> Dict[str, Any]:
+    def get_dashboard_metrics() -> dict[str, Any]:
         """Collect all relevant metrics for dashboard"""
 
         campaigns = st.session_state.get("campaign_history", [])
@@ -59,7 +59,7 @@ class SmartDashboard:
         }
 
     @staticmethod
-    def _count_since(items: List[Dict], since_date: datetime) -> int:
+    def _count_since(items: list[dict], since_date: datetime) -> int:
         """Count items created/updated since date"""
         count = 0
         for item in items:
@@ -72,12 +72,12 @@ class SmartDashboard:
                 )
                 if item_date >= since_date:
                     count += 1
-            except:
+            except Exception:
                 pass
         return count
 
     @staticmethod
-    def _calculate_avg_engagement(campaigns: List[Dict]) -> str:
+    def _calculate_avg_engagement(campaigns: list[dict]) -> str:
         """Calculate average engagement across campaigns"""
         if not campaigns:
             return "N/A"
@@ -89,7 +89,7 @@ class SmartDashboard:
         return "N/A"
 
     @staticmethod
-    def _get_most_used_platform(scheduled: List[Dict]) -> str:
+    def _get_most_used_platform(scheduled: list[dict]) -> str:
         """Get most frequently scheduled platform"""
         platforms = {}
 
@@ -256,7 +256,7 @@ class SmartDashboard:
                                     st.rerun()
 
     @staticmethod
-    def _generate_insights(metrics: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _generate_insights(metrics: dict[str, Any]) -> list[dict[str, Any]]:
         """Generate contextual insights based on metrics"""
 
         insights = []
@@ -331,7 +331,7 @@ class SmartDashboard:
                         "priority": "low",
                     }
                 )
-        except:
+        except Exception:
             pass
 
         # Insight: Growing content library
@@ -352,7 +352,7 @@ class ActivityFeed:
     """Activity timeline showing recent actions"""
 
     @staticmethod
-    def get_recent_activity(limit: int = 10) -> List[Dict[str, Any]]:
+    def get_recent_activity(limit: int = 10) -> list[dict[str, Any]]:
         """Get recent activity across all features"""
 
         activity = []
@@ -430,7 +430,7 @@ class ActivityFeed:
                                 else:
                                     time_str = f"{time_diff.days} days ago"
                                 st.caption(f"⏱️ {time_str}")
-                            except:
+                            except Exception:
                                 pass
 
                     st.markdown("---")
@@ -468,7 +468,7 @@ class NotificationCenter:
         st.session_state.notifications.append(notification)
 
     @staticmethod
-    def get_unread_notifications(limit: int = 5) -> List[Dict]:
+    def get_unread_notifications(limit: int = 5) -> list[dict]:
         """Get unread notifications"""
 
         if "notifications" not in st.session_state:

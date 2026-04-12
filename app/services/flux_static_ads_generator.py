@@ -6,17 +6,14 @@ Includes PIL-based text overlay fallback for reliable text rendering.
 """
 
 import base64
-import json
 import logging
 import os
-from datetime import datetime
-from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Optional
 
 import replicate
 import requests
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
 from app.services.secure_config import get_api_key
 
@@ -129,7 +126,7 @@ def get_system_font(style: str = "bold", size: int = 48):
     # Ultimate fallback
     try:
         return ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", size)
-    except:
+    except Exception:
         return ImageFont.load_default()
 
 
@@ -162,7 +159,7 @@ def add_glow_effect(
                 if dx != 0 or dy != 0:
                     try:
                         draw.text((x + dx, y + dy), text, font=font, fill=glow_color)
-                    except:
+                    except Exception:
                         pass
 
     # Draw main text on top
@@ -247,7 +244,7 @@ def add_text_overlay_to_image(
     brand_name: str = "",
     platform: str = "instagram_post",
     style: str = "bold",
-    brand_colors: Optional[Dict[str, str]] = None,
+    brand_colors: Optional[dict[str, str]] = None,
 ) -> Optional[str]:
     """
     Add professional text overlay to an image with modern fonts and effects.
@@ -584,7 +581,7 @@ def create_social_ad_with_text(
     price: Optional[float] = None,
     brand_name: Optional[str] = None,
     style: str = "bold",
-    brand_colors: Optional[Dict[str, str]] = None,
+    brand_colors: Optional[dict[str, str]] = None,
 ) -> Optional[str]:
     """
     Create a complete social media ad with text overlay.
@@ -651,7 +648,7 @@ def create_social_ad_with_text(
         # Clean up temp file
         try:
             os.remove(temp_path)
-        except:
+        except Exception:
             pass
 
         return result
@@ -811,7 +808,7 @@ def generate_ad_copy_with_ai(
     style: str,
     price: Optional[float] = None,
     brand_name: Optional[str] = None,
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """
     Generate compelling ad copy using AI for the specific platform and style.
 
@@ -927,7 +924,6 @@ class FluxStaticAdsGenerator:
         FLUX can render text when given explicit instructions about what text to display,
         where to place it, and what style to use.
         """
-        import random
 
         # Text positioning based on platform
         position_styles = {
@@ -1042,7 +1038,7 @@ The text must be clearly legible, professionally styled, and integrated beautifu
         num_inference_steps: int = 28,
         seed: Optional[int] = None,
         prompt_strength: float = 0.75,
-        ad_copy: Optional[Dict[str, str]] = None,
+        ad_copy: Optional[dict[str, str]] = None,
         price: Optional[float] = None,
         brand_name: Optional[str] = None,
     ) -> Optional[str]:
@@ -1146,7 +1142,7 @@ The advertisement should have bold, readable text overlaid on the image. The tex
                 input_params["seed"] = seed
 
             # Run the model
-            logger.info(f"🚀 Running flux-static-ads model...")
+            logger.info("🚀 Running flux-static-ads model...")
             output = replicate.run(f"{self.model}:{self.model_version}", input=input_params)
 
             # Handle output (could be list or single URL)
@@ -1160,7 +1156,7 @@ The advertisement should have bold, readable text overlaid on the image. The tex
                 return None
 
             # Download the generated image
-            logger.info(f"📥 Downloading generated ad...")
+            logger.info("📥 Downloading generated ad...")
             response = requests.get(image_url)
 
             if response.status_code != 200:
@@ -1197,11 +1193,11 @@ The advertisement should have bold, readable text overlaid on the image. The tex
         product_image_path: str,
         product_description: str,
         campaign_dir: Path,
-        platforms: Optional[List[str]] = None,
+        platforms: Optional[list[str]] = None,
         ad_style: str = "lifestyle",
         brand_name: Optional[str] = None,
         price: Optional[float] = None,
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Generate static ads for multiple platforms with unique ad copy for each.
 
@@ -1306,8 +1302,8 @@ The advertisement should have bold, readable text overlaid on the image. The tex
         output_dir: Path,
         num_variations: int = 3,
         platform: str = "instagram_post",
-        styles: Optional[List[str]] = None,
-    ) -> List[str]:
+        styles: Optional[list[str]] = None,
+    ) -> list[str]:
         """
         Generate multiple variations of an ad for A/B testing.
 
@@ -1357,13 +1353,13 @@ def generate_social_ads_for_product(
     product_mockup_path: str,
     product_concept: str,
     campaign_dir: Path,
-    platforms: Optional[List[str]] = None,
+    platforms: Optional[list[str]] = None,
     style: str = "lifestyle",
     brand_name: Optional[str] = None,
     price: Optional[float] = None,
-    brand_colors: Optional[Dict[str, str]] = None,
+    brand_colors: Optional[dict[str, str]] = None,
     use_flux: bool = False,  # Default to PIL for reliability
-) -> Dict[str, str]:
+) -> dict[str, str]:
     """
     Generate social media ads for a product WITH professional text overlays.
 
@@ -1669,11 +1665,11 @@ def generate_human_description(
         title = f"{concept_short.title()} {product_type.title()}"
 
     tagline_templates = [
-        f"Where creativity meets style",
+        "Where creativity meets style",
         f"Your new favorite {product_type.lower()}",
-        f"Something different. Something special.",
-        f"For those who appreciate the unique",
-        f"Stand out from the crowd",
+        "Something different. Something special.",
+        "For those who appreciate the unique",
+        "Stand out from the crowd",
     ]
     tagline = random.choice(tagline_templates)
 
@@ -1699,7 +1695,7 @@ def generate_human_description(
 
     full_desc_parts.append("")
     full_desc_parts.append(
-        f"We put a lot of thought into this one. The design captures something special - it's the kind of thing that makes people ask 'where'd you get that?'"
+        "We put a lot of thought into this one. The design captures something special - it's the kind of thing that makes people ask 'where'd you get that?'"
     )
     full_desc_parts.append("")
 

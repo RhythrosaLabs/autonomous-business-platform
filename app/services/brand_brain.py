@@ -5,13 +5,12 @@ Centralized brand asset management and brand-aware content generation
 
 import json
 import logging
-import shutil
 from datetime import datetime as dt
 from pathlib import Path
-from typing import Dict, List, Optional
 
 import streamlit as st
 import yaml
+
 from app.services.secure_config import get_api_key
 
 logger = logging.getLogger(__name__)
@@ -75,7 +74,7 @@ class BrandBrain:
         logger.info(f"Saved {category} asset: {file_path}")
         return str(file_path)
 
-    def get_assets(self, category: str) -> List[Path]:
+    def get_assets(self, category: str) -> list[Path]:
         """Get all assets in a category"""
         category_map = {
             "logo": self.logos_dir,
@@ -95,7 +94,7 @@ class BrandBrain:
         """Read content from a file based on its extension."""
         suffix = file_path.suffix.lower()
         if suffix in [".txt", ".md", ".json", ".yaml", ".yml"]:
-            with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            with open(file_path, encoding="utf-8", errors="ignore") as f:
                 return f.read()
         elif suffix == ".pdf":
             try:
@@ -109,7 +108,7 @@ class BrandBrain:
                 return f"[Error reading PDF {file_path.name}: {str(e)}]"
         return ""
 
-    def process_knowledge_base(self) -> Dict:
+    def process_knowledge_base(self) -> dict:
         """
         Process all files in guidelines directory and create a knowledge base
 
@@ -146,14 +145,14 @@ class BrandBrain:
 
         return knowledge_base
 
-    def get_knowledge_base(self) -> Dict:
+    def get_knowledge_base(self) -> dict:
         """Get processed knowledge base"""
         kb_file = self.brand_dir / "brand_knowledge.json"
         if kb_file.exists():
             try:
-                with open(kb_file, "r") as f:
+                with open(kb_file) as f:
                     return json.load(f)
-            except:
+            except Exception:
                 return {}
         return {}
 
@@ -161,26 +160,26 @@ class BrandBrain:
     # BRAND PROFILE MANAGEMENT
     # ============================================
 
-    def load_profile(self) -> Dict:
+    def load_profile(self) -> dict:
         """Load brand profile from YAML"""
         if self.config_file.exists():
             with open(self.config_file) as f:
                 return yaml.safe_load(f)
         return self._get_default_profile()
 
-    def save_profile(self, profile: Dict):
+    def save_profile(self, profile: dict):
         """Save brand profile to YAML"""
         with open(self.config_file, "w") as f:
             yaml.dump(profile, f, default_flow_style=False, indent=2)
         logger.info("Brand profile saved")
 
-    def update_profile(self, updates: Dict):
+    def update_profile(self, updates: dict):
         """Update specific fields in brand profile"""
         profile = self.load_profile()
         profile.update(updates)
         self.save_profile(profile)
 
-    def _get_default_profile(self) -> Dict:
+    def _get_default_profile(self) -> dict:
         """Default brand profile template"""
         return {
             "brand_name": "My Brand",
@@ -233,7 +232,7 @@ KEYWORDS: {', '.join(profile['content_guidelines']['keywords'])}
 """
         return context
 
-    def _format_examples(self, examples: List[str]) -> str:
+    def _format_examples(self, examples: list[str]) -> str:
         """Format example posts"""
         if not examples:
             return "No examples provided yet"
@@ -269,7 +268,7 @@ IMPORTANT: Maintain brand consistency. Match the style of our example posts abov
     # WRITING STYLE ANALYSIS
     # ============================================
 
-    def analyze_writing_samples(self, samples: str, api_client) -> Dict:
+    def analyze_writing_samples(self, samples: str, api_client) -> dict:
         """
         Analyze writing samples to extract style patterns
 
@@ -317,7 +316,7 @@ Return as JSON:
             logger.error(f"Style analysis failed: {e}")
             return {}
 
-    def train_from_examples(self, examples: List[str], api_client):
+    def train_from_examples(self, examples: list[str], api_client):
         """
         Train brand brain from example posts
         Updates brand profile with learned patterns
@@ -392,7 +391,6 @@ Return as JSON:
     def apply_brand_colors_to_image(self, image_path: str) -> str:
         """Apply brand color filter to image"""
         try:
-            import numpy as np
             from PIL import Image, ImageEnhance
 
             profile = self.load_profile()
@@ -594,7 +592,6 @@ def render_brand_brain_page():
             if st.button("🧠 Analyze Writing Style with AI"):
                 if examples_text.strip():
                     # Get Replicate API
-                    import os
 
                     from performance_utils import get_replicate_api
 

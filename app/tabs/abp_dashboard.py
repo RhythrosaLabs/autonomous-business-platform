@@ -216,7 +216,7 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
 
         product_enabled = st.checkbox(
             "🎨 **Design Generation**",
-            value=True if check_all else True,
+            value=True,
             help="Generate AI artwork/designs that will be printed on products (canvas art, posters, journals, mugs, etc.)",
         )
 
@@ -250,7 +250,6 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
             "📧 **Email Campaign Generation**",
             value=True if check_all else False,
             help="Generate professional HTML email campaigns with images",
-            disabled=not social_enabled,
         )
 
     # Digital Products Configuration (if enabled) - Full Generator
@@ -777,6 +776,61 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
 
     st.markdown("---")
 
+    # Defaults for all Advanced Configuration variables (overridden when expander is opened)
+    ken_burns = True
+    use_sora = False
+    use_kling = False
+    model_selection_mode = "⚙️ Manual Selection"
+    use_prompt_templates = False
+    video_template = None
+    prompt_quality_level = "high"
+    video_resolution = "1080p"
+    video_fps = 30
+    video_bitrate = "8M"
+    platform_preset = "Custom"
+    batch_export = False
+    img_width = 1024
+    img_height = 1024
+    img_aspect_ratio = "1:1"
+    img_guidance = 3.5
+    img_steps = 28
+    img_speed_mode = "Quality"
+    img_seed = -1
+    img_output_format = "png"
+    img_output_quality = 90
+    img_num_outputs = 1
+    sora_aspect_ratio = "16:9"
+    sora_seconds = 10
+    sora_resolution = "1080p"
+    sora_seed = -1
+    sora_loop = False
+    sora_include_audio = True
+    kling_aspect_ratio = "16:9"
+    kling_duration = 5.0
+    kling_motion_level = 5
+    kling_cfg_scale = 0.5
+    kling_seed = -1
+    kling_negative_prompt = ""
+    voice_preset = "alloy"
+    voice_speed = 1.0
+    voice_pitch = 0
+    voice_volume = 100
+    voice_emotion = "neutral"
+    voice_sample_rate = 44100
+    voice_format = "mp3"
+    music_genre = "Electronic"
+    music_mood = "Uplifting"
+    music_tempo = 120
+    music_key = "C"
+    music_scale = "major"
+    music_intensity = 0.7
+    text_max_tokens = 2048
+    text_temperature = 0.7
+    text_top_p = 0.9
+    text_frequency_penalty = 0.0
+    text_presence_penalty = 0.0
+    advanced_model_params = {}
+
     # Combined Advanced Configuration & Model Parameters
     with st.expander("⚙️ Advanced Configuration & Model Parameters", expanded=False):
 
@@ -1187,8 +1241,8 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
             st.caption("📋 Fallback Order:")
             for i, model in enumerate(fallback_order, 1):
                 model_info = ModelPriority.MODEL_CAPABILITIES[model]
-                st.caption(f"  {i}. {model_info['name']} → ", end="")
-            st.caption("Done!")
+                st.caption(f"  {i}. {model_info['name']}")
+            st.caption("✅ Done!")
 
             # Enable all models in fallback order
             ken_burns = any(m.value == "ken_burns" for m in fallback_order)
@@ -1821,6 +1875,16 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
             auto_use_luma=auto_use_luma,
             auto_use_sora=auto_use_sora,
             auto_use_kling=auto_use_kling,
+            auto_use_luma2=auto_use_luma2,
+            auto_use_veo3=auto_use_veo3,
+            auto_use_veo3_fast=auto_use_veo3_fast,
+            auto_use_veo31_fast=auto_use_veo31_fast,
+            auto_use_veo2=auto_use_veo2,
+            auto_use_pixverse5=auto_use_pixverse5,
+            auto_use_pixverse45=auto_use_pixverse45,
+            auto_use_leonardo=auto_use_leonardo,
+            auto_use_wan=auto_use_wan,
+            auto_use_seedance=auto_use_seedance,
         )
 
     # Show recent campaigns
@@ -1841,17 +1905,5 @@ def render_dashboard_tab(smart_dashboard_available, cross_page_mgr):
                 """
                 )
 
-    st.markdown("---")
-
-    st.markdown("### 📋 Recent Activity")
-
-    if st.session_state.campaign_history:
-        for campaign in st.session_state.campaign_history[-5:]:
-            campaign_title = campaign.get("concept", campaign.get("name", "Campaign"))[:50]
-            with st.expander(f"📌 {campaign_title}... - {campaign['timestamp']}"):
-                st.json(campaign)
-    else:
+    if not st.session_state.campaign_history:
         st.info("📭 No recent activity. Start creating!")
-
-    # TAB 1: TASK QUEUE (Autonomous AI Task System)
-    # ========================================

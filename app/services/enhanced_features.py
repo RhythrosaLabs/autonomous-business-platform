@@ -11,11 +11,9 @@ New functionality to improve workflow, productivity, and intelligence:
 - Auto-generated templates
 """
 
-import json
 import logging
 from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 import streamlit as st
 
@@ -36,7 +34,7 @@ class GlobalSearchManager:
     }
 
     @staticmethod
-    def search(query: str, content_types: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+    def search(query: str, content_types: Optional[list[str]] = None) -> list[dict[str, Any]]:
         """
         Global search across all content types
 
@@ -88,14 +86,14 @@ class GlobalSearchManager:
         return results
 
     @staticmethod
-    def _extract_searchable_text(item: Dict[str, Any]) -> str:
+    def _extract_searchable_text(item: dict[str, Any]) -> str:
         """Extract all searchable text from an item"""
         if isinstance(item, dict):
             return " ".join(str(v) for v in item.values() if isinstance(v, (str, int)))
         return str(item)
 
     @staticmethod
-    def _get_item_title(item: Dict[str, Any], content_type: str) -> str:
+    def _get_item_title(item: dict[str, Any], content_type: str) -> str:
         """Get display title for item"""
         title_keys = ["name", "title", "prompt", "description", "text"]
         for key in title_keys:
@@ -104,7 +102,7 @@ class GlobalSearchManager:
         return f"Untitled {content_type.rstrip('s')}"
 
     @staticmethod
-    def _get_preview(item: Dict[str, Any], content_type: str) -> str:
+    def _get_preview(item: dict[str, Any], content_type: str) -> str:
         """Get preview text for item"""
         if content_type == "campaigns":
             return item.get("description", "")[:100]
@@ -118,7 +116,7 @@ class GlobalSearchManager:
             return str(item)[:100]
 
     @staticmethod
-    def _get_date(item: Dict[str, Any]) -> str:
+    def _get_date(item: dict[str, Any]) -> str:
         """Extract date from item"""
         for date_key in ["date", "created_at", "timestamp", "updated_at"]:
             if date_key in item:
@@ -150,7 +148,7 @@ class SmartSuggestionEngine:
     """Generate context-aware suggestions based on current work"""
 
     @staticmethod
-    def get_suggestions(context: Optional[Dict[str, Any]] = None) -> List[Dict[str, Any]]:
+    def get_suggestions(context: Optional[dict[str, Any]] = None) -> list[dict[str, Any]]:
         """
         Generate smart suggestions based on:
         - Current tab/feature being used
@@ -303,7 +301,7 @@ class ContentOptimizer:
     """AI-powered content optimization"""
 
     @staticmethod
-    def optimize_text(text: str, optimization_type: str = "seo") -> Dict[str, Any]:
+    def optimize_text(text: str, optimization_type: str = "seo") -> dict[str, Any]:
         """
         Optimize text content for specific purposes
 
@@ -329,7 +327,7 @@ class ContentOptimizer:
         return optimizer(text)
 
     @staticmethod
-    def _optimize_seo(text: str) -> Dict[str, Any]:
+    def _optimize_seo(text: str) -> dict[str, Any]:
         """Optimize for search engines"""
         return {
             "type": "seo",
@@ -346,7 +344,7 @@ class ContentOptimizer:
         }
 
     @staticmethod
-    def _optimize_social(text: str) -> Dict[str, Any]:
+    def _optimize_social(text: str) -> dict[str, Any]:
         """Optimize for social media"""
         return {
             "type": "social",
@@ -363,7 +361,7 @@ class ContentOptimizer:
         }
 
     @staticmethod
-    def _optimize_email(text: str) -> Dict[str, Any]:
+    def _optimize_email(text: str) -> dict[str, Any]:
         """Optimize for email marketing"""
         return {
             "type": "email",
@@ -380,7 +378,7 @@ class ContentOptimizer:
         }
 
     @staticmethod
-    def _optimize_ad(text: str) -> Dict[str, Any]:
+    def _optimize_ad(text: str) -> dict[str, Any]:
         """Optimize for advertising"""
         return {
             "type": "ad",
@@ -397,7 +395,7 @@ class ContentOptimizer:
         }
 
     @staticmethod
-    def _optimize_blog(text: str) -> Dict[str, Any]:
+    def _optimize_blog(text: str) -> dict[str, Any]:
         """Optimize for blog posts"""
         return {
             "type": "blog",
@@ -418,7 +416,7 @@ class SmartTemplateGenerator:
     """Auto-generate templates from past successful campaigns"""
 
     @staticmethod
-    def generate_from_campaigns() -> List[Dict[str, Any]]:
+    def generate_from_campaigns() -> list[dict[str, Any]]:
         """
         Analyze past campaigns and auto-generate reusable templates
 
@@ -442,7 +440,7 @@ class SmartTemplateGenerator:
                     {
                         "name": f"High-Performer: {campaign.get('name', 'Campaign')}",
                         "icon": "⭐",
-                        "description": f"Template based on your top-performing campaign",
+                        "description": "Template based on your top-performing campaign",
                         "metrics": {
                             "engagement": campaign.get("engagement", "Unknown"),
                             "reach": campaign.get("reach", "Unknown"),
@@ -472,7 +470,7 @@ class SmartTemplateGenerator:
                         "description": f"{top_color} is your most popular color choice",
                         "metrics": {
                             "usage_count": colors[top_color],
-                            "customer_preference": f"{int((colors[top_color]/len(products)*100))}%",
+                            "customer_preference": f"{int(colors[top_color]/len(products)*100)}%",
                         },
                         "suggested_next_step": f"Create more {top_color} variations",
                     }
@@ -485,7 +483,7 @@ class BatchProcessingQueue:
     """Track and manage batch processing jobs"""
 
     @staticmethod
-    def create_batch_job(job_type: str, items: List[Any], params: Optional[Dict] = None) -> str:
+    def create_batch_job(job_type: str, items: list[Any], params: Optional[dict] = None) -> str:
         """
         Create a new batch processing job
 
@@ -523,7 +521,7 @@ class BatchProcessingQueue:
         return job_id
 
     @staticmethod
-    def get_job_status(job_id: str) -> Dict[str, Any]:
+    def get_job_status(job_id: str) -> dict[str, Any]:
         """Get status of a batch job"""
         if "batch_jobs" not in st.session_state:
             return {"error": "Job not found"}
@@ -547,7 +545,7 @@ class BatchProcessingQueue:
                 job["completed_at"] = datetime.now().isoformat()
 
     @staticmethod
-    def list_active_jobs() -> List[Dict[str, Any]]:
+    def list_active_jobs() -> list[dict[str, Any]]:
         """Get all active batch jobs"""
         if "batch_jobs" not in st.session_state:
             return []
@@ -563,7 +561,7 @@ class ContentCalendarManager:
     """Visual calendar for scheduled content"""
 
     @staticmethod
-    def get_calendar_data(year: int, month: int) -> Dict[int, List[Dict[str, Any]]]:
+    def get_calendar_data(year: int, month: int) -> dict[int, list[dict[str, Any]]]:
         """
         Get scheduled content for a calendar month
 
@@ -595,13 +593,13 @@ class ContentCalendarManager:
                             "time": item_date.strftime("%H:%M"),
                         }
                     )
-            except:
+            except Exception:
                 continue
 
         return calendar_data
 
     @staticmethod
-    def get_upcoming_posts(days: int = 7) -> List[Dict[str, Any]]:
+    def get_upcoming_posts(days: int = 7) -> list[dict[str, Any]]:
         """Get next N days of scheduled posts"""
         scheduled_items = st.session_state.get("scheduled_items", [])
         today = datetime.now()
@@ -620,7 +618,7 @@ class ContentCalendarManager:
                             "content": item.get("content", "")[:100],
                         }
                     )
-            except:
+            except Exception:
                 continue
 
         # Sort by date

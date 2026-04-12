@@ -17,18 +17,17 @@ Architecture:
 
 import json
 import logging
-import os
 import queue
 import threading
-import time
 import traceback
 import uuid
+from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Optional
 
 import streamlit as st
 
@@ -64,7 +63,7 @@ class BackgroundTask:
     started_at: Optional[str] = None
     completed_at: Optional[str] = None
     page_origin: str = ""
-    logs: List[str] = field(default_factory=list)
+    logs: list[str] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         """Convert to JSON-serializable dict."""
@@ -131,10 +130,10 @@ class CrossPageStateManager:
 
         self._initialized = True
         self._executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="bg_task_")
-        self._tasks: Dict[str, BackgroundTask] = {}
-        self._task_futures: Dict[str, Future] = {}
-        self._page_states: Dict[str, Dict[str, Any]] = {}
-        self._progress_queues: Dict[str, queue.Queue] = {}
+        self._tasks: dict[str, BackgroundTask] = {}
+        self._task_futures: dict[str, Future] = {}
+        self._page_states: dict[str, dict[str, Any]] = {}
+        self._progress_queues: dict[str, queue.Queue] = {}
 
         # Load any persisted tasks and states
         self._load_persisted_state()
@@ -147,7 +146,7 @@ class CrossPageStateManager:
             # Load page states
             for state_file in STATE_DIR.glob("*.json"):
                 try:
-                    with open(state_file, "r") as f:
+                    with open(state_file) as f:
                         page_name = state_file.stem
                         self._page_states[page_name] = json.load(f)
                 except Exception as e:
@@ -156,7 +155,7 @@ class CrossPageStateManager:
             # Load task metadata (not running tasks - those need to be restarted)
             for task_file in TASKS_DIR.glob("*.json"):
                 try:
-                    with open(task_file, "r") as f:
+                    with open(task_file) as f:
                         task_data = json.load(f)
                         task = BackgroundTask.from_dict(task_data)
                         # Mark incomplete tasks as failed (they were interrupted)
@@ -170,7 +169,7 @@ class CrossPageStateManager:
         except Exception as e:
             logger.error(f"Error loading persisted state: {e}")
 
-    def save_page_state(self, page_name: str, state: Dict[str, Any], merge: bool = True):
+    def save_page_state(self, page_name: str, state: dict[str, Any], merge: bool = True):
         """
         Save the current state of a page.
 
@@ -222,7 +221,7 @@ class CrossPageStateManager:
         except (TypeError, ValueError):
             return str(obj)[:500]
 
-    def restore_page_state(self, page_name: str) -> Dict[str, Any]:
+    def restore_page_state(self, page_name: str) -> dict[str, Any]:
         """
         Restore the saved state for a page.
 
@@ -240,7 +239,7 @@ class CrossPageStateManager:
         state_file = STATE_DIR / f"{page_name}.json"
         if state_file.exists():
             try:
-                with open(state_file, "r") as f:
+                with open(state_file) as f:
                     state = json.load(f)
                     self._page_states[page_name] = state
                     return state.copy()
@@ -407,7 +406,7 @@ class CrossPageStateManager:
             return (task.progress, task.progress_message)
         return (None, None)
 
-    def get_active_tasks(self, page: Optional[str] = None) -> List[BackgroundTask]:
+    def get_active_tasks(self, page: Optional[str] = None) -> list[BackgroundTask]:
         """Get all active (running/pending) tasks, optionally filtered by page."""
         active = [
             t for t in self._tasks.values() if t.status in [TaskStatus.PENDING, TaskStatus.RUNNING]
@@ -416,7 +415,7 @@ class CrossPageStateManager:
             active = [t for t in active if t.page_origin == page]
         return active
 
-    def get_all_tasks(self, limit: int = 50) -> List[BackgroundTask]:
+    def get_all_tasks(self, limit: int = 50) -> list[BackgroundTask]:
         """Get all tasks, most recent first."""
         tasks = list(self._tasks.values())
         tasks.sort(key=lambda t: t.created_at or "", reverse=True)
@@ -443,7 +442,7 @@ class CrossPageStateManager:
                 created = datetime.fromisoformat(task.created_at).timestamp()
                 if created < cutoff and task.status not in [TaskStatus.PENDING, TaskStatus.RUNNING]:
                     to_remove.append(task_id)
-            except:
+            except Exception:
                 pass
 
         for task_id in to_remove:
@@ -513,7 +512,7 @@ def save_current_page_state(page_name: str, extra_state: Optional[dict] = None):
     manager.save_page_state(page_name, page_state)
 
 
-def restore_page_to_session(page_name: str, keys_to_restore: Optional[List[str]] = None):
+def restore_page_to_session(page_name: str, keys_to_restore: Optional[list[str]] = None):
     """
     Restore saved page state back into st.session_state.
 

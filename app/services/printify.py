@@ -37,7 +37,7 @@ WORKFLOW OVERVIEW:
    └─ Single design → Applied to MULTIPLE product blueprints
    └─ Example: "Sunset Dreams" design applied to:
        • Unisex T-Shirt (5 sizes, 10 colors) = 50 SKUs
-       • Premium Hoodie (4 sizes, 8 colors) = 32 SKUs  
+       • Premium Hoodie (4 sizes, 8 colors) = 32 SKUs
        • Coffee Mug (1 size, 2 finishes) = 2 SKUs
        • Poster (3 sizes) = 3 SKUs
        TOTAL: 1 design → 87 product SKUs
@@ -82,18 +82,18 @@ PrintifyAPI (Lines 883-1005):
   └─ upload_image(image_data, file_name) → upload_id
       • Uploads design as base64-encoded image
       • Returns reusable Printify asset ID
-  
+
   └─ find_blueprint(product_type) → blueprint_id
       • Searches Printify catalog for product template
       • Example: "mug" → Blueprint ID 384
-  
+
   └─ get_provider_and_variant(blueprint_id) → (provider_id, variant_id, details)
       • Finds best manufacturer and available product variants
-  
+
   └─ create_product(shop_id, product_data) → product
       • Creates product with design applied
       • product_data includes: design placement, pricing, variants
-  
+
   └─ publish_product(shop_id, product_id) → result
       • Publishes product to Shopify store
       • Makes product live for customer orders
@@ -121,7 +121,7 @@ Step 1: Generate 3 designs with Cyberpunk Neon theme
   → design_1.png, design_2.png, design_3.png
 
 Step 2: For EACH design, create products on ALL specified types:
-  
+
   Design 1 "Neon Skyline" →
     ├─ Upload once to Printify (upload_id_1)
     └─ Create products:
@@ -171,26 +171,13 @@ AUTOMATION CAPABILITIES:
 ===================================================================================
 """
 
-import base64
 import csv
-import io
 import json
 import os
-import sqlite3
 import sys
-import tempfile
-import time
-import zipfile
-from concurrent.futures import ThreadPoolExecutor
-from dataclasses import asdict, dataclass
-from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import requests
-from PIL import Image
-
-from app.services.api_service import PrintifyAPI, ReplicateAPI
+from app.services.api_service import PrintifyAPI
 from app.services.local_models_manager import LocalModelsManager
 
 from .database_manager import DatabaseManager
@@ -204,22 +191,17 @@ except ImportError:
     HAS_DIALOGS = False
     TemplateDialog = PriceRuleDialog = ScheduleDialog = None
 
-from PyQt5.QtCore import QDateTime, QObject, QRunnable, Qt, QThreadPool, QTimer, pyqtSignal
-from PyQt5.QtGui import QColor, QFont, QPalette, QPixmap
+from PyQt5.QtCore import QObject, QRunnable, Qt, QThreadPool, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QPalette
 from PyQt5.QtWidgets import (
     QApplication,
     QCheckBox,
     QComboBox,
-    QDateTimeEdit,
     QDialog,
-    QDialogButtonBox,
     QDoubleSpinBox,
     QFileDialog,
-    QFrame,
-    QGridLayout,
     QGroupBox,
     QHBoxLayout,
-    QHeaderView,
     QLabel,
     QLineEdit,
     QListWidget,
@@ -227,7 +209,6 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QPushButton,
-    QScrollArea,
     QSpinBox,
     QStatusBar,
     QTableWidget,
@@ -260,14 +241,7 @@ except ImportError:
 # ============================================================================
 
 # Data models are imported from data_models.py
-from .data_models import (
-    APIConfig,
-    PriceRule,
-    ProductDetails,
-    ProductTemplate,
-    ScheduledJob,
-    WorkflowResult,
-)
+from .data_models import APIConfig, ProductDetails, WorkflowResult
 
 # ============================================================================
 # Local AI Models Manager
@@ -891,10 +865,10 @@ class ProductWizardApp(QMainWindow):
         config_file = Path.home() / ".pod_wizard_replicate.json"
         if config_file.exists():
             try:
-                with open(config_file, "r") as f:
+                with open(config_file) as f:
                     data = json.load(f)
                     self.replicate_input.setText(data.get("token", ""))
-            except:
+            except Exception:
                 pass
 
     def _save_replicate_token(self):
@@ -903,7 +877,7 @@ class ProductWizardApp(QMainWindow):
         try:
             with open(config_file, "w") as f:
                 json.dump({"token": self.replicate_input.text()}, f)
-        except:
+        except Exception:
             pass
 
     def _toggle_batch_mode(self, enabled: bool):
@@ -1056,7 +1030,7 @@ class ProductWizardApp(QMainWindow):
             self.threadpool.start(worker)
             self.active_workers += 1
 
-    def _load_batch_prompts(self) -> List[str]:
+    def _load_batch_prompts(self) -> list[str]:
         """Load prompts from batch file"""
         file_path = self.batch_file_input.text().strip()
         if not file_path or not os.path.exists(file_path):
@@ -1067,7 +1041,7 @@ class ProductWizardApp(QMainWindow):
 
         try:
             prompts = []
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 if file_path.endswith(".csv"):
                     reader = csv.reader(f)
                     next(reader, None)
@@ -1160,7 +1134,7 @@ class ProductWizardApp(QMainWindow):
         else:
             try:
                 os.remove(result.assets_path)
-            except:
+            except Exception:
                 pass
 
     # ========================================================================

@@ -15,7 +15,6 @@ Run with: python3 setup_social_accounts.py
 
 import asyncio
 import os
-import sys
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -56,10 +55,10 @@ def check_requirements():
 
     if missing:
         print(f"❌ Missing packages: {', '.join(missing)}")
-        print(f"\nInstall with:")
+        print("\nInstall with:")
         print(f"  pip install {' '.join(missing)}")
         if "playwright" in missing:
-            print(f"  playwright install chromium")
+            print("  playwright install chromium")
         return False
 
     # Check for Anthropic API key
@@ -135,8 +134,8 @@ async def verify_login(browser_type: str, platform: str):
         await page.goto(urls[platform])
 
         print(f"\n   ✨ Browser opened to {platform.title()}")
-        print(f"   👀 Please check if you're logged in.")
-        print(f"   📱 If not logged in, click 'Continue with Google' to sign in.")
+        print("   👀 Please check if you're logged in.")
+        print("   📱 If not logged in, click 'Continue with Google' to sign in.")
 
         input(f"\n   Press Enter when you've verified you're logged in to {platform.title()}...")
 
@@ -153,7 +152,7 @@ async def verify_login(browser_type: str, platform: str):
         print(f"   ❌ Error: {e}")
         try:
             await browser.close()
-        except:
+        except Exception:
             pass
         return False
 
@@ -237,7 +236,7 @@ async def test_post(browser_type: str, platform: str):
         print(f"   ❌ Test failed: {e}")
         try:
             await browser.close()
-        except:
+        except Exception:
             pass
         return False
 
@@ -250,7 +249,7 @@ def update_env_file(platform: str, google_email: str):
         print("❌ .env file not found!")
         return False
 
-    with open(env_path, "r") as f:
+    with open(env_path) as f:
         content = f.read()
 
     # For Google OAuth accounts, we use the Google email

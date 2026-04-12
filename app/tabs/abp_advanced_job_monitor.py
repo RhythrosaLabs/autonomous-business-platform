@@ -3,17 +3,9 @@ Advanced Job Monitor Tab
 Comprehensive job tracking, Ray dashboard integration, and performance analytics
 """
 
-import time
-from typing import Any, Dict, List
-
 from app.services.global_job_queue import JobStatus, JobType
-from app.services.tab_job_helpers import (
-    are_all_jobs_done,
-    check_jobs_progress,
-    collect_job_results,
-    get_global_job_queue,
-)
-from app.tabs.abp_imports_common import Path, datetime, st
+from app.services.tab_job_helpers import get_global_job_queue
+from app.tabs.abp_imports_common import datetime, st
 
 
 def render_advanced_job_monitor_tab():
@@ -102,9 +94,10 @@ def render_advanced_job_monitor_tab():
                             st.caption(f"**CPUs:** {resources.get('num_cpus', 1)}")
                             st.caption(f"**RAM:** {resources.get('memory', 0) / 1_000_000:.0f}MB")
 
-            if auto_refresh:
-                time.sleep(2)
-                st.rerun()
+            if auto_refresh and active_jobs:
+                st.info("⏳ Auto-refresh is enabled. Click below to refresh.")
+                if st.button("🔄 Refresh Now", key="job_monitor_refresh"):
+                    st.rerun()
 
     # TAB 2: All Jobs (with filters)
     with monitor_tabs[1]:
@@ -296,7 +289,7 @@ def render_advanced_job_monitor_tab():
                     st.caption(f"Memory available: {resources.get('memory', 0) / 1e9:.1f}GB")
                 else:
                     st.warning("⚠️ Ray not initialized")
-            except:
+            except Exception:
                 st.error("❌ Ray not available")
 
         # Embed Ray dashboard

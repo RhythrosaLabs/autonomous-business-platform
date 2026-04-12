@@ -197,7 +197,7 @@ Respond in JSON format:
                                             "suggested_tags": [],
                                             "related_topics": [],
                                         }
-                                except:
+                                except Exception:
                                     ai_data = {
                                         "summary": ai_response[:200],
                                         "actions": [],
@@ -715,13 +715,13 @@ Keep it warm, supportive, and under 200 words."""
                 recent_entries = st.session_state.journal_entries[:7]
 
                 for entry in recent_entries:
-                    st.markdown(f"{entry['date']}: {entry['mood']}")
+                    st.markdown(f"{entry.get('date', 'Unknown')}: {entry.get('mood', '😐 Okay')}")
 
                 # Calculate average
                 if recent_entries:
-                    avg_mood = sum(mood_map.get(e["mood"], 3) for e in recent_entries) / len(
-                        recent_entries
-                    )
+                    avg_mood = sum(
+                        mood_map.get(e.get("mood", "😐 Okay"), 3) for e in recent_entries
+                    ) / len(recent_entries)
                     avg_emoji = ["😫", "😕", "😐", "🙂", "😊", "🚀"][min(int(avg_mood) - 1, 5)]
                     st.metric("7-Day Average", avg_emoji)
             else:
@@ -740,7 +740,10 @@ Keep it warm, supportive, and under 200 words."""
                 yesterday_date = (dt.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
                 if today_date in dates or yesterday_date in dates:
+                    # Start from today if there's an entry, otherwise from yesterday
                     check_date = dt.now().date()
+                    if today_date not in dates:
+                        check_date = check_date - timedelta(days=1)
                     for i in range(len(dates)):
                         if check_date.strftime("%Y-%m-%d") in dates:
                             streak += 1
@@ -756,7 +759,7 @@ Keep it warm, supportive, and under 200 words."""
 
         if st.session_state.journal_entries:
             for entry in st.session_state.journal_entries[:10]:
-                with st.expander(f"{entry['mood']} {entry['date']}"):
+                with st.expander(f"{entry.get('mood', '😐 Okay')} {entry.get('date', 'Unknown')}"):
                     if entry.get("wins"):
                         st.markdown(f"**🏆 Wins:** {entry['wins']}")
                     if entry.get("challenges"):
@@ -1007,7 +1010,7 @@ Format as a numbered list with clear, actionable items."""
                                 all_content.append(f"Note: {note.get('text', '')[:200]}")
                             for entry in st.session_state.journal_entries[:7]:
                                 all_content.append(
-                                    f"Journal ({entry['mood']}): Wins: {entry.get('wins', '')} Challenges: {entry.get('challenges', '')}"
+                                    f"Journal ({entry.get('mood', '😐 Okay')}): Wins: {entry.get('wins', '')} Challenges: {entry.get('challenges', '')}"
                                 )
 
                             analysis_prompt = f"""Analyze these personal notes and journal entries to identify:

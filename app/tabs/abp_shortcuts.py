@@ -726,24 +726,6 @@ Now analyze the request above and provide the steps:"""
                         # Force reload to show new shortcut
                         st.rerun()
 
-                        # Show preview
-                        st.markdown("### Preview:")
-                        btn_style = {
-                            "primary": "primary",
-                            "success": "secondary",
-                            "warning": "secondary",
-                            "danger": "secondary",
-                            "info": "secondary",
-                            "secondary": "secondary",
-                        }
-                        st.button(
-                            f"{shortcut_icon} {shortcut_name}",
-                            type=btn_style.get(shortcut["color"], "primary"),
-                            disabled=True,
-                        )
-
-                        st.balloons()
-
                     except Exception as e:
                         st.error(f"Error creating shortcut: {str(e)}")
 
@@ -964,6 +946,7 @@ Now analyze the request above and provide the steps:"""
                                 if bg_option:
                                     # Execute in background using BackgroundTaskManager
                                     try:
+                                        import asyncio
                                         import threading
 
                                         from app.services.background_task_manager import (
@@ -972,15 +955,11 @@ Now analyze the request above and provide the steps:"""
 
                                         task_mgr = BackgroundTaskManager()
 
-                                        task_id = task_mgr.create_task(
+                                        task = task_mgr.create_task(
                                             name=f"{shortcut['icon']} {shortcut['name']}",
-                                            task_type="shortcut",
-                                            total_steps=len(shortcut["steps"]),
-                                            params={
-                                                "shortcut_id": shortcut["id"],
-                                                "shortcut": shortcut,
-                                            },
+                                            description=f"Shortcut: {shortcut['name']} ({len(shortcut['steps'])} steps)",
                                         )
+                                        task_id = task.id if hasattr(task, "id") else str(task)
 
                                         # Start background execution in separate thread
                                         def run_async_task():
@@ -1865,6 +1844,10 @@ Now analyze the request above and provide the steps:"""
 
                         content = uploaded_file.read().decode("utf-8")
                         shortcuts_data = json.loads(content)
+
+                        # Handle both list format and dict format (from export)
+                        if isinstance(shortcuts_data, dict) and "shortcuts" in shortcuts_data:
+                            shortcuts_data = shortcuts_data["shortcuts"]
 
                         if isinstance(shortcuts_data, list):
                             count = 0

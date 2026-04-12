@@ -7,7 +7,7 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import streamlit as st
 
@@ -44,7 +44,6 @@ def generate_ken_burns_video(
     """
     try:
         import cv2
-        import numpy as np
         from moviepy.editor import ImageSequenceClip
 
         logger.info(f"Generating Ken Burns video: {image_path} -> {output_path}")
@@ -325,67 +324,68 @@ def add_cta_card(
         logger.error(f"CTA card addition failed: {e}", exc_info=True)
         raise VideoGenerationError(f"CTA card addition failed: {e}")
 
-    def apply_brand_overlay(video_path: str, output_path: str, brand_template: Dict) -> bool:
-        """Apply brand overlay (logo and color bar) to a video.
 
-        This places a small logo in the top-right and a color accent bar at the bottom
-        using the primary brand color. It preserves the original audio/video.
-        """
+def apply_brand_overlay(video_path: str, output_path: str, brand_template: dict) -> bool:
+    """Apply brand overlay (logo and color bar) to a video.
+
+    This places a small logo in the top-right and a color accent bar at the bottom
+    using the primary brand color. It preserves the original audio/video.
+    """
+    try:
+        from moviepy.editor import ColorClip, CompositeVideoClip, ImageClip, VideoFileClip
+
+        logger.info(f"Applying brand overlay to {video_path}")
+
+        if not os.path.exists(video_path):
+            raise VideoGenerationError("Source video not found for branding")
+
+        video = VideoFileClip(video_path)
+        w, h = video.size
+
+        overlays = [video]
+
+        # Logo overlay (if provided)
+        logo_path = None
+        if brand_template:
+            logo_path = brand_template.get("logo")
+            primary_color = brand_template.get("colors", {}).get("primary", "#000000")
+        else:
+            primary_color = "#000000"
+
+        if logo_path and os.path.exists(logo_path):
+            logo = ImageClip(logo_path).set_duration(video.duration)
+            # Scale logo to 8% of width
+            logo = logo.resize(width=int(w * 0.08))
+            logo = logo.set_pos(("right", "top")).margin(right=20, top=20)
+            overlays.append(logo)
+
+        # Bottom color bar
         try:
-            from moviepy.editor import ColorClip, CompositeVideoClip, ImageClip, VideoFileClip
+            # Convert hex color to RGB tuple
+            hexc = primary_color.lstrip("#")
+            rgb = tuple(int(hexc[i : i + 2], 16) for i in (0, 2, 4))
+        except Exception:
+            rgb = (0, 0, 0)
 
-            logger.info(f"Applying brand overlay to {video_path}")
+        bar_height = int(h * 0.06)
+        color_bar = ColorClip(size=(w, bar_height), color=rgb).set_duration(video.duration)
+        color_bar = color_bar.set_pos(("center", h - bar_height))
+        overlays.append(color_bar)
 
-            if not os.path.exists(video_path):
-                raise VideoGenerationError("Source video not found for branding")
+        final = CompositeVideoClip(overlays)
+        final.write_videofile(
+            output_path, codec="libx264", audio_codec="aac", threads=1, logger=None
+        )
 
-            video = VideoFileClip(video_path)
-            w, h = video.size
+        # Cleanup
+        video.close()
+        final.close()
+        logger.info(f"Brand overlay applied: {output_path}")
+        return True
 
-            overlays = [video]
-
-            # Logo overlay (if provided)
-            logo_path = None
-            if brand_template:
-                logo_path = brand_template.get("logo")
-                primary_color = brand_template.get("colors", {}).get("primary", "#000000")
-            else:
-                primary_color = "#000000"
-
-            if logo_path and os.path.exists(logo_path):
-                logo = ImageClip(logo_path).set_duration(video.duration)
-                # Scale logo to 8% of width
-                logo = logo.resize(width=int(w * 0.08))
-                logo = logo.set_pos(("right", "top")).margin(right=20, top=20)
-                overlays.append(logo)
-
-            # Bottom color bar
-            try:
-                # Convert hex color to RGB tuple
-                hexc = primary_color.lstrip("#")
-                rgb = tuple(int(hexc[i : i + 2], 16) for i in (0, 2, 4))
-            except Exception:
-                rgb = (0, 0, 0)
-
-            bar_height = int(h * 0.06)
-            color_bar = ColorClip(size=(w, bar_height), color=rgb).set_duration(video.duration)
-            color_bar = color_bar.set_pos(("center", h - bar_height))
-            overlays.append(color_bar)
-
-            final = CompositeVideoClip(overlays)
-            final.write_videofile(
-                output_path, codec="libx264", audio_codec="aac", threads=1, logger=None
-            )
-
-            # Cleanup
-            video.close()
-            final.close()
-            logger.info(f"Brand overlay applied: {output_path}")
-            return True
-
-        except Exception as e:
-            logger.error(f"Brand overlay failed: {e}", exc_info=True)
-            raise VideoGenerationError(f"Brand overlay failed: {e}")
+    except Exception as e:
+        logger.error(f"Brand overlay failed: {e}", exc_info=True)
+        raise VideoGenerationError(f"Brand overlay failed: {e}")
 
 
 def orchestrate_video_generation(
@@ -393,10 +393,10 @@ def orchestrate_video_generation(
     prompt: str,
     image_path: Optional[str],
     output_dir: str,
-    quality_config: Dict,
+    quality_config: dict,
     add_cta: bool = True,
     cta_text: str = "Shop Now!",
-) -> Tuple[str, Dict]:
+) -> tuple[str, dict]:
     """
     Orchestrate complete video generation workflow.
 

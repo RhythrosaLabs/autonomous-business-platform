@@ -1,11 +1,11 @@
-from app.tabs.abp_imports_common import asyncio, json, logging, os, setup_logger, st
+from app.tabs.abp_imports_common import asyncio, json, setup_logger, st
 
 logger = setup_logger(__name__)
 
 import pandas as pd
 
 from app.services.api_service import ReplicateAPI
-from app.services.contact_finder_service import Contact, ContactFinderService, OutreachPlan
+from app.services.contact_finder_service import ContactFinderService
 from app.services.platform_helpers import _get_replicate_token
 from app.services.platform_integrations import tracked_replicate_run
 
@@ -348,7 +348,10 @@ Be specific and actionable."""
 
     # Initialize contact finder
     if "contact_finder" not in st.session_state:
-        replicate_token = _get_replicate_token()
+        try:
+            replicate_token = _get_replicate_token()
+        except ValueError:
+            replicate_token = None
         if replicate_token:
             replicate_api = ReplicateAPI(api_token=replicate_token)
             # FREE mode - no paid APIs like Hunter.io or Apollo.io
@@ -444,13 +447,16 @@ Be specific and actionable."""
             if not product_name:
                 st.error("Please provide Product Name")
             else:
-                with st.spinner(f"🔍 Analyzing product and finding contacts..."):
+                with st.spinner("🔍 Analyzing product and finding contacts..."):
 
                     # Auto-detect target market if not provided
                     if not target_market or target_market.strip() == "":
                         with st.spinner("🤖 AI detecting target market..."):
                             # Use AI to determine target market from product name and type
-                            replicate_token = _get_replicate_token()
+                            try:
+                                replicate_token = _get_replicate_token()
+                            except ValueError:
+                                replicate_token = None
                             if replicate_token:
                                 temp_replicate = ReplicateAPI(api_token=replicate_token)
 
@@ -564,7 +570,7 @@ Be specific and actionable."""
 
             if are_all_jobs_done(job_ids):
                 results = collect_job_results(job_ids)
-                for (plan_type, _), result in zip(plan_jobs, results):
+                for (plan_type, _), result in zip(plan_jobs, results, strict=False):
                     if plan_type == "day":
                         st.session_state.cf_day_plan = result
                     elif plan_type == "week":
@@ -612,10 +618,10 @@ Be specific and actionable."""
                         st.markdown(f"**Contact Type:** {contact.contact_type}")
                         st.markdown(f"**Channel:** `{contact.channel}` ({contact.channel_type})")
 
-                        st.markdown(f"**Why This Contact:**")
+                        st.markdown("**Why This Contact:**")
                         st.info(contact.rationale)
 
-                        st.markdown(f"**Outreach Approach:**")
+                        st.markdown("**Outreach Approach:**")
                         st.success(contact.outreach_approach)
 
                     with card_cols[1]:
@@ -628,11 +634,11 @@ Be specific and actionable."""
                         st.markdown(f"**Source:** {contact.source}")
 
                         # Action buttons
-                        if st.button(f"📧 Draft Email", key=f"draft_email_{i}"):
+                        if st.button("📧 Draft Email", key=f"draft_email_{i}"):
                             st.session_state.cf_draft_contact_index = i
                             st.rerun()
 
-                        if st.button(f"📋 Copy Contact", key=f"copy_contact_{i}"):
+                        if st.button("📋 Copy Contact", key=f"copy_contact_{i}"):
                             st.session_state.cf_copied = contact.channel
                             st.success("Copied!")
 

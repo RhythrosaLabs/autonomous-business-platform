@@ -82,7 +82,7 @@ def get_printify_catalog(_api, blueprint_id: int):
     """Cache Printify catalog data (5 minute TTL)."""
     try:
         return _api.get_print_providers(blueprint_id)
-    except:
+    except Exception:
         return []
 
 
@@ -91,7 +91,7 @@ def get_printify_blueprints(_api):
     """Cache Printify blueprints (5 minute TTL)."""
     try:
         return _api.get_blueprints()
-    except:
+    except Exception:
         return []
 
 
@@ -100,7 +100,7 @@ def get_shopify_products(_api, limit: int = 50):
     """Cache Shopify products (1 minute TTL)."""
     try:
         return _api.get_products(limit=limit)
-    except:
+    except Exception:
         return []
 
 
@@ -109,7 +109,7 @@ def get_youtube_channel_stats(_service):
     """Cache YouTube channel stats (5 minute TTL)."""
     try:
         return _service.get_channel_stats()
-    except:
+    except Exception:
         return {}
 
 

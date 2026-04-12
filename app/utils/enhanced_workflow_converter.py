@@ -13,10 +13,9 @@ Hyper-intelligent workflow converter that:
 import json
 import logging
 import re
-from collections import defaultdict
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -68,16 +67,16 @@ class UniversalNode:
     category: StepCategory = StepCategory.UTILITIES
 
     # Configuration
-    inputs: Dict = field(default_factory=dict)
-    outputs: Dict = field(default_factory=dict)
-    config: Dict = field(default_factory=dict)
+    inputs: dict = field(default_factory=dict)
+    outputs: dict = field(default_factory=dict)
+    config: dict = field(default_factory=dict)
 
     # Connections
-    connections_in: List[str] = field(default_factory=list)
-    connections_out: List[str] = field(default_factory=list)
+    connections_in: list[str] = field(default_factory=list)
+    connections_out: list[str] = field(default_factory=list)
 
     # Position for visual layout
-    position: Tuple[int, int] = (0, 0)
+    position: tuple[int, int] = (0, 0)
 
     # Conversion hints
     our_step_type: str = ""
@@ -108,15 +107,15 @@ class WorkflowAnalysis:
     has_scheduling: bool = False
 
     # Extracted data
-    prompts: List[str] = field(default_factory=list)
-    models_referenced: List[str] = field(default_factory=list)
-    api_endpoints: List[str] = field(default_factory=list)
-    file_paths: List[str] = field(default_factory=list)
-    triggers: List[str] = field(default_factory=list)
+    prompts: list[str] = field(default_factory=list)
+    models_referenced: list[str] = field(default_factory=list)
+    api_endpoints: list[str] = field(default_factory=list)
+    file_paths: list[str] = field(default_factory=list)
+    triggers: list[str] = field(default_factory=list)
 
     # Quality metrics
-    optimization_suggestions: List[str] = field(default_factory=list)
-    potential_issues: List[str] = field(default_factory=list)
+    optimization_suggestions: list[str] = field(default_factory=list)
+    potential_issues: list[str] = field(default_factory=list)
 
     # Summary
     description: str = ""
@@ -589,10 +588,10 @@ class EnhancedUniversalConverter:
     """
 
     def __init__(self):
-        self.nodes: Dict[str, UniversalNode] = {}
+        self.nodes: dict[str, UniversalNode] = {}
         self.platform: WorkflowPlatform = WorkflowPlatform.UNKNOWN
         self.analysis: WorkflowAnalysis = None
-        self.execution_order: List[str] = []
+        self.execution_order: list[str] = []
 
     def detect_platform(self, workflow_json: Any) -> WorkflowPlatform:
         """Auto-detect workflow platform with high accuracy"""
@@ -600,7 +599,7 @@ class EnhancedUniversalConverter:
         if isinstance(workflow_json, str):
             try:
                 workflow_json = json.loads(workflow_json)
-            except:
+            except Exception:
                 return WorkflowPlatform.UNKNOWN
 
         # n8n: has nodes array with n8n-nodes type prefix
@@ -681,7 +680,7 @@ class EnhancedUniversalConverter:
 
         return WorkflowPlatform.UNKNOWN
 
-    def convert_workflow(self, workflow_json: Any) -> Tuple[Dict, WorkflowAnalysis]:
+    def convert_workflow(self, workflow_json: Any) -> tuple[dict, WorkflowAnalysis]:
         """
         Main conversion method - detects platform and converts to our format.
 
@@ -709,9 +708,9 @@ class EnhancedUniversalConverter:
         else:
             return self._convert_unknown(workflow_json)
 
-    def _convert_comfyui(self, workflow_json: Dict) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_comfyui(self, workflow_json: dict) -> tuple[dict, WorkflowAnalysis]:
         """Convert ComfyUI workflow using dedicated converter"""
-        from comfyui_converter import ComfyUIConverter, convert_comfyui_workflow
+        from comfyui_converter import convert_comfyui_workflow
 
         our_workflow, info = convert_comfyui_workflow(workflow_json)
 
@@ -729,7 +728,7 @@ class EnhancedUniversalConverter:
 
         return our_workflow, analysis
 
-    def _convert_n8n(self, workflow_json: Dict) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_n8n(self, workflow_json: dict) -> tuple[dict, WorkflowAnalysis]:
         """Convert n8n workflow"""
         nodes = workflow_json.get("nodes", [])
         connections = workflow_json.get("connections", {})
@@ -796,7 +795,7 @@ class EnhancedUniversalConverter:
             "original_workflow": workflow_json,
         }, analysis
 
-    def _convert_node_red(self, workflow_json: List) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_node_red(self, workflow_json: list) -> tuple[dict, WorkflowAnalysis]:
         """Convert Node-RED workflow"""
         nodes = [n for n in workflow_json if isinstance(n, dict) and n.get("type") != "tab"]
 
@@ -851,7 +850,7 @@ class EnhancedUniversalConverter:
             "source": "node-red",
         }, analysis
 
-    def _convert_home_assistant(self, workflow_json: Dict) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_home_assistant(self, workflow_json: dict) -> tuple[dict, WorkflowAnalysis]:
         """Convert Home Assistant automation"""
         analysis = WorkflowAnalysis(
             platform=WorkflowPlatform.HOME_ASSISTANT,
@@ -897,7 +896,7 @@ class EnhancedUniversalConverter:
             "source": "home-assistant",
         }, analysis
 
-    def _convert_make(self, workflow_json: Dict) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_make(self, workflow_json: dict) -> tuple[dict, WorkflowAnalysis]:
         """Convert Make.com (Integromat) workflow"""
         flow = workflow_json.get("flow", {})
         modules = flow.get("modules", [])
@@ -953,7 +952,7 @@ class EnhancedUniversalConverter:
             "source": "make",
         }, analysis
 
-    def _convert_activepieces(self, workflow_json: Dict) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_activepieces(self, workflow_json: dict) -> tuple[dict, WorkflowAnalysis]:
         """Convert Activepieces workflow"""
         trigger = workflow_json.get("trigger", {})
         actions = workflow_json.get("actions", {})
@@ -1003,7 +1002,7 @@ class EnhancedUniversalConverter:
             "source": "activepieces",
         }, analysis
 
-    def _convert_windmill(self, workflow_json: Dict) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_windmill(self, workflow_json: dict) -> tuple[dict, WorkflowAnalysis]:
         """Convert Windmill workflow"""
         value = workflow_json.get("value", {})
         modules = value.get("modules", [])
@@ -1051,7 +1050,7 @@ class EnhancedUniversalConverter:
             "source": "windmill",
         }, analysis
 
-    def _convert_pipedream(self, workflow_json: Dict) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_pipedream(self, workflow_json: dict) -> tuple[dict, WorkflowAnalysis]:
         """Convert Pipedream workflow"""
         steps_list = workflow_json.get("steps", [])
 
@@ -1097,7 +1096,7 @@ class EnhancedUniversalConverter:
             "source": "pipedream",
         }, analysis
 
-    def _convert_unknown(self, workflow_json: Any) -> Tuple[Dict, WorkflowAnalysis]:
+    def _convert_unknown(self, workflow_json: Any) -> tuple[dict, WorkflowAnalysis]:
         """Handle unknown workflow format with best-effort conversion"""
         analysis = WorkflowAnalysis(
             platform=WorkflowPlatform.UNKNOWN,
@@ -1135,7 +1134,7 @@ class EnhancedUniversalConverter:
 
     # Helper methods
 
-    def _find_n8n_mapping(self, node_type: str) -> Dict:
+    def _find_n8n_mapping(self, node_type: str) -> dict:
         """Find mapping for n8n node type"""
         mappings = PLATFORM_NODE_MAPPINGS.get("n8n", {})
 
@@ -1152,7 +1151,7 @@ class EnhancedUniversalConverter:
         # Default
         return {"capability": "unknown", "our_type": node_type, "category": StepCategory.UTILITIES}
 
-    def _analyze_intent(self, name: str, params: Dict) -> str:
+    def _analyze_intent(self, name: str, params: dict) -> str:
         """Analyze semantic intent from name and parameters"""
         combined = f"{name} {json.dumps(params)}"
 
@@ -1162,7 +1161,7 @@ class EnhancedUniversalConverter:
 
         return "unknown"
 
-    def _extract_config(self, params: Dict, capability: str) -> Dict:
+    def _extract_config(self, params: dict, capability: str) -> dict:
         """Extract relevant config from parameters"""
         config = {}
 
@@ -1181,7 +1180,7 @@ class EnhancedUniversalConverter:
 
         return config
 
-    def _extract_schedule(self, workflow_json: Dict) -> Optional[Dict]:
+    def _extract_schedule(self, workflow_json: dict) -> Optional[dict]:
         """Extract schedule information if present"""
         nodes = workflow_json.get("nodes", [])
         for node in nodes:
@@ -1212,7 +1211,7 @@ class EnhancedUniversalConverter:
 
 
 # Convenience functions
-def convert_any_workflow(workflow_json: Any) -> Tuple[Dict, WorkflowAnalysis]:
+def convert_any_workflow(workflow_json: Any) -> tuple[dict, WorkflowAnalysis]:
     """Convert any workflow format to our unified format"""
     converter = EnhancedUniversalConverter()
     return converter.convert_workflow(workflow_json)

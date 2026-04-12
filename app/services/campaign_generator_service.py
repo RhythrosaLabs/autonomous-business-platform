@@ -341,7 +341,7 @@ Be specific and tactical."""
                     try:
                         if len(str(cell.value)) > max_length:
                             max_length = len(cell.value)
-                    except:
+                    except Exception:
                         pass
                 adjusted_width = max_length + 2
                 worksheet.column_dimensions[column_letter].width = adjusted_width
@@ -418,7 +418,7 @@ Be specific and tactical."""
                     try:
                         if len(str(cell.value)) > max_length:
                             max_length = len(cell.value)
-                    except:
+                    except Exception:
                         pass
                 adjusted_width = min((max_length + 2), 50)
                 worksheet.column_dimensions[column_letter].width = adjusted_width

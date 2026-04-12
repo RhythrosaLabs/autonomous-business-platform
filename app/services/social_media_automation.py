@@ -28,10 +28,9 @@ import logging
 import os
 import time
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 from selenium import webdriver
-from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -173,7 +172,7 @@ Write ONLY the tweet text, nothing else."""
         options.add_argument("--disable-blink-features=AutomationControlled")
         options.add_argument("--disable-notifications")
         options.add_argument(
-            f"user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+            "user-agent=Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
         )
 
         # Set download directory
@@ -218,7 +217,7 @@ Write ONLY the tweet text, nothing else."""
         element.send_keys(keys)
         return element
 
-    def _find_element_with_selectors(self, selectors: List[tuple], timeout: int = 8):
+    def _find_element_with_selectors(self, selectors: list[tuple], timeout: int = 8):
         """Try a list of (By, selector) tuples and return (element, by, selector) for the first match."""
         for by, selector in selectors:
             try:
@@ -272,7 +271,7 @@ Write ONLY the tweet text, nothing else."""
                 )
                 not_now_btn.click()
                 time.sleep(2)
-            except:
+            except Exception:
                 pass
 
             # Handle "Turn on Notifications" prompt (click Not Now)
@@ -282,7 +281,7 @@ Write ONLY the tweet text, nothing else."""
                 )
                 not_now_btn.click()
                 time.sleep(2)
-            except:
+            except Exception:
                 pass
 
             if is_story:
@@ -318,7 +317,7 @@ Write ONLY the tweet text, nothing else."""
             self._wait_and_click(By.XPATH, "//button[contains(text(), 'Share')]")
             time.sleep(5)
 
-            logger.info(f"✅ Successfully posted to Instagram!")
+            logger.info("✅ Successfully posted to Instagram!")
             return True
 
         except Exception as e:
@@ -348,7 +347,7 @@ Write ONLY the tweet text, nothing else."""
 
         try:
             self._setup_driver()
-            logger.info(f"📘 Posting to Facebook...")
+            logger.info("📘 Posting to Facebook...")
 
             # Login
             self.driver.get("https://www.facebook.com/login/")
@@ -383,7 +382,7 @@ Write ONLY the tweet text, nothing else."""
             self._wait_and_click(By.XPATH, "//span[contains(text(), 'Post')]")
             time.sleep(5)
 
-            logger.info(f"✅ Successfully posted to Facebook!")
+            logger.info("✅ Successfully posted to Facebook!")
             return True
 
         except Exception as e:
@@ -414,7 +413,7 @@ Write ONLY the tweet text, nothing else."""
         try:
             # Use persistent session to keep login state
             self._setup_driver(use_persistent_session=True)
-            logger.info(f"🐦 Posting to Twitter/X...")
+            logger.info("🐦 Posting to Twitter/X...")
             logger.info(f"   Username: {creds['username']}")
             logger.info(f"   Image: {image_path}")
             logger.info(f"   Caption length: {len(caption)} chars")
@@ -452,7 +451,7 @@ Write ONLY the tweet text, nothing else."""
                             self._wait_and_send_keys(by, selector, creds["username"], timeout=5)
                             username_entered = True
                             break
-                        except:
+                        except Exception:
                             continue
 
                     if not username_entered:
@@ -469,7 +468,7 @@ Write ONLY the tweet text, nothing else."""
                         try:
                             self._wait_and_click(by, selector, timeout=5)
                             break
-                        except:
+                        except Exception:
                             continue
 
                     time.sleep(4)
@@ -531,7 +530,7 @@ Write ONLY the tweet text, nothing else."""
                         try:
                             self._wait_and_click(by, selector, timeout=5)
                             break
-                        except:
+                        except Exception:
                             continue
 
                     time.sleep(8)
@@ -684,7 +683,7 @@ Write ONLY the tweet text, nothing else."""
                 logger.error(f"   Failed to click Post button: {e}")
                 raise
 
-            logger.info(f"✅ Successfully posted to Twitter!")
+            logger.info("✅ Successfully posted to Twitter!")
             return True
 
         except Exception as e:
@@ -694,7 +693,7 @@ Write ONLY the tweet text, nothing else."""
                 screenshot_path = f"/tmp/twitter_error_{int(time.time())}.png"
                 self.driver.save_screenshot(screenshot_path)
                 logger.error(f"   Screenshot saved: {screenshot_path}")
-            except:
+            except Exception:
                 pass
             return False
         finally:
@@ -703,11 +702,11 @@ Write ONLY the tweet text, nothing else."""
 
     def batch_post(
         self,
-        platforms: List[str],
+        platforms: list[str],
         image_path: str,
         caption: str,
-        platform_specific_captions: Optional[Dict[str, str]] = None,
-    ) -> Dict[str, bool]:
+        platform_specific_captions: Optional[dict[str, str]] = None,
+    ) -> dict[str, bool]:
         """
         Post to multiple platforms at once.
 

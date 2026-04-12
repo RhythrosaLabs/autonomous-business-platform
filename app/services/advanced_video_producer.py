@@ -10,12 +10,9 @@ import logging
 import os
 import re
 import tempfile
-from datetime import datetime
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 
 import numpy as np
-import requests
 from moviepy.audio.AudioClip import AudioArrayClip
 from moviepy.editor import (
     AudioFileClip,
@@ -25,19 +22,10 @@ from moviepy.editor import (
     concatenate_videoclips,
 )
 
-from app.services.platform_integrations import tracked_replicate_run
-
 # Import modular functions (Phase 2 optimization)
 from modules import (  # AI Generation; Audio Processing; File Utilities
-    MUSIC_PROMPTS,
-    VOICE_MAP,
-    create_temp_directory,
     download_file,
     generate_background_music,
-    generate_script_with_llama,
-    generate_voiceover_audio,
-    mix_audio_tracks,
-    prepare_background_music,
 )
 
 # Configure logging
@@ -94,7 +82,7 @@ class AdvancedVideoProducer:
         key_benefits: str,
         call_to_action: str,
         duration: int = 20,
-    ) -> Tuple[str, List[str]]:
+    ) -> tuple[str, list[str]]:
         """
         Generate sophisticated ad script following proven commercial structure
         Returns: (full_script_text, script_segments_list)
@@ -151,7 +139,7 @@ Write ONLY the script segments - no additional commentary."""
 
     def generate_educational_script(
         self, topic: str, duration: int = 20, style: str = "Educational"
-    ) -> Tuple[str, List[str]]:
+    ) -> tuple[str, list[str]]:
         """
         Generate educational video script with cohesive narrative structure
         Returns: (full_script_text, script_segments_list)
@@ -204,7 +192,7 @@ Write ONLY the script - no extra commentary."""
 
     def generate_video_segments(
         self,
-        script_segments: List[str],
+        script_segments: list[str],
         video_type: str = "commercial",  # 'commercial' or 'educational'
         product_name: str = "",
         ad_tone: str = "Professional & Trustworthy",
@@ -214,7 +202,7 @@ Write ONLY the script - no extra commentary."""
         motion_level: int = 2,
         aspect_ratio: str = "16:9",
         kling_params: Optional[dict] = None,  # Advanced Kling parameters from UI
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Generate video segments with sophisticated prompting for each segment
         Returns list of video file paths
@@ -232,9 +220,7 @@ Write ONLY the script - no extra commentary."""
             try:
                 # Rate limit: Wait 12 seconds between video requests (Replicate limit: 6/min)
                 if i > 0:
-                    logger.info(
-                        f"   ⏱️ Rate limit cooldown: Waiting 12 seconds before next video..."
-                    )
+                    logger.info("   ⏱️ Rate limit cooldown: Waiting 12 seconds before next video...")
                     import time
 
                     time.sleep(12)
@@ -345,7 +331,7 @@ Write ONLY the script - no extra commentary."""
                     try:
                         # Use replicate.run() with file object (Replicate handles upload automatically)
                         logger.info(
-                            f"   🎬 Converting lifestyle mockup to video with cinematic motion..."
+                            "   🎬 Converting lifestyle mockup to video with cinematic motion..."
                         )
 
                         import replicate
@@ -370,7 +356,7 @@ Write ONLY the script - no extra commentary."""
                             if kling_params.get("negative_prompt"):
                                 input_data["negative_prompt"] = kling_params["negative_prompt"]
 
-                            logger.info(f"   🎥 Calling Kling with mockup as 'image' parameter...")
+                            logger.info("   🎥 Calling Kling with mockup as 'image' parameter...")
                             logger.info(
                                 f"   Advanced Kling params: cfg_scale={input_data.get('cfg_scale')}, duration={input_data.get('duration')}s"
                             )
@@ -384,12 +370,12 @@ Write ONLY the script - no extra commentary."""
                         else:
                             raise Exception(f"Unexpected output format: {type(output)}")
 
-                        logger.info(f"   ✅ Image-to-video complete using ACTUAL product mockup")
+                        logger.info("   ✅ Image-to-video complete using ACTUAL product mockup")
 
                     except Exception as e:
                         logger.error(f"   ❌ Image-to-video FAILED: {e}")
                         logger.info(
-                            f"   ⚠️ Falling back to text-to-video (WARNING: will not show actual product!)"
+                            "   ⚠️ Falling back to text-to-video (WARNING: will not show actual product!)"
                         )
                         # Fall back to text-to-video if image-to-video fails
                         video_uri = self.replicate_api.generate_video(
@@ -436,7 +422,7 @@ Write ONLY the script - no extra commentary."""
                 # Clean up original
                 try:
                     os.remove(video_path)
-                except:
+                except Exception:
                     pass
 
                 video_paths.append(processed_path)
@@ -450,7 +436,7 @@ Write ONLY the script - no extra commentary."""
 
     def generate_voiceover(
         self,
-        script_segments: List[str],
+        script_segments: list[str],
         ad_tone: str = "Professional & Trustworthy",
         voice_name: Optional[str] = None,
         voice_params: Optional[dict] = None,
@@ -569,7 +555,7 @@ Write ONLY the script - no extra commentary."""
 
     def assemble_final_video(
         self,
-        video_paths: List[str],
+        video_paths: list[str],
         voice_path: str,
         music_path: str,
         target_duration: float = 20.0,
@@ -742,12 +728,12 @@ Write ONLY the script - no extra commentary."""
                 music_clip.close()
                 for clip in clips:
                     clip.close()
-            except:
+            except Exception:
                 pass
 
             if encoding_success:
                 file_size_mb = os.path.getsize(output_path) / (1024 * 1024)
-                logger.info(f"✅ Video assembly complete! Final video ready.")
+                logger.info("✅ Video assembly complete! Final video ready.")
                 logger.info(f"   📦 Output: {output_path}")
                 logger.info(f"   💾 File size: {file_size_mb:.2f} MB")
                 return output_path
@@ -768,7 +754,7 @@ Write ONLY the script - no extra commentary."""
         duration: int = 20,
         run_folder: Optional[str] = None,
         voice_params: Optional[dict] = None,
-    ) -> Tuple[str, List[str], str]:
+    ) -> tuple[str, list[str], str]:
         """
         Complete end-to-end product ad creation pipeline
         Returns: (script_path, video_segment_paths, final_video_path)

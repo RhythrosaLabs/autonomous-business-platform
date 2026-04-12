@@ -18,12 +18,10 @@ import logging
 import os
 import pickle
 import smtplib
-from datetime import datetime
-from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Optional
 
 import requests
 
@@ -118,7 +116,6 @@ class EmailMarketingService:
             return self.gmail_service
 
         try:
-            from google.oauth2.credentials import Credentials
             from googleapiclient.discovery import build
 
             token_path = Path(__file__).parent / "token.pickle"
@@ -290,7 +287,7 @@ class EmailMarketingService:
         target_audience: str = "general consumers",
         special_offer: str = "",
         tone: str = "professional and friendly",
-    ) -> Dict[str, str]:
+    ) -> dict[str, str]:
         """
         Generate AI-powered email content.
         """
@@ -328,7 +325,7 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                 import json
 
                 content = json.loads(response)
-            except:
+            except Exception:
                 content = {
                     "subject": f"Introducing {product_name}!",
                     "preview_text": product_description[:100],
@@ -435,13 +432,13 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
             color-scheme: light dark;
             supported-color-schemes: light dark;
         }}
-        
+
         * {{
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }}
-        
+
         body {{
             margin: 0;
             padding: 0;
@@ -451,7 +448,7 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
             background-color: #f3f4f6;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
         }}
-        
+
         @media only screen and (max-width: 600px) {{
             .container {{
                 width: 100% !important;
@@ -470,7 +467,7 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                 margin: 0 16px !important;
             }}
         }}
-        
+
         @media (prefers-color-scheme: dark) {{
             .dark-mode-bg {{
                 background-color: #1f2937 !important;
@@ -479,7 +476,7 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                 color: #f9fafb !important;
             }}
         }}
-        
+
         .hover-grow:hover {{
             transform: scale(1.02);
         }}
@@ -491,15 +488,15 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
         {preview_text}
         &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
     </div>
-    
+
     <!-- Email wrapper -->
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6;">
         <tr>
             <td align="center" style="padding: 40px 16px;">
-                
+
                 <!-- Main container -->
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0" class="container" style="max-width: 600px; width: 100%; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
-                    
+
                     <!-- Gradient Header -->
                     <tr>
                         <td style="background: linear-gradient(135deg, {brand_color} 0%, #8b5cf6 50%, #ec4899 100%); padding: 32px 24px; text-align: center;">
@@ -520,40 +517,40 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                             </table>
                         </td>
                     </tr>
-                    
+
                     <!-- Hero Product Image -->
                     {hero_image_html}
-                    
+
                     <!-- Product Card (overlapping image) -->
                     <tr>
                         <td style="padding: 0 24px;">
                             <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="product-card" style="background: #ffffff; border-radius: 16px; margin-top: {margin_top}; position: relative; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.15);">
                                 <tr>
                                     <td class="content-padding" style="padding: 40px 32px;">
-                                        
+
                                         <!-- Badge -->
                                         <div style="text-align: center; margin-bottom: 20px;">
                                             <span style="display: inline-block; background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px;">🔥 Limited Edition</span>
                                         </div>
-                                        
+
                                         <!-- Headline -->
                                         <h1 class="headline" style="font-size: 32px; font-weight: 800; color: #1f2937; text-align: center; margin: 0 0 8px 0; line-height: 1.2; letter-spacing: -0.5px;">
                                             {headline}
                                         </h1>
-                                        
+
                                         <!-- Subheadline -->
                                         <p style="font-size: 18px; color: #6b7280; text-align: center; margin: 0 0 24px 0; font-weight: 500;">
                                             {product_name}
                                         </p>
-                                        
+
                                         <!-- Divider -->
                                         <div style="width: 60px; height: 4px; background: linear-gradient(90deg, {brand_color}, #ec4899); margin: 0 auto 24px auto; border-radius: 2px;"></div>
-                                        
+
                                         <!-- Body Content -->
                                         <div style="margin-bottom: 32px;">
                                             {body_html}
                                         </div>
-                                        
+
                                         <!-- Features Grid -->
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin-bottom: 32px;">
                                             <tr>
@@ -571,9 +568,9 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                                                 </td>
                                             </tr>
                                         </table>
-                                        
+
                                         {price_html}
-                                        
+
                                         <!-- CTA Button -->
                                         <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                                             <tr>
@@ -584,7 +581,7 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                                                 </td>
                                             </tr>
                                         </table>
-                                        
+
                                         <!-- Trust badges -->
                                         <div style="text-align: center; margin-top: 24px; padding-top: 24px; border-top: 1px solid #e5e7eb;">
                                             <span style="font-size: 13px; color: #9ca3af;">🔒 Secure Checkout</span>
@@ -593,13 +590,13 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                                             <span style="margin: 0 12px; color: #e5e7eb;">|</span>
                                             <span style="font-size: 13px; color: #9ca3af;">💬 24/7 Support</span>
                                         </div>
-                                        
+
                                     </td>
                                 </tr>
                             </table>
                         </td>
                     </tr>
-                    
+
                     <!-- Social Links -->
                     <tr>
                         <td style="padding: 32px 24px; text-align: center;">
@@ -622,46 +619,46 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
                             </table>
                         </td>
                     </tr>
-                    
+
                     <!-- Footer -->
                     <tr>
                         <td style="background: #1f2937; padding: 40px 32px; text-align: center;">
                             <p style="font-size: 20px; font-weight: 700; color: #ffffff; margin-bottom: 8px;">{self.from_name}</p>
                             <p style="font-size: 14px; color: #9ca3af; margin-bottom: 24px;">Premium products, exceptional quality</p>
-                            
+
                             <div style="margin-bottom: 24px;">
                                 <a href="{cta_link}" style="color: #a5b4fc; text-decoration: none; font-size: 13px; margin: 0 12px;">Shop</a>
                                 <a href="{cta_link}" style="color: #a5b4fc; text-decoration: none; font-size: 13px; margin: 0 12px;">About</a>
                                 <a href="{cta_link}" style="color: #a5b4fc; text-decoration: none; font-size: 13px; margin: 0 12px;">Contact</a>
                                 <a href="{cta_link}" style="color: #a5b4fc; text-decoration: none; font-size: 13px; margin: 0 12px;">FAQ</a>
                             </div>
-                            
+
                             <p style="font-size: 12px; color: #6b7280; margin-bottom: 16px;">
                                 © {current_year} {self.from_name}. All rights reserved.
                             </p>
-                            
+
                             <p style="font-size: 11px; color: #4b5563;">
                                 You're receiving this because you subscribed to our newsletter.<br>
-                                <a href="#" style="color: #9ca3af; text-decoration: underline;">Unsubscribe</a> · 
+                                <a href="#" style="color: #9ca3af; text-decoration: underline;">Unsubscribe</a> ·
                                 <a href="#" style="color: #9ca3af; text-decoration: underline;">Update preferences</a>
                             </p>
                         </td>
                     </tr>
-                    
+
                 </table>
-                
+
             </td>
         </tr>
     </table>
-    
+
 </body>
 </html>
 """
         return html
 
     def send_batch_emails(
-        self, recipients: List[str], subject: str, html_content: str, delay_seconds: float = 1.0
-    ) -> Dict[str, int]:
+        self, recipients: list[str], subject: str, html_content: str, delay_seconds: float = 1.0
+    ) -> dict[str, int]:
         """Send emails to multiple recipients."""
         import time
 
@@ -691,12 +688,12 @@ Format as JSON with keys: subject, preview_text, headline, body, cta"""
         template_type: str,
         product_name: str,
         product_description: str,
-        recipients: List[str],
+        recipients: list[str],
         cta_link: str,
         product_image_url: Optional[str] = None,
         special_offer: str = "",
         target_audience: str = "general consumers",
-    ) -> Dict:
+    ) -> dict:
         """Complete workflow: Generate AI content and send email campaign."""
 
         # Sanitize inputs - handle None values

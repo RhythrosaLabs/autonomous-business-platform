@@ -4,7 +4,7 @@ import re
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Optional
 
 
 def is_streamlit_cloud():
@@ -293,7 +293,7 @@ def _send_design_to_printify(
                     f"Unique {product_type.lower()} featuring our {prompt.split(',')[0].strip().lower()} design.",
                 )
             )
-        except:
+        except Exception:
             description = strip_markdown(
                 f"Unique {product_type.lower()} featuring our {prompt.split(',')[0].strip().lower()} design. Made with care."
             )
@@ -362,7 +362,7 @@ def _send_design_to_printify(
     return record
 
 
-def _ensure_printify_config_defaults(config_key: str) -> Dict[str, Any]:
+def _ensure_printify_config_defaults(config_key: str) -> dict[str, Any]:
     defaults = {
         "search_query": "poster",  # Default to poster products
         "blueprint_id": None,
@@ -381,7 +381,7 @@ def _ensure_printify_config_defaults(config_key: str) -> Dict[str, Any]:
         "custom_title": "",
         "custom_description": "",
     }
-    config: Dict[str, Any] = st.session_state.setdefault(config_key, {})
+    config: dict[str, Any] = st.session_state.setdefault(config_key, {})
     for key, value in defaults.items():
         config.setdefault(key, value if not isinstance(value, list) else list(value))
     return config
@@ -392,7 +392,7 @@ def _render_printify_product_config(
     config_key: str = "product_studio_printify_config",
     allow_auto_toggle: bool = True,
     instructions: Optional[str] = None,
-) -> Tuple[Dict[str, Any], bool, Any]:
+) -> tuple[dict[str, Any], bool, Any]:
     config = _ensure_printify_config_defaults(config_key)
     widget_prefix = re.sub(r"\W+", "_", config_key.lower())
     printify_api_client = _get_printify_api()
@@ -586,7 +586,7 @@ def _render_printify_product_config(
             suggested_price, price_rationale = calculate_smart_price(product_type, is_digital=False)
             st.caption(f"💡 Suggested price for {product_type}: ${suggested_price:.2f}")
             default_price = suggested_price
-        except:
+        except Exception:
             default_price = 25.0
     else:
         default_price = current_price if current_price > 0 else 25.0
@@ -658,7 +658,7 @@ def _render_printify_product_config(
     return config, _printify_selection_ready(config), printify_api_client
 
 
-def _resolve_campaign_printify_config() -> Optional[Dict[str, Any]]:
+def _resolve_campaign_printify_config() -> Optional[dict[str, Any]]:
     candidates = [
         st.session_state.get("campaign_printify_config"),
         st.session_state.get("product_studio_printify_config"),
@@ -669,7 +669,7 @@ def _resolve_campaign_printify_config() -> Optional[Dict[str, Any]]:
     return None
 
 
-def _build_default_printify_config(product_type: str = "poster") -> Optional[Dict[str, Any]]:
+def _build_default_printify_config(product_type: str = "poster") -> Optional[dict[str, Any]]:
     api = _get_printify_api()
     if not api:
         return None
@@ -708,11 +708,7 @@ def _slugify(value: Optional[str], max_length: int = 80) -> str:
 
 def _get_replicate_token() -> str:
     token = get_api_key("REPLICATE_API_TOKEN", "Replicate API Token")
-    if not token:
-        raise ValueError(
-            "Add your REPLICATE_API_TOKEN in the Settings panel to enable AI generation."
-        )
-    return token
+    return token or ""
 
 
 def _get_cached_replicate_client(token: str, model_name: str):
@@ -738,7 +734,7 @@ def create_campaign_directory(concept: str) -> Path:
     return base_dir
 
 
-def save_campaign_metadata(campaign_dir: Path, metadata: Dict[str, Any]) -> Path:
+def save_campaign_metadata(campaign_dir: Path, metadata: dict[str, Any]) -> Path:
     metadata_path = Path(campaign_dir) / "campaign_metadata.json"
     metadata_path.write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     return metadata_path
