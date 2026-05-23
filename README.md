@@ -337,7 +337,7 @@ Your hyperintelligent multi-agent AI powered by Claude Sonnet 3.5/4:
 └──────────────────────┬──────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────┐
-│          FastAPI Backend (Port 8000)                 │
+│          FastAPI Backend (Port 8601)                 │
 │  • REST API endpoints                               │
 │  • WebSocket support                                │
 │  • Job queue management                             │
@@ -428,7 +428,7 @@ cd scripts
 
 Access:
 - 🎨 **Frontend**: http://localhost:8501
-- 🔧 **API**: http://localhost:8000/docs
+- 🔧 **API**: http://localhost:8601/docs
 - 📊 **Ray Dashboard**: http://localhost:8265
 
 ---
@@ -449,7 +449,7 @@ docker compose down
 ```
 
 **Services Started**:
-- Backend (FastAPI) on port 8000
+- Backend (FastAPI) on port 8601
 - Frontend (Streamlit) on port 8501
 - Ray Dashboard on port 8265
 
@@ -460,9 +460,9 @@ docker compose down
 docker build -t abp .
 
 # Run backend
-docker run -d -p 8000:8000 -p 8265:8265 \
+docker run -d -p 8601:8601 -p 8265:8265 \
   --env-file .env abp \
-  python -m uvicorn fastapi_backend:app --host 0.0.0.0 --port 8000
+  python -m uvicorn fastapi_backend:app --host 0.0.0.0 --port 8601
 
 # Run frontend
 docker run -d -p 8501:8501 --env-file .env abp
@@ -669,7 +669,7 @@ This platform has been audited and hardened against common security risks:
    - **Streamlit Secrets** → Owner-only secrets in Streamlit Cloud dashboard
    - **Local .env** → Local environment file (never committed to repo)
 
-3. **No Hardcoded Keys**: 
+3. **No Hardcoded Keys**:
    - ✅ No API keys are hardcoded in the source code
    - ✅ No keys are committed to the repository
    - ✅ `.env` files are in `.gitignore`
@@ -734,5 +734,3 @@ MIT License - see [LICENSE](LICENSE) file
 **⭐ Star this repo if you find it useful!**
 
 **Made with ❤️ by Dan Sheils**
-
-
