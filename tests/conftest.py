@@ -41,19 +41,20 @@ def test_env():
 @pytest.fixture
 def mock_settings():
     """Provide mock settings for testing."""
-    from app.config.settings import Settings
+    from app.config.settings import AppSettings, ServerSettings, Settings
 
     return Settings(
-        server={"backend_port": 8601, "frontend_port": 8501},
-        app={"enable_analytics": False},
+        server=ServerSettings(backend_port=8601, frontend_port=8501),
+        app=AppSettings(enable_analytics=False),
     )
 
 
 @pytest.fixture
 def mock_session_manager():
     """Provide mock session manager for testing."""
-    from app.services.unified_session_manager import UnifiedSessionManager
     import tempfile
+
+    from app.services.unified_session_manager import UnifiedSessionManager
 
     # Create temporary session directory
     with tempfile.TemporaryDirectory() as tmpdir:
