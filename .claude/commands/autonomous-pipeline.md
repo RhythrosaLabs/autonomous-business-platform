@@ -1,6 +1,6 @@
 # autonomous-pipeline
 
-Fully autonomous end-to-end campaign pipeline. One command delivers every asset: strategy brief, image prompt (+ real image if Replicate key is present), product copy, video script (+ video spec), social posts, email campaign, hashtags, and a publish checklist — all saved to a file.
+Fully autonomous end-to-end campaign pipeline. One command delivers every asset: strategy brief, image (generated via Replicate when key is set), product copy, video script + spec, social posts, email campaign, hashtags, a Printify product, a Shopify product draft, a Shopify blog draft, and a publish checklist — all saved to a file.
 
 **NON-NEGOTIABLE RULES:**
 - Never pause, ask questions, or wait for approval.
@@ -17,22 +17,27 @@ If no concept is given, invent one and proceed.
 
 ---
 
-## PHASE 0 — Parse & API check
+## PHASE 0 — Parse & platform check
 
 Parse `$ARGUMENTS`: extract **concept** (text before first `--`), `--workflow` override, `--brand` name.
 
-Run this silently:
+Run platform check:
 ```bash
-python scripts/pipeline_runner.py --step check
+python scripts/pipeline_runner.py --step check-platforms
 ```
 
-Store the result:
-- `API_KEY_PRESENT` → set `has_api=true`. Real images and video specs will be generated via Replicate.
-- `NO_API_KEY` → set `has_api=false`. Write production-ready prompts as the deliverable instead.
+Parse the `PLATFORM_STATUS:{...}` JSON line. Store:
+- `has_replicate` — Replicate key present (real image/video generation)
+- `has_printify`  — Printify key present (auto-create print product)
+- `has_shopify`   — Shopify key + URL present (auto-create product listing + blog draft)
 
 If `--brand` given, read `brand_templates.json`, find the matching template (case-insensitive on `name`), extract: `voice`, `content_tone`, `image_style`, `colors.primary`, `colors.secondary`, `cta_text`, `hashtags`. If not found, continue without brand context.
 
-Print: `🚀 Pipeline starting: "<concept>" | API: <yes/no> | Brand: <name or none>`
+Print one status line:
+```
+🚀 Pipeline starting: "<concept>"
+   Replicate: <yes/no>  |  Printify: <yes/no>  |  Shopify: <yes/no>  |  Brand: <name or none>
+```
 
 ---
 
@@ -108,7 +113,7 @@ Prompt:   [3–5 sentence detailed prompt]
 Negative: blurry, watermark, text overlay, cluttered background, low quality
 ```
 
-**If `has_api=true`**, immediately run:
+**If `has_replicate=true`**, immediately run:
 ```bash
 python scripts/pipeline_runner.py --step image \
   --prompt "<the exact prompt above>" \
@@ -116,7 +121,7 @@ python scripts/pipeline_runner.py --step image \
 ```
 Print the returned `IMAGE_URL:…` or `IMAGE_FILE:…` line as the image result.
 
-**If `has_api=false`**, the prompt block above is the deliverable. Note: "Ready to submit to Replicate when API key is configured."
+**If `has_replicate=false`**, the prompt block above is the deliverable. Note: "Ready to submit to Replicate when API key is configured."
 
 Save image URL/path to context as `image_url`.
 
@@ -200,7 +205,7 @@ Duration:       5 seconds
 Motion level:   3/5
 ```
 
-**If `has_api=true`** and `image_url` is in context, run:
+**If `has_replicate=true`** and `image_url` is in context, run:
 ```bash
 python scripts/pipeline_runner.py --step video \
   --prompt "<video prompt above>" \
@@ -209,7 +214,7 @@ python scripts/pipeline_runner.py --step video \
 ```
 Print the returned `VIDEO_URL:…` as the video result.
 
-**If `has_api=false`** or no `image_url`, the spec above is the deliverable.
+**If `has_replicate=false`** or no `image_url`, the spec above is the deliverable.
 
 ---
 
@@ -221,7 +226,78 @@ Write a complete HTML email. Output subject line and preview text above the code
 
 ---
 
-## PHASE 5 — Save to file
+## PHASE 5 — Printify product (if `has_printify=true`)
+
+Only run if `has_printify=true`. Otherwise print `⬜ Printify: skipped (no API key)` and continue.
+
+Save the product description to a temp file first, then run:
+```bash
+# Write description to temp file
+# Then:
+python scripts/pipeline_runner.py --step printify \
+  --image-url "<image_url from context>" \
+  --concept "<concept>" \
+  --title "<product title derived from concept>" \
+  --description-file "/tmp/pipeline_description.txt" \
+  --tags "<comma-separated tags from context>" \
+  --price-cents 2499 \
+  --publish-live
+```
+
+Parse the output:
+- `PRINTIFY_PRODUCT_ID:xxx` → store as `printify_product_id`
+- `PRINTIFY_PUBLISHED:true/false` → store as `printify_published`
+- Any `PRINTIFY_ERROR:…` → print the error, continue pipeline
+
+Print: `✅ Printify product created: ID <id> | Published: <yes/no>`
+
+The product type (poster, canvas, t-shirt, etc.) is auto-detected from the concept keywords by the runner — no manual selection needed.
+
+---
+
+## PHASE 6 — Shopify product + blog draft (if `has_shopify=true`)
+
+Only run if `has_shopify=true`. Otherwise print `⬜ Shopify: skipped (no API key / URL)` and continue.
+
+### 6a — Product listing (draft)
+
+Write the product description as HTML to a temp file, then:
+```bash
+python scripts/pipeline_runner.py --step shopify-product \
+  --title "<product title>" \
+  --description-file "/tmp/pipeline_description.html" \
+  --image-url "<image_url from context>" \
+  --tags "<comma-separated tags>"
+```
+
+Parse output:
+- `SHOPIFY_PRODUCT_ID:xxx` → store as `shopify_product_id`
+- `SHOPIFY_PRODUCT_URL:xxx` → store as `shopify_product_url`
+
+Print: `✅ Shopify product draft: <shopify_product_url>`
+
+### 6b — Blog post (draft)
+
+Convert `full_content` markdown to basic HTML (wrap paragraphs in `<p>`, headings in `<h2>`/`<h3>`). Write to temp file, then:
+```bash
+python scripts/pipeline_runner.py --step shopify-blog \
+  --title "<blog post title derived from concept>" \
+  --description-file "/tmp/pipeline_blog.html" \
+  --image-url "<image_url from context>" \
+  --tags "<comma-separated tags>"
+```
+Note: `--published` flag is NOT passed — all blog posts save as drafts for review.
+
+Parse output:
+- `SHOPIFY_BLOG_ID:xxx` → store as `shopify_blog_id`
+- `SHOPIFY_BLOG_URL:xxx` → store as `shopify_blog_url`
+- `SHOPIFY_BLOG_STATUS:draft` → confirm draft status
+
+Print: `✅ Shopify blog draft saved: <shopify_blog_url>`
+
+---
+
+## PHASE 7 — Save to file
 
 1. Build filename: lowercase concept, first 40 chars, spaces→underscores, strip special chars, append `_YYYYMMDD`. Example: `cyberpunk_neon_husky_with_glowing_eyes_20260527.md`
 2. Use the Write tool to create `data/pipeline_runs/<filename>` containing every generated asset with `##` headings.
@@ -229,47 +305,55 @@ Write a complete HTML email. Output subject line and preview text above the code
 
 ---
 
-## PHASE 6 — Summary & publish checklist
+## PHASE 8 — Summary & publish checklist
+
+Print the campaign summary using real values from context:
 
 ```
 ## Campaign Complete
 Concept:   <concept>
 Workflow:  <type>
 Brand:     <name or none>
-API:       <real assets generated / prompts only>
 Output:    data/pipeline_runs/<filename>
 
 Assets produced:
 ✅ Strategy Brief
-✅/⬜ Design image (generated / prompt ready)
-✅/⬜ Product description
-✅/⬜ Video script
-✅/⬜ Video (generated / spec ready)
-✅/⬜ Social posts (Twitter · Instagram · Facebook)
-✅/⬜ Marketing copy
-✅/⬜ Tags
-✅/⬜ Email campaign
-✅/⬜ Hashtags
+✅/⬜ Design image          — generated via Replicate / prompt ready
+✅/⬜ Product description   — written
+✅/⬜ Video script          — written
+✅/⬜ Video                 — generated / spec ready
+✅/⬜ Social posts          — Twitter · Instagram · Facebook
+✅/⬜ Marketing copy        — headline + bullets + CTA
+✅/⬜ Tags                  — 10 product tags
+✅/⬜ Email campaign        — full HTML ready
+✅/⬜ Hashtags              — 15 tags (3 tiers)
+✅/⬜ Printify product      — ID: <printify_product_id or "skipped">
+✅/⬜ Shopify product draft — <shopify_product_url or "skipped">
+✅/⬜ Shopify blog draft    — <shopify_blog_url or "skipped">
 ```
 
-Then print the full publish checklist:
+Then print the publish checklist. Tick off items that were already completed automatically:
 
 ```markdown
 ## Publish Checklist
 
-### Now
-- [ ] Printify/Printful — submit Image Generation Prompt → generate mockup → upload to store
-- [ ] Twitter/X — post the Twitter entry from Social Posts
+### Done automatically ✅ (if keys were configured)
+- [x/] Printify product — created and published to Shopify store
+- [x/] Shopify product listing — created as draft (review in Shopify Admin → Products)
+- [x/] Shopify blog post — saved as draft (review in Shopify Admin → Blog Posts → publish when ready)
+
+### Post now
+- [ ] Twitter/X — copy the Twitter post from Social Posts
 - [ ] Instagram — post with mockup image + caption from Social Posts
 
 ### Within 24 hours
-- [ ] Shopify Product — product description + tags → new product listing
 - [ ] Facebook — schedule the Facebook post
 - [ ] Email — paste HTML email into Klaviyo/Shopify Email → send to list
+- [ ] Activate Shopify product draft (Admin → Products → set to Active)
 
 ### Within 48 hours
 - [ ] YouTube — generate video using Video Generation Spec → upload, use thumbnail prompt
-- [ ] Blog — paste full article into Shopify Blog → publish
+- [ ] Publish Shopify blog draft when ready (Admin → Blog Posts)
 - [ ] Pinterest — use social image prompt → pin linking to product
 
 ### Ongoing
