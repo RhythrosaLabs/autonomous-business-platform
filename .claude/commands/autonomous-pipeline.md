@@ -1,3 +1,8 @@
+---
+name: autonomous-pipeline
+description: Fully autonomous end-to-end business campaign pipeline. Generates strategy brief, product design prompt, copy, video script, social posts, email campaign, hashtags, and publishes to Printify and Shopify automatically when API keys are configured.
+---
+
 # autonomous-pipeline
 
 Fully autonomous end-to-end campaign pipeline. One command delivers every asset: strategy brief, image (generated via Replicate when key is set), product copy, video script + spec, social posts, email campaign, hashtags, a Printify product, a Shopify product draft, a Shopify blog draft, and a publish checklist — all saved to a file.
